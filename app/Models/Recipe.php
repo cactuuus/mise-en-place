@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Recipe extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'title',
@@ -28,12 +29,12 @@ class Recipe extends Model
     ];
 
     protected $casts = [
-        'ingredients' => 'array',
-        'instructions' => 'array',
-        'is_public' => 'boolean',
-        'prep_time' => 'integer',
-        'cook_time' => 'integer',
-        'serves' => 'integer',
+        'ingredients'      => 'array',
+        'instructions'     => 'array',
+        'is_public'        => 'boolean',
+        'prep_time'        => 'integer',
+        'cook_time'        => 'integer',
+        'serves'           => 'integer',
         'difficulty_level' => Difficulty::class,
     ];
 
@@ -52,14 +53,14 @@ class Recipe extends Model
         return $this->hasMany(Recipe::class, 'forked_from_recipe_id');
     }
 
-    public function ratings(): HasMany
-    {
-        return $this->hasMany(RecipeRating::class);
-    }
-
     public function averageRating(): float
     {
         return $this->ratings()->avg('rating') ?? 0;
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(RecipeRating::class);
     }
 
     public function totalRatings(): int
@@ -74,11 +75,23 @@ class Recipe extends Model
 
     public function isExternalBookmark(): bool
     {
-        return !is_null($this->source_url);
+        return ! is_null($this->source_url);
     }
 
     public function isFork(): bool
     {
-        return !is_null($this->forked_from_recipe_id);
+        return ! is_null($this->forked_from_recipe_id);
+    }
+
+    public function fork(int $userId, ?string $customTitle = null): self
+    {
+        $forkedRecipe                        = $this->replicate();
+        $forkedRecipe->user_id               = $userId;
+        $forkedRecipe->forked_from_recipe_id = $this->id;
+        $forkedRecipe->title                 = $customTitle ?? "Fork of $this->title";
+        $forkedRecipe->is_public             = false; // Forked recipes start as private
+        $forkedRecipe->save();
+
+        return $forkedRecipe;
     }
 }

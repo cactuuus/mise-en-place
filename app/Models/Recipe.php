@@ -94,4 +94,17 @@ class Recipe extends Model
 
         return $forkedRecipe;
     }
+
+    public function rate(int $userId, int $rating): RecipeRating
+    {
+        return $this->ratings()->updateOrCreate(
+            ['user_id' => $userId],
+            ['rating' => $rating],
+        );
+    }
+
+    public function getUserRating(int $userId): ?int
+    {
+        return $this->ratings()->where('user_id', $userId)->first()?->rating;
+    }
 }

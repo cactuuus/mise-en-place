@@ -11,6 +11,7 @@
         "filament/filament": "^3.3",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "mokhosh/filament-rating": "^1.4",
         "secondnetwork/blade-tabler-icons": "^3.34"
     },
     "require-dev": {

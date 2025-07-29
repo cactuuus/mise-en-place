@@ -13,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Mokhosh\FilamentRating\Columns\RatingColumn;
+use Mokhosh\FilamentRating\Entries\RatingEntry;
 
 class BrowseRecipeResource extends Resource
 {
@@ -119,13 +121,12 @@ class BrowseRecipeResource extends Resource
                             ->icon('tabler-git-fork')
                             ->visible(fn($record) => $record->parentRecipe),
 
-                        Infolists\Components\TextEntry::make('average_rating')
+                        RatingEntry::make('average_rating')
                             ->label('Average Rating')
-                            ->state(fn($record,
-                            )
-                                => $record->averageRating() > 0 ? number_format($record->averageRating(),
-                                    1).'/5 stars ('.$record->totalRatings().' ratings)' : 'No ratings yet')
-                            ->icon('tabler-star'),
+                            ->state(fn($record) => $record->averageRating())
+                            ->stars(5)
+                            ->color('warning')
+                            ->helperText(fn($record) => $record->totalRatings() . ' ratings'),
                     ])
                     ->collapsed()
                     ->collapsible(),
@@ -184,10 +185,11 @@ class BrowseRecipeResource extends Resource
                         => $state?->color() ?? 'gray',
                     ),
 
-                Tables\Columns\TextColumn::make('ratings_avg_rating')
+                RatingColumn::make('ratings_avg_rating')
                     ->label('Rating')
                     ->avg('ratings', 'rating')
-                    ->formatStateUsing(fn($state) => $state ? number_format($state, 1).'/5' : 'No ratings')
+                    ->stars(5)
+                    ->color('warning')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Helpers\ErrorMessages;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -63,7 +64,7 @@ class ViewUser extends ViewRecord
                 ->failureNotification(
                     Notification::make()
                         ->danger()
-                        ->title('Ouchie boo boo!')
+                        ->title(ErrorMessages::random())
                         ->body('Something went wrong, please try again later or submit a bug report.'),
                 ),
         ];

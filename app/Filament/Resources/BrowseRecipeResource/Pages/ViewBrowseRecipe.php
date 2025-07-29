@@ -4,6 +4,7 @@ namespace App\Filament\Resources\BrowseRecipeResource\Pages;
 
 use App\Filament\Resources\BrowseRecipeResource;
 use App\Filament\Resources\MyRecipeResource;
+use App\Helpers\ErrorMessages;
 use App\Models\Recipe;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -66,7 +67,7 @@ class ViewBrowseRecipe extends ViewRecord
                 ->failureNotification(
                     Notification::make()
                         ->danger()
-                        ->title('Oopsie daisy!')
+                        ->title(ErrorMessages::random())
                         ->body('Something went wrong, your rating was not saved. Please try again later or submit a bug report.'),
                 )
                 ->visible(fn() => Auth::check()),

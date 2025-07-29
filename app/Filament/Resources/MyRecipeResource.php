@@ -15,7 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
-class MyRecipesResource extends Resource
+class MyRecipeResource extends Resource
 {
     protected static ?string $model = Recipe::class;
     protected static ?string $navigationIcon = 'tabler-chef-hat';

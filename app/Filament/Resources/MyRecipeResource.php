@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Auth;
 class MyRecipeResource extends Resource
 {
     protected static ?string $model = Recipe::class;
-    protected static ?string $navigationIcon = 'tabler-chef-hat';
-    protected static ?string $navigationLabel = 'My Cookbook';
+    protected static ?string $navigationIcon = 'tabler-soup';
+    protected static ?string $navigationLabel = 'My Recipes';
     protected static ?string $modelLabel = 'Recipe';
 
     public static function form(Form $form): Form

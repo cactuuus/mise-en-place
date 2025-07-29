@@ -16,10 +16,10 @@ use Illuminate\Database\Eloquent\Builder;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'tabler-users';
-    protected static ?string $navigationLabel = 'Users';
-    protected static ?string $modelLabel = 'User';
-    protected static ?string $pluralModelLabel = 'Users';
+    protected static ?string $navigationIcon = 'tabler-chef-hat';
+    protected static ?string $navigationLabel = 'Cooks';
+    protected static ?string $modelLabel = 'Cook';
+    protected static ?string $pluralModelLabel = 'Cooks';
 
     public static function form(Form $form): Form
     {

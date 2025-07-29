@@ -31,6 +31,7 @@ class AppPanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->spa()
+            ->topNavigation()
             ->colors([
                 'primary' => Color::Amber,
             ])

@@ -20,9 +20,8 @@ class BrowseRecipeResource extends Resource
 {
     protected static ?string $model = Recipe::class;
     protected static ?string $navigationIcon = 'tabler-world';
-    protected static ?string $navigationLabel = 'Browse Recipes';
+    protected static ?string $navigationLabel = 'Explore';
     protected static ?string $modelLabel = 'Recipe';
-    protected static ?string $pluralModelLabel = 'Browse Recipes';
 
     public static function form(Form $form): Form
     {
@@ -126,7 +125,7 @@ class BrowseRecipeResource extends Resource
                             ->state(fn($record) => $record->averageRating())
                             ->stars(5)
                             ->color('warning')
-                            ->helperText(fn($record) => $record->totalRatings() . ' ratings'),
+                            ->helperText(fn($record) => $record->totalRatings().' ratings'),
                     ])
                     ->collapsed()
                     ->collapsible(),

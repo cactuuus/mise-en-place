@@ -40,6 +40,15 @@ class Recipe extends Model
 
     protected static function booted(): void
     {
+        static::updating(function ($recipe) {
+            if ($recipe->isDirty('image_path')) {
+                $originalImagePath = $recipe->getOriginal('image_path');
+                if ($originalImagePath) {
+                    Storage::delete($originalImagePath);
+                }
+            }
+        });
+
         static::deleting(function ($recipe) {
             if ($recipe->image_path) {
                 Storage::delete($recipe->image_path);

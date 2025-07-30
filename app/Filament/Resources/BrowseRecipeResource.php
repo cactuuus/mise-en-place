@@ -37,7 +37,6 @@ class BrowseRecipeResource extends Resource
                     ->schema([
                         Infolists\Components\ImageEntry::make('image_path')
                             ->size(200)
-                            ->disk('r2')
                             ->visibility('private')
                             ->columnSpanFull(),
 
@@ -156,7 +155,6 @@ class BrowseRecipeResource extends Resource
                 Tables\Columns\ImageColumn::make('image_path')
                     ->square()
                     ->size(60)
-                    ->disk('r2')
                     ->visibility('private'),
 
                 Tables\Columns\TextColumn::make('title')

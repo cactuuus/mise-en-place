@@ -7,11 +7,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Recipe extends Model
+class Recipe extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
+
+    private static array $IMAGE_SIZES = [
+        'sm' => 150,
+        'lg' => 800,
+    ];
 
     protected $fillable = [
         'user_id',
@@ -38,22 +46,17 @@ class Recipe extends Model
         'difficulty_level' => Difficulty::class,
     ];
 
-    protected static function booted(): void
+    public function registerMediaConversions(?Media $media = null): void
     {
-        static::updating(function ($recipe) {
-            if ($recipe->isDirty('image_path')) {
-                $originalImagePath = $recipe->getOriginal('image_path');
-                if ($originalImagePath) {
-                    Storage::delete($originalImagePath);
-                }
-            }
-        });
-
-        static::deleting(function ($recipe) {
-            if ($recipe->image_path) {
-                Storage::delete($recipe->image_path);
-            }
-        });
+        foreach (self::$IMAGE_SIZES as $name => $size) {
+            $this
+                ->addMediaConversion($name)
+                ->fit(Fit::Max, $size, $size)
+                ->format('webp')
+                ->optimize()
+                ->quality(90)
+                ->queued();
+        }
     }
 
     public function user(): BelongsTo

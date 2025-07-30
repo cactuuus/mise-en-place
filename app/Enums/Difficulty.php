@@ -2,13 +2,16 @@
 
 namespace App\Enums;
 
-enum Difficulty: int
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum Difficulty: int implements HasLabel, HasColor
 {
     case Easy = 1;
     case Medium = 2;
     case Hard = 3;
 
-    public function label(): string
+    public function getLabel(): ?string
     {
         return match ($this) {
             self::Easy => 'Easy',
@@ -17,28 +20,12 @@ enum Difficulty: int
         };
     }
 
-    public function color(): string
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::Easy => 'success',
             self::Medium => 'warning',
             self::Hard => 'danger',
         };
-    }
-
-    public static function options(): array
-    {
-        return collect(self::cases())
-            ->mapWithKeys(fn(self $case) => [$case->value => $case->label()])
-            ->toArray();
-    }
-
-    public static function fromValue(?int $value): ?self
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return self::tryFrom($value);
     }
 }

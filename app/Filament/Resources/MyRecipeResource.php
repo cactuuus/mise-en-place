@@ -65,7 +65,9 @@ class MyRecipeResource extends Resource
 
                 Forms\Components\FileUpload::make('image_path')
                     ->image()
+                    ->disk('r2')
                     ->directory('recipe-images')
+                    ->visibility('private')
                     ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('source_url')
@@ -109,6 +111,8 @@ class MyRecipeResource extends Resource
                     ->schema([
                         Infolists\Components\ImageEntry::make('image_path')
                             ->size(200)
+                            ->disk('r2')
+                            ->visibility('private')
                             ->columnSpanFull(),
 
 
@@ -225,7 +229,9 @@ class MyRecipeResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image_path')
                     ->square()
-                    ->size(60),
+                    ->size(60)
+                    ->disk('r2')
+                    ->visibility('private'),
 
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()

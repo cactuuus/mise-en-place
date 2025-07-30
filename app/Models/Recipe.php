@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Recipe extends Model
 {
@@ -27,7 +28,6 @@ class Recipe extends Model
         'serves',
         'difficulty_level',
     ];
-
     protected $casts = [
         'ingredients'      => 'array',
         'instructions'     => 'array',
@@ -37,6 +37,15 @@ class Recipe extends Model
         'serves'           => 'integer',
         'difficulty_level' => Difficulty::class,
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function ($recipe) {
+            if ($recipe->image_path) {
+                Storage::delete($recipe->image_path);
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {

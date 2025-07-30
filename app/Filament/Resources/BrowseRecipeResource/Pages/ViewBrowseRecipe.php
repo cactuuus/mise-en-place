@@ -9,9 +9,11 @@ use App\Models\Recipe;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Mokhosh\FilamentRating\Components\Rating;
+use Mokhosh\FilamentRating\RatingTheme;
 
 class ViewBrowseRecipe extends ViewRecord
 {
@@ -32,17 +34,18 @@ class ViewBrowseRecipe extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Fork this recipe?')
                 ->modalDescription('This will create a copy of this recipe that you can modify and make your own.')
-                ->modalSubmitActionLabel('Fork Recipe')
-                ->visible(fn() => Auth::check()),
+                ->modalSubmitActionLabel('Fork Recipe'),
 
             Action::make('rate')
-                ->label('Rate Recipe')
+                ->label($this->record->getUserRating(Auth::id()) ? 'Adjust rating' : 'Rate Recipe')
                 ->icon('tabler-star')
                 ->color('success')
                 ->form([
                     Rating::make('rating')
-                        ->label('Your Rating')
+                        ->label(false)
                         ->required()
+                        ->theme(RatingTheme::HalfStars)
+                        ->size('xl')
                         ->default(fn() => $this->record->getUserRating(Auth::id()) ?? 5)
                         ->stars(5)
                         ->color('warning'),
@@ -56,8 +59,8 @@ class ViewBrowseRecipe extends ViewRecord
                         $action->failure();
                     }
                 })
+                ->modalWidth(MaxWidth::FitContent)
                 ->modalHeading(fn() => 'Rate "'.$this->record->title.'"')
-                ->modalDescription('Share your experience with this recipe')
                 ->modalSubmitActionLabel('Submit Rating')
                 ->successNotification(
                     Notification::make()
@@ -69,8 +72,7 @@ class ViewBrowseRecipe extends ViewRecord
                         ->danger()
                         ->title(ErrorMessages::random())
                         ->body('Something went wrong, your rating was not saved. Please try again later or submit a bug report.'),
-                )
-                ->visible(fn() => Auth::check()),
+                ),
         ];
     }
 }

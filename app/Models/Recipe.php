@@ -33,6 +33,7 @@ class Recipe extends Model implements HasMedia
         'forked_from_recipe_id',
         'prep_time',
         'cook_time',
+        'total_time',
         'serves',
         'difficulty_level',
     ];
@@ -42,9 +43,17 @@ class Recipe extends Model implements HasMedia
         'is_public'        => 'boolean',
         'prep_time'        => 'integer',
         'cook_time'        => 'integer',
+        'total_time'       => 'integer',
         'serves'           => 'integer',
         'difficulty_level' => Difficulty::class,
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Recipe $recipe) {
+            $recipe->total_time = ($recipe->prep_time ?? 0) + ($recipe->cook_time ?? 0);
+        });
+    }
 
     public function registerMediaConversions(?Media $media = null): void
     {

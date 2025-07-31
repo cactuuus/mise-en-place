@@ -43,30 +43,29 @@ abstract class BaseRecipeResource extends Resource
                                     ->extraAttributes(['class' => 'text-3xl'])
                                     ->columnSpanFull(),
 
+                                RatingEntry::make('average_rating')
+                                    ->label(false)
+                                    ->state(fn($record) => $record->averageRating())
+                                    ->stars(5)
+                                    ->color('warning')
+                                    ->helperText(fn($record) => "{$record->totalRatings()} ratings")
+                                    ->columnSpanFull(),
+
                                 Infolists\Components\TextEntry::make('user.name')
                                     ->label('Created by')
                                     ->icon('tabler-user'),
 
-                                RatingEntry::make('average_rating')
-                                    ->label('Rating')
-                                    ->state(fn($record) => $record->averageRating())
-                                    ->stars(5)
-                                    ->color('warning')
-                                    ->tooltip(fn($record) => "{$record->totalRatings()} ratings"),
-
                                 Infolists\Components\TextEntry::make('difficulty_level')
                                     ->badge(),
 
+                                Infolists\Components\TextEntry::make('total_time')
+                                    ->label('Time')
+                                    ->suffix(' min')
+                                    ->icon('tabler-clock')
+                                    ->hint(fn(Recipe $record): string => static::getTimeBreakdown($record)),
+
                                 Infolists\Components\TextEntry::make('serves')
                                     ->icon('tabler-users'),
-
-                                Infolists\Components\TextEntry::make('prep_time')
-                                    ->suffix(' min')
-                                    ->icon('tabler-clock'),
-
-                                Infolists\Components\TextEntry::make('cook_time')
-                                    ->suffix(' min')
-                                    ->icon('tabler-flame'),
                             ])
                             ->columns(2),
                     ])
@@ -127,6 +126,19 @@ abstract class BaseRecipeResource extends Resource
             ]);
     }
 
+    protected static function getTimeBreakdown(Recipe $record): string
+    {
+        $hints = [];
+        if ($record->prep_time) {
+            $hints[] = "{$record->prep_time} min prep";
+        }
+        if ($record->cook_time) {
+            $hints[] = "{$record->cook_time} min cook";
+        }
+
+        return empty($hints) ? '' : implode(' + ', $hints);
+    }
+
     protected static function getStepNumber(): int
     {
         static $stepCounter = 0;
@@ -183,14 +195,11 @@ abstract class BaseRecipeResource extends Resource
                 ->width(0)
                 ->badge(),
 
-            Tables\Columns\TextColumn::make('prep_time')
+            Tables\Columns\TextColumn::make('total_time')
+                ->label('Time')
                 ->width(0)
                 ->suffix(' min')
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make('cook_time')
-                ->width(0)
-                ->suffix(' min')
+                ->description(fn(Recipe $record): string => static::getTimeBreakdown($record))
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('created_at')

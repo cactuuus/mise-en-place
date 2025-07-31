@@ -193,6 +193,9 @@ class RecipeFactory extends Factory
             if ($this->faker->boolean(70)) {
                 $this->attachRandomImage($recipe);
             }
+
+            // Attach random tags to each recipe
+            $this->attachRandomTags($recipe);
         });
     }
 
@@ -215,12 +218,12 @@ class RecipeFactory extends Factory
 
         // Create a temporary copy so we don't consume the original
         $tempPath = storage_path('app/temp/'.basename($randomImagePath));
-        
+
         // Ensure temp directory exists
-        if (!is_dir(dirname($tempPath))) {
+        if ( ! is_dir(dirname($tempPath))) {
             mkdir(dirname($tempPath), 0755, true);
         }
-        
+
         // Copy the file
         copy($randomImagePath, $tempPath);
 
@@ -228,5 +231,18 @@ class RecipeFactory extends Factory
         $recipe
             ->addMedia($tempPath)
             ->toMediaCollection('recipe-images');
+    }
+
+    private function attachRandomTags($recipe): void
+    {
+        $allTags = \Spatie\Tags\Tag::all();
+
+        if ($allTags->isEmpty()) {
+            return;
+        }
+
+        // Attach 1-6 random tags
+        $randomTags = $allTags->random($this->faker->numberBetween(1, min(6, $allTags->count())));
+        $recipe->attachTags($randomTags);
     }
 }

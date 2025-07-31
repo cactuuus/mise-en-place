@@ -3,8 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Enums\Difficulty;
+use App\Enums\TagType;
 use App\Filament\Resources\MyRecipeResource\Pages;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Form;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,11 +34,8 @@ class MyRecipeResource extends BaseRecipeResource
                                     ->required()
                                     ->maxLength(255),
 
-                                Forms\Components\TextInput::make('source_url')
-                                    ->url()
-                                    ->placeholder('https://example.com/recipe')
-                                    ->helperText('If this recipe is from an external website')
-                                    ->columnSpanFull(),
+                                SpatieTagsInput::make('tags')
+                                    ->type(TagType::Recipe->value),
 
                                 Forms\Components\Grid::make(2)
                                     ->schema([
@@ -78,6 +77,11 @@ class MyRecipeResource extends BaseRecipeResource
                             ->maxSize(5120) // 5MB max file size
                             ->collection('recipe-images'),
 
+                        Forms\Components\TextInput::make('source_url')
+                            ->url()
+                            ->placeholder('https://example.com/recipe')
+                            ->helperText('If this recipe is from an external website')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 
@@ -125,7 +129,8 @@ class MyRecipeResource extends BaseRecipeResource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('user_id', Auth::id());
+        return parent::getEloquentQuery()
+            ->where('user_id', Auth::id());
     }
 
     public static function getPages(): array

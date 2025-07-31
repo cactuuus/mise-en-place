@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
         // Create all users first (including test user)
         $this->call(UserSeeder::class);
         
+        // Create tags before recipes so we can attach them
+        $this->call(TagSeeder::class);
+        
         // Then create recipes, ratings, and follows for those users
         $this->call(RecipeSeeder::class);
     }

@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\TagType;
 use App\Models\Recipe;
 use Filament\Infolists;
+use Filament\Infolists\Components\SpatieTagsEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Table;
 use Mokhosh\FilamentRating\Columns\RatingColumn;
 use Mokhosh\FilamentRating\Entries\RatingEntry;
@@ -41,6 +44,11 @@ abstract class BaseRecipeResource extends Resource
                                     ->size('64')
                                     ->weight('bold')
                                     ->extraAttributes(['class' => 'text-3xl'])
+                                    ->columnSpanFull(),
+
+                                SpatieTagsEntry::make('tags')
+                                    ->label(false)
+                                    ->type(TagType::Recipe->value)
                                     ->columnSpanFull(),
 
                                 RatingEntry::make('average_rating')
@@ -189,6 +197,11 @@ abstract class BaseRecipeResource extends Resource
                 ->label(false)
                 ->searchable()
                 ->description(fn(Recipe $record): string => static::getTitleDescription($record)),
+
+            SpatieTagsColumn::make('tags')
+                ->limitList(4)
+                ->type(TagType::Recipe->value)
+                ->toggleable(),
 
             Tables\Columns\TextColumn::make('difficulty_level')
                 ->label('Difficulty')

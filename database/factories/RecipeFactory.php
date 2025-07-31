@@ -18,21 +18,20 @@ class RecipeFactory extends Factory
     public function definition(): array
     {
         $recipeData = $this->getRandomRecipeData();
-        
+
         return [
-            'user_id' => \App\Models\User::factory(),
-            'title' => $recipeData['title'],
-            'ingredients' => $recipeData['ingredients'],
-            'instructions' => $recipeData['instructions'],
-            'notes' => $this->faker->optional(0.6)->paragraph(),
-            'source_url' => $this->faker->optional(0.3)->url(),
-            'image_path' => null, // We'll skip image generation for now
-            'is_public' => $this->faker->boolean(85), // 85% chance of being public
+            'user_id'               => \App\Models\User::factory(),
+            'title'                 => $recipeData['title'],
+            'ingredients'           => $recipeData['ingredients'],
+            'instructions'          => $recipeData['instructions'],
+            'notes'                 => $this->faker->optional(0.6)->paragraph(),
+            'source_url'            => $this->faker->optional(0.3)->url(),
+            'is_public'             => $this->faker->boolean(85), // 85% chance of being public
             'forked_from_recipe_id' => null, // We'll handle forks separately
-            'prep_time' => $this->faker->numberBetween(5, 60),
-            'cook_time' => $this->faker->numberBetween(10, 180),
-            'serves' => $this->faker->numberBetween(1, 8),
-            'difficulty_level' => $this->faker->randomElement(Difficulty::cases()),
+            'prep_time'             => $this->faker->numberBetween(5, 60),
+            'cook_time'             => $this->faker->numberBetween(10, 180),
+            'serves'                => $this->faker->numberBetween(1, 8),
+            'difficulty_level'      => $this->faker->randomElement(Difficulty::cases()),
         ];
     }
 
@@ -40,8 +39,8 @@ class RecipeFactory extends Factory
     {
         $recipes = [
             [
-                'title' => 'Classic Chocolate Chip Cookies',
-                'ingredients' => [
+                'title'        => 'Classic Chocolate Chip Cookies',
+                'ingredients'  => [
                     ['item' => 'all-purpose flour', 'amount' => '2¼ cups'],
                     ['item' => 'baking soda', 'amount' => '1 tsp'],
                     ['item' => 'salt', 'amount' => '1 tsp'],
@@ -65,8 +64,8 @@ class RecipeFactory extends Factory
                 ],
             ],
             [
-                'title' => 'Homemade Pizza Margherita',
-                'ingredients' => [
+                'title'        => 'Homemade Pizza Margherita',
+                'ingredients'  => [
                     ['item' => 'pizza dough', 'amount' => '1 lb'],
                     ['item' => 'olive oil', 'amount' => '2 tbsp'],
                     ['item' => 'crushed tomatoes', 'amount' => '1 cup'],
@@ -89,8 +88,8 @@ class RecipeFactory extends Factory
                 ],
             ],
             [
-                'title' => 'Chicken Stir Fry',
-                'ingredients' => [
+                'title'        => 'Chicken Stir Fry',
+                'ingredients'  => [
                     ['item' => 'chicken breast, sliced', 'amount' => '1 lb'],
                     ['item' => 'soy sauce', 'amount' => '3 tbsp'],
                     ['item' => 'vegetable oil', 'amount' => '2 tbsp'],
@@ -115,8 +114,8 @@ class RecipeFactory extends Factory
                 ],
             ],
             [
-                'title' => 'Classic Caesar Salad',
-                'ingredients' => [
+                'title'        => 'Classic Caesar Salad',
+                'ingredients'  => [
                     ['item' => 'romaine lettuce', 'amount' => '2 heads'],
                     ['item' => 'parmesan cheese', 'amount' => '½ cup grated'],
                     ['item' => 'croutons', 'amount' => '1 cup'],
@@ -136,8 +135,8 @@ class RecipeFactory extends Factory
                 ],
             ],
             [
-                'title' => 'Beef Tacos',
-                'ingredients' => [
+                'title'        => 'Beef Tacos',
+                'ingredients'  => [
                     ['item' => 'ground beef', 'amount' => '1 lb'],
                     ['item' => 'taco seasoning', 'amount' => '1 packet'],
                     ['item' => 'water', 'amount' => '¾ cup'],
@@ -159,8 +158,8 @@ class RecipeFactory extends Factory
                 ],
             ],
             [
-                'title' => 'Banana Bread',
-                'ingredients' => [
+                'title'        => 'Banana Bread',
+                'ingredients'  => [
                     ['item' => 'ripe bananas', 'amount' => '3 large'],
                     ['item' => 'melted butter', 'amount' => '⅓ cup'],
                     ['item' => 'sugar', 'amount' => '¾ cup'],
@@ -185,5 +184,37 @@ class RecipeFactory extends Factory
         ];
 
         return $this->faker->randomElement($recipes);
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function ($recipe) {
+            // Only add images to 70% of recipes
+            if ($this->faker->boolean(70)) {
+                $this->attachRandomImage($recipe);
+            }
+        });
+    }
+
+    private function attachRandomImage($recipe): void
+    {
+        $seedImagesPath = storage_path('app/public/seed-images');
+
+        // Get all image files from the seed-images directory
+        if ( ! is_dir($seedImagesPath)) {
+            return;
+        }
+
+        $imageFiles = glob($seedImagesPath.'/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
+
+        if (empty($imageFiles)) {
+            return;
+        }
+
+        $randomImagePath = $this->faker->randomElement($imageFiles);
+
+        $recipe
+            ->addMedia($randomImagePath)
+            ->toMediaCollection('recipe-images');
     }
 }

@@ -213,8 +213,20 @@ class RecipeFactory extends Factory
 
         $randomImagePath = $this->faker->randomElement($imageFiles);
 
+        // Create a temporary copy so we don't consume the original
+        $tempPath = storage_path('app/temp/'.basename($randomImagePath));
+        
+        // Ensure temp directory exists
+        if (!is_dir(dirname($tempPath))) {
+            mkdir(dirname($tempPath), 0755, true);
+        }
+        
+        // Copy the file
+        copy($randomImagePath, $tempPath);
+
+        // Add the copy to media library (this will move it to final location)
         $recipe
-            ->addMedia($randomImagePath)
+            ->addMedia($tempPath)
             ->toMediaCollection('recipe-images');
     }
 }

@@ -6,6 +6,7 @@ services:
     environment:
       PHP_OPCACHE_ENABLE: "1"
       AUTORUN_ENABLED: "true"
+      AUTORUN_LARAVEL_CONFIG_CACHE: "false"
       APP_ENV: "${SPIN_DEPLOYMENT_ENVIRONMENT:-production}"
       HEALTHCHECK_PATH: "/up"
     volumes:
@@ -16,13 +17,7 @@ services:
       - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
     networks:
       - web-public
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        delay: 10s
-        max_attempts: 3
-        window: 120s
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/up" ]
       interval: 30s
@@ -43,13 +38,7 @@ services:
       - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
     networks:
       - web-public
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        delay: 10s
-        max_attempts: 3
-        window: 120s
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD", "healthcheck-queue" ]
       start_period: 10s

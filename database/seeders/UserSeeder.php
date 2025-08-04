@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $NUMBER_OF_USERS = 100;
+        $NUMBER_OF_USERS = 5;
 
         // Create the test user first
         \App\Models\User::factory()->create([
@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        // Create 99 more users (for a total of 100)
+        // Create 50 more users (for a total of 51)
         \App\Models\User::factory($NUMBER_OF_USERS)->create();
 
         $this->command->info("✅ Created $NUMBER_OF_USERS users (including test user)");

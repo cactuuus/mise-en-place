@@ -36,16 +36,24 @@ RUN groupadd --force -g $WWWGROUP sail
 RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 
 # Copy application files
-COPY --chown=sail:sail . /var/www/html
+COPY . /var/www/html
 
-# Switch to sail user
+# Fix git ownership issue for Docker builds
+RUN git config --global --add safe.directory /var/www/html
+
+# Create application user
+RUN groupadd --force -g $WWWGROUP sail
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+
+# Set ownership and create directories before switching users
+RUN chown -R sail:sail /var/www/html
+RUN mkdir -p /var/www/html/.infrastructure/volume_data/sqlite
+
+# Switch to sail user for composer install
 USER sail
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Create SQLite database directory
-RUN mkdir -p /var/www/html/.infrastructure/volume_data/sqlite
 
 # Switch back to root for final setup
 USER root

@@ -208,8 +208,14 @@ class RecipeFactory extends Factory
             return;
         }
 
-        $imageFiles = glob($seedImagesPath.'/*.{jpg,jpeg,png,gif,webp}', GLOB_BRACE);
-
+        $imageFiles = array_merge(
+            glob($seedImagesPath.'/*.jpg') ?: [],
+            glob($seedImagesPath.'/*.jpeg') ?: [],
+            glob($seedImagesPath.'/*.png') ?: [],
+            glob($seedImagesPath.'/*.gif') ?: [],
+            glob($seedImagesPath.'/*.webp') ?: [],
+        );
+        
         if (empty($imageFiles)) {
             return;
         }

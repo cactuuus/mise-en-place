@@ -40,18 +40,21 @@ services:
       R2_ENDPOINT: "${R2_ENDPOINT}"
       R2_USE_PATH_STYLE_ENDPOINT: "${R2_USE_PATH_STYLE_ENDPOINT:-false}"
     volumes:
+      # Mount volumes but let the container fix permissions at startup
       - "storage_private:/var/www/html/storage/app/private/"
       - "storage_public:/var/www/html/storage/app/public/"
       - "storage_sessions:/var/www/html/storage/framework/sessions"
       - "storage_logs:/var/www/html/storage/logs"
       - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
     restart: unless-stopped
+    # Run as root initially to fix permissions, then drop to www-data
+    user: root
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:80/up" ]
       interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 45s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
 
   queue:
     build:
@@ -62,25 +65,19 @@ services:
     stop_signal: SIGTERM
     environment:
       PHP_OPCACHE_ENABLE: "1"
-      AUTORUN_ENABLED: "false"  # Disable autorun for queue worker
+      AUTORUN_ENABLED: "false"
 
       # Laravel environment
       APP_ENV: "${APP_ENV:-production}"
       APP_DEBUG: "${APP_DEBUG:-false}"
       APP_KEY: "${APP_KEY}"
       APP_URL: "${APP_URL}"
-
-      # Database
       DB_CONNECTION: "${DB_CONNECTION:-sqlite}"
       DB_DATABASE: "${DB_DATABASE:-/var/www/html/.infrastructure/volume_data/sqlite/database.sqlite}"
-
-      # Cache & Sessions
       CACHE_STORE: "${CACHE_STORE:-file}"
       SESSION_DRIVER: "${SESSION_DRIVER:-database}"
       QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
       FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
-
-      # R2 Configuration
       R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
       R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
       R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
@@ -94,6 +91,7 @@ services:
       - "storage_logs:/var/www/html/storage/logs"
       - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
     restart: unless-stopped
+    user: root
     depends_on:
       app:
         condition: service_healthy
@@ -106,25 +104,17 @@ services:
     command: [ "php", "/var/www/html/artisan", "schedule:work" ]
     environment:
       PHP_OPCACHE_ENABLE: "1"
-      AUTORUN_ENABLED: "false"  # Disable autorun for scheduler
-
-      # Laravel environment
+      AUTORUN_ENABLED: "false"
       APP_ENV: "${APP_ENV:-production}"
       APP_DEBUG: "${APP_DEBUG:-false}"
       APP_KEY: "${APP_KEY}"
       APP_URL: "${APP_URL}"
-
-      # Database
       DB_CONNECTION: "${DB_CONNECTION:-sqlite}"
       DB_DATABASE: "${DB_DATABASE:-/var/www/html/.infrastructure/volume_data/sqlite/database.sqlite}"
-
-      # Cache & Sessions
       CACHE_STORE: "${CACHE_STORE:-file}"
       SESSION_DRIVER: "${SESSION_DRIVER:-database}"
       QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
       FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
-
-      # R2 Configuration
       R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
       R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
       R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
@@ -138,6 +128,7 @@ services:
       - "storage_logs:/var/www/html/storage/logs"
       - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
     restart: unless-stopped
+    user: root
     depends_on:
       app:
         condition: service_healthy

@@ -2,7 +2,7 @@ services:
   app:
     image: serversideup/php:8.4-fpm-nginx
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "${APP_PORT:-8080}:80"
     environment:
       APP_ENV: "${APP_ENV:-production}"
       APP_DEBUG: "${APP_DEBUG:-false}"
@@ -17,9 +17,12 @@ services:
       # Performance optimizations
       PHP_OPCACHE_ENABLE: "1"
       AUTORUN_ENABLED: "true"
+      AUTORUN_COMPOSER_INSTALL: "true"
       AUTORUN_LARAVEL_CONFIG_CACHE: "true"
       AUTORUN_LARAVEL_ROUTE_CACHE: "true"
       AUTORUN_LARAVEL_VIEW_CACHE: "true"
+      AUTORUN_LARAVEL_MIGRATION: "true"
+      AUTORUN_LARAVEL_STORAGE_LINK: "true"
       # R2 Configuration
       R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
       R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
@@ -33,9 +36,11 @@ services:
       - storage_logs:/var/www/html/storage/logs
       - storage_framework:/var/www/html/storage/framework
       - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    working_dir: /var/www/html
+    user: "33:33"
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/up" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:80/up" ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -55,10 +60,9 @@ services:
       SESSION_DRIVER: "${SESSION_DRIVER:-database}"
       QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
       FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
-      # Performance optimizations
       PHP_OPCACHE_ENABLE: "1"
       AUTORUN_ENABLED: "true"
-      # R2 Configuration
+      AUTORUN_COMPOSER_INSTALL: "true"
       R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
       R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
       R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
@@ -71,12 +75,13 @@ services:
       - storage_logs:/var/www/html/storage/logs
       - storage_framework:/var/www/html/storage/framework
       - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    working_dir: /var/www/html
+    user: "33:33"
     restart: unless-stopped
     depends_on:
       app:
         condition: service_healthy
 
-  # Optional: Scheduler service for Laravel cron jobs
   scheduler:
     image: serversideup/php:8.4-fpm-nginx
     command: [ "php", "artisan", "schedule:work" ]
@@ -91,10 +96,9 @@ services:
       SESSION_DRIVER: "${SESSION_DRIVER:-database}"
       QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
       FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
-      # Performance optimizations
       PHP_OPCACHE_ENABLE: "1"
       AUTORUN_ENABLED: "true"
-      # R2 Configuration
+      AUTORUN_COMPOSER_INSTALL: "true"
       R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
       R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
       R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
@@ -107,6 +111,8 @@ services:
       - storage_logs:/var/www/html/storage/logs
       - storage_framework:/var/www/html/storage/framework
       - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    working_dir: /var/www/html
+    user: "33:33"
     restart: unless-stopped
     depends_on:
       app:

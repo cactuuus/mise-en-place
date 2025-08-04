@@ -1,0 +1,4 @@
+FROM serversideup/php:8.4-fpm-nginx
+
+# Install missing extensions
+RUN install-php-extensions intl exif gd imagick

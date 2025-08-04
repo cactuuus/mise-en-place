@@ -1,0 +1,114 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${APP_URL}"
+      DB_CONNECTION: "${DB_CONNECTION:-sqlite}"
+      DB_DATABASE: "${DB_DATABASE:-/var/www/html/.infrastructure/volume_data/sqlite/database.sqlite}"
+      CACHE_STORE: "${CACHE_STORE:-file}"
+      SESSION_DRIVER: "${SESSION_DRIVER:-database}"
+      QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
+      FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
+      # R2 Configuration
+      R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
+      R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
+      R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
+      R2_BUCKET: "${R2_BUCKET}"
+      R2_ENDPOINT: "${R2_ENDPOINT}"
+      R2_USE_PATH_STYLE_ENDPOINT: "${R2_USE_PATH_STYLE_ENDPOINT:-false}"
+    volumes:
+      - storage_app:/var/www/html/storage/app
+      - storage_logs:/var/www/html/storage/logs
+      - storage_framework:/var/www/html/storage/framework
+      - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/up" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: [ "php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600", "--memory=512", "--timeout=300" ]
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${APP_URL}"
+      DB_CONNECTION: "${DB_CONNECTION:-sqlite}"
+      DB_DATABASE: "${DB_DATABASE:-/var/www/html/database/database.sqlite}"
+      CACHE_STORE: "${CACHE_STORE:-file}"
+      SESSION_DRIVER: "${SESSION_DRIVER:-database}"
+      QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
+      FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
+      # R2 Configuration
+      R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
+      R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
+      R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
+      R2_BUCKET: "${R2_BUCKET}"
+      R2_ENDPOINT: "${R2_ENDPOINT}"
+      R2_USE_PATH_STYLE_ENDPOINT: "${R2_USE_PATH_STYLE_ENDPOINT:-false}"
+    volumes:
+      - storage_app:/var/www/html/storage/app
+      - storage_logs:/var/www/html/storage/logs
+      - storage_framework:/var/www/html/storage/framework
+      - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # Optional: Scheduler service for Laravel cron jobs
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    command: [ "php", "artisan", "schedule:work" ]
+    environment:
+      APP_ENV: "${APP_ENV:-production}"
+      APP_DEBUG: "${APP_DEBUG:-false}"
+      APP_KEY: "${APP_KEY}"
+      APP_URL: "${APP_URL}"
+      DB_CONNECTION: "${DB_CONNECTION:-sqlite}"
+      DB_DATABASE: "${DB_DATABASE:-/var/www/html/.infrastructure/volume_data/sqlite/database.sqlite}"
+      CACHE_STORE: "${CACHE_STORE:-file}"
+      SESSION_DRIVER: "${SESSION_DRIVER:-database}"
+      QUEUE_CONNECTION: "${QUEUE_CONNECTION:-database}"
+      FILESYSTEM_DISK: "${FILESYSTEM_DISK:-local}"
+      # R2 Configuration
+      R2_ACCESS_KEY_ID: "${R2_ACCESS_KEY_ID}"
+      R2_SECRET_ACCESS_KEY: "${R2_SECRET_ACCESS_KEY}"
+      R2_DEFAULT_REGION: "${R2_DEFAULT_REGION}"
+      R2_BUCKET: "${R2_BUCKET}"
+      R2_ENDPOINT: "${R2_ENDPOINT}"
+      R2_USE_PATH_STYLE_ENDPOINT: "${R2_USE_PATH_STYLE_ENDPOINT:-false}"
+    volumes:
+      - storage_app:/var/www/html/storage/app
+      - storage_logs:/var/www/html/storage/logs
+      - storage_framework:/var/www/html/storage/framework
+      - database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  storage_app:
+    driver: local
+  storage_logs:
+    driver: local
+  storage_framework:
+    driver: local
+  database_sqlite:
+    driver: local

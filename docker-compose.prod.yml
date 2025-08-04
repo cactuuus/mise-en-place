@@ -1,0 +1,65 @@
+services:
+  php:
+    image: ${SPIN_IMAGE_DOCKERFILE}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      PHP_OPCACHE_ENABLE: "1"
+      AUTORUN_ENABLED: "true"
+      APP_ENV: "${SPIN_DEPLOYMENT_ENVIRONMENT:-production}"
+      HEALTHCHECK_PATH: "/up"
+    volumes:
+      - "storage_private:/var/www/html/storage/app/private/"
+      - "storage_public:/var/www/html/storage/app/public/"
+      - "storage_sessions:/var/www/html/storage/framework/sessions"
+      - "storage_logs:/var/www/html/storage/logs"
+      - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
+    networks:
+      - web-public
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/up" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  queue:
+    image: ${SPIN_IMAGE_DOCKERFILE}
+    command: [ "php", "/var/www/html/artisan", "queue:work", "--tries=3" ]
+    stop_signal: SIGTERM
+    environment:
+      PHP_OPCACHE_ENABLE: "1"
+    volumes:
+      - "storage_private:/var/www/html/storage/app/private/"
+      - "storage_public:/var/www/html/storage/app/public/"
+      - "storage_sessions:/var/www/html/storage/framework/sessions"
+      - "storage_logs:/var/www/html/storage/logs"
+      - "database_sqlite:/var/www/html/.infrastructure/volume_data/sqlite"
+    networks:
+      - web-public
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    healthcheck:
+      test: [ "CMD", "healthcheck-queue" ]
+      start_period: 10s
+
+volumes:
+  storage_private:
+  storage_public:
+  storage_sessions:
+  storage_logs:
+  database_sqlite:
+
+networks:
+  web-public:

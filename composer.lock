@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3253f7f184bd101a98e6fbb8f23cfd48",
+    "content-hash": "6ab9e4479242f65e64a7c13c62b326e2",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -128,16 +128,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.351.12",
+            "version": "3.352.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "8f376246010c34cc310fbab71e82befc76678fff"
+                "reference": "7f3ad0da2545b24259273ea7ab892188bae7d91b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/8f376246010c34cc310fbab71e82befc76678fff",
-                "reference": "8f376246010c34cc310fbab71e82befc76678fff",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/7f3ad0da2545b24259273ea7ab892188bae7d91b",
+                "reference": "7f3ad0da2545b24259273ea7ab892188bae7d91b",
                 "shasum": ""
             },
             "require": {
@@ -219,9 +219,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.351.12"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.352.0"
             },
-            "time": "2025-07-31T18:03:40+00:00"
+            "time": "2025-08-01T18:04:23+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -4191,16 +4191,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "3.10.1",
+            "version": "3.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CarbonPHP/carbon.git",
-                "reference": "1fd1935b2d90aef2f093c5e35f7ae1257c448d00"
+                "reference": "76b5c07b8a9d2025ed1610e14cef1f3fd6ad2c24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/1fd1935b2d90aef2f093c5e35f7ae1257c448d00",
-                "reference": "1fd1935b2d90aef2f093c5e35f7ae1257c448d00",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/76b5c07b8a9d2025ed1610e14cef1f3fd6ad2c24",
+                "reference": "76b5c07b8a9d2025ed1610e14cef1f3fd6ad2c24",
                 "shasum": ""
             },
             "require": {
@@ -4292,7 +4292,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-21T15:19:35+00:00"
+            "time": "2025-08-02T09:36:06+00:00"
         },
         {
             "name": "nette/schema",
@@ -9603,69 +9603,6 @@
             "time": "2025-07-10T18:09:32+00:00"
         },
         {
-            "name": "laravel/sail",
-            "version": "v1.44.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/sail.git",
-                "reference": "a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sail/zipball/a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe",
-                "reference": "a09097bd2a8a38e23ac472fa6a6cf5b0d1c1d3fe",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "^9.52.16|^10.0|^11.0|^12.0",
-                "illuminate/contracts": "^9.52.16|^10.0|^11.0|^12.0",
-                "illuminate/support": "^9.52.16|^10.0|^11.0|^12.0",
-                "php": "^8.0",
-                "symfony/console": "^6.0|^7.0",
-                "symfony/yaml": "^6.0|^7.0"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^7.0|^8.0|^9.0|^10.0",
-                "phpstan/phpstan": "^1.10"
-            },
-            "bin": [
-                "bin/sail"
-            ],
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Laravel\\Sail\\SailServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Laravel\\Sail\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
-                }
-            ],
-            "description": "Docker files for running a basic Laravel application.",
-            "keywords": [
-                "docker",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/laravel/sail/issues",
-                "source": "https://github.com/laravel/sail"
-            },
-            "time": "2025-07-04T16:17:06+00:00"
-        },
-        {
             "name": "mockery/mockery",
             "version": "1.6.12",
             "source": {
@@ -9750,16 +9687,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.13.3",
+            "version": "1.13.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "faed855a7b5f4d4637717c2b3863e277116beb36"
+                "reference": "07d290f0c47959fd5eed98c95ee5602db07e0b6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/faed855a7b5f4d4637717c2b3863e277116beb36",
-                "reference": "faed855a7b5f4d4637717c2b3863e277116beb36",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/07d290f0c47959fd5eed98c95ee5602db07e0b6a",
+                "reference": "07d290f0c47959fd5eed98c95ee5602db07e0b6a",
                 "shasum": ""
             },
             "require": {
@@ -9798,7 +9735,7 @@
             ],
             "support": {
                 "issues": "https://github.com/myclabs/DeepCopy/issues",
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.3"
+                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.4"
             },
             "funding": [
                 {
@@ -9806,7 +9743,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-05T12:25:42+00:00"
+            "time": "2025-08-01T08:46:24+00:00"
         },
         {
             "name": "nunomaduro/collision",
@@ -11481,6 +11418,51 @@
             "time": "2024-10-09T05:16:32+00:00"
         },
         {
+            "name": "serversideup/spin",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/serversideup/spin.git",
+                "reference": "f0e9c78dad8fd86db6030871a9f143fd6ab918e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/serversideup/spin/zipball/f0e9c78dad8fd86db6030871a9f143fd6ab918e3",
+                "reference": "f0e9c78dad8fd86db6030871a9f143fd6ab918e3",
+                "shasum": ""
+            },
+            "bin": [
+                "bin/spin"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Dan Pastori",
+                    "homepage": "https://twitter.com/danpastori"
+                },
+                {
+                    "name": "Jay Rogers",
+                    "homepage": "https://twitter.com/jaydrogers"
+                }
+            ],
+            "description": "Replicate your production environment locally using Docker. Just run \"spin up\". It's really that easy.",
+            "support": {
+                "issues": "https://github.com/serversideup/spin/issues",
+                "source": "https://github.com/serversideup/spin/tree/v3.0.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/serversideup",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-01-14T19:02:40+00:00"
+        },
+        {
             "name": "staabm/side-effects-detector",
             "version": "1.0.5",
             "source": {
@@ -11531,82 +11513,6 @@
                 }
             ],
             "time": "2024-10-20T05:08:20+00:00"
-        },
-        {
-            "name": "symfony/yaml",
-            "version": "v7.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/yaml.git",
-                "reference": "b8d7d868da9eb0919e99c8830431ea087d6aae30"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/b8d7d868da9eb0919e99c8830431ea087d6aae30",
-                "reference": "b8d7d868da9eb0919e99c8830431ea087d6aae30",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.2",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
-                "symfony/polyfill-ctype": "^1.8"
-            },
-            "conflict": {
-                "symfony/console": "<6.4"
-            },
-            "require-dev": {
-                "symfony/console": "^6.4|^7.0"
-            },
-            "bin": [
-                "Resources/bin/yaml-lint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Yaml\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Loads and dumps YAML files",
-            "homepage": "https://symfony.com",
-            "support": {
-                "source": "https://github.com/symfony/yaml/tree/v7.3.2"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-07-10T08:47:49+00:00"
         },
         {
             "name": "theseer/tokenizer",

@@ -63,3 +63,30 @@ To start the app again, use the following command:
 
     sail up -d
     sail npm run dev
+
+## Laradock Setup
+
+This project uses a modified Laradock configuration for comprehensive image format support in its queue worker.
+
+### Supported Image Formats:
+
+- ✅ JPEG (photos)
+- ✅ PNG (graphics, screenshots)
+- ✅ GIF (animations)
+- ✅ WebP (modern web format)
+- ✅ BMP (Windows bitmap)
+
+### Development Setup:
+
+1. Clone the repository
+2. Initialize submodules: `git submodule update --init`
+3. Apply GD fix: `cd laradock && git apply ../laradock-gd-php84-fix.patch`
+4. Build containers: `docker-compose build php-worker`
+5. Start services: `docker-compose up -d nginx mysql workspace php-worker`
+
+### What the patch fixes:
+
+- PHP 8.4 GD configuration for modern image formats
+- WebP and JPEG processing in queue workers
+- Required for Spatie Media Library image conversions
+

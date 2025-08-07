@@ -16,4 +16,10 @@ class EditMyRecipe extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getFormActions(): array
+    {
+        // Return empty array to hide default form actions since wizard has its own submit button
+        return [];
+    }
 }

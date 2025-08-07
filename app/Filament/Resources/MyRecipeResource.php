@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Enums\Difficulty;
 use App\Enums\TagType;
 use App\Filament\Resources\MyRecipeResource\Pages;
+use Awcodes\TableRepeater\Components\TableRepeater;
+use Awcodes\TableRepeater\Header;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Form;
@@ -21,109 +23,186 @@ class MyRecipeResource extends BaseRecipeResource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make()
-                    ->schema([
+                Forms\Components\Wizard::make([
 
-                        Forms\Components\Group::make()
-                            ->schema([
-                                Forms\Components\Toggle::make('is_public')
-                                    ->label('Make public')
-                                    ->default(true),
+                    Forms\Components\Wizard\Step::make('General info')
+                        ->icon('tabler-question-mark')
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255)
+                                ->placeholder('e.g., Grandma\'s Chocolate Chip Cookies')
+                                ->columnSpanFull(),
 
-                                Forms\Components\TextInput::make('title')
-                                    ->required()
-                                    ->maxLength(255),
+                            Forms\Components\Toggle::make('is_public')
+                                ->label('Share this recipe publicly')
+                                ->helperText('Other users will be able to see and fork your recipe')
+                                ->default(true)
+                                ->columnSpanFull(),
 
-                                SpatieTagsInput::make('tags')
-                                    ->type(TagType::Recipe->value),
+                            SpatieTagsInput::make('tags')
+                                ->label('Tags')
+                                ->placeholder('Add tags like "vegetarian", "italian", "dessert"...')
+                                ->type(TagType::Recipe->value)
+                                ->hint('(optional)')
+                                ->columnSpanFull(),
 
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('prep_time')
-                                            ->numeric()
-                                            ->suffix('minutes')
-                                            ->minValue(0)
-                                            ->required(),
-
-                                        Forms\Components\TextInput::make('cook_time')
-                                            ->numeric()
-                                            ->suffix('minutes')
-                                            ->minValue(0)
-                                            ->required(),
-
-                                        Forms\Components\TextInput::make('serves')
-                                            ->numeric()
-                                            ->suffix('people')
-                                            ->default(1)
-                                            ->minValue(1)
-                                            ->required(),
-
-                                        Forms\Components\Select::make('difficulty_level')
-                                            ->options(Difficulty::class)
-                                            ->required(),
-                                    ]),
-                            ]),
-
-                        Forms\Components\SpatieMediaLibraryFileUpload::make('image')
-                            ->label('Image')
-                            ->hint('Upload a photo of your finished dish (optional)')
-                            ->image()
-                            ->imageEditor()
-                            ->imageCropAspectRatio('1:1')
-                            ->imageEditorAspectRatios(['1:1'])
-                            ->imageEditorViewportWidth(800)
-                            ->imageEditorViewportHeight(800)
-                            ->visibility('private')
-                            ->maxSize(5120) // 5MB max file size
-                            ->collection('recipe-images'),
-
-                        Forms\Components\TextInput::make('source_url')
-                            ->url()
-                            ->placeholder('https://example.com/recipe')
-                            ->helperText('If this recipe is from an external website')
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
-
-                Forms\Components\Section::make()
-                    ->schema([
-                        Forms\Components\Repeater::make('ingredients')
-                            ->label('List of ingredients')
-                            ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->required()
-                                    ->placeholder('e.g., 2 cups, 3 large, 1 tsp'),
-
-                                Forms\Components\TextInput::make('item')
-                                    ->required()
-                                    ->placeholder('e.g., flour, eggs, milk'),
+                            Forms\Components\Grid::make([
+                                'default' => 1,
+                                'sm'      => 2,
+                                'md'      => 4,
                             ])
-                            ->columns(2)
-                            ->required()
-                            ->minItems(1)
-                            ->addActionLabel('Add ingredient'),
+                                ->schema([
+                                    Forms\Components\TextInput::make('prep_time')
+                                        ->label('Prep Time')
+                                        ->integer()
+                                        ->suffixIcon('tabler-clock')
+                                        ->suffix('minutes')
+                                        ->minValue(0)
+                                        ->required(),
 
-                        Forms\Components\Repeater::make('instructions')
-                            ->label('Step by step instructions')
-                            ->schema([
-                                Forms\Components\Textarea::make('instruction')
-                                    ->label(fn() => 'Step '.BaseRecipeResource::getStepNumber())
-                                    ->required()
-                                    ->placeholder('Describe this step in detail')
-                                    ->rows(2),
-                            ])
-                            ->required()
-                            ->minItems(1)
-                            ->addActionLabel('Add step')
-                            ->orderColumn('step')
-                            ->reorderableWithButtons()
-                            ->defaultItems(1),
+                                    Forms\Components\TextInput::make('cook_time')
+                                        ->label('Cook Time')
+                                        ->integer()
+                                        ->suffixIcon('tabler-clock')
+                                        ->suffix('minutes')
+                                        ->minValue(0)
+                                        ->required()
+                                        ->extraAttributes(['class' => 'text-center']),
 
-                        Forms\Components\Textarea::make('Additional notes')
-                            ->hint('(optional)')
-                            ->rows(4)
-                            ->columnSpanFull(),
-                    ]),
+                                    Forms\Components\TextInput::make('serves')
+                                        ->label('Serves')
+                                        ->integer()
+                                        ->suffixIcon('tabler-users')
+                                        ->suffix('people')
+                                        ->minValue(1)
+                                        ->default(1)
+                                        ->required()
+                                        ->extraAttributes(['class' => 'text-center']),
+
+                                    Forms\Components\Select::make('difficulty_level')
+                                        ->label('Difficulty Level')
+                                        ->options(Difficulty::class)
+                                        ->required()
+                                        ->placeholder('Select difficulty')
+                                        ->native(false),
+                                ]),
+
+                            Forms\Components\TextInput::make('source_url')
+                                ->label('Recipe Source')
+                                ->url()
+                                ->placeholder('https://example.com/original-recipe')
+                                ->hint('(optional)')
+                                ->helperText('Link to the original recipe if this is adapted from somewhere')
+                                ->columnSpanFull(),
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Ingredients')
+                        ->icon('tabler-shopping-cart')
+                        ->schema([
+                            TableRepeater::make('ingredients')
+                                ->label(false)
+                                ->headers([
+                                    Header::make('amount')
+                                        ->label('Amount')
+                                        ->width('100px'),
+                                    Header::make('item')
+                                        ->label('Ingredient'),
+                                ])
+                                ->schema([
+                                    Forms\Components\TextInput::make('amount')
+                                        ->required()
+                                        ->placeholder('2 cups')
+                                        ->extraAttributes(['class' => 'text-center font-mono']),
+
+                                    Forms\Components\TextInput::make('item')
+                                        ->required()
+                                        ->placeholder('all-purpose flour'),
+                                ])
+                                ->required()
+                                ->minItems(1)
+                                ->defaultItems(3)
+                                ->addActionLabel('Add ingredient')
+                                ->stackAt('sm')
+                                ->reorderableWithButtons()
+                                ->reorderableWithDragAndDrop()
+                                ->streamlined(),
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Instructions')
+                        ->icon('tabler-list-numbers')
+                        ->schema([
+                            Forms\Components\Repeater::make('instructions')
+                                ->label(false)
+                                ->schema([
+                                    Forms\Components\RichEditor::make('instruction')
+                                        ->label(false)
+                                        ->required()
+                                        ->placeholder('Describe this step in detail')
+                                        ->toolbarButtons([
+                                            'bold',
+                                            'italic',
+                                            'bulletList',
+                                            'orderedList',
+                                        ]),
+                                ])
+                                ->required()
+                                ->minItems(1)
+                                ->addActionLabel('Add step')
+                                ->orderColumn('step')
+                                ->reorderableWithButtons()
+                                ->reorderableWithDragAndDrop()
+                                ->defaultItems(1)
+                                ->itemLabel(fn() => 'Step '.BaseRecipeResource::getStepNumber())
+                                ->extraAttributes(['class' => 'seamless-repeater']),
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Photo & Notes')
+                        ->icon('tabler-camera')
+                        ->schema([
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                                ->label('Recipe Photo')
+                                ->helperText('Upload a photo of your finished dish to make it more appealing!')
+                                ->image()
+                                ->imageEditor()
+                                ->imageCropAspectRatio('1:1')
+                                ->imageEditorAspectRatios(['1:1'])
+                                ->imageEditorViewportWidth(800)
+                                ->imageEditorViewportHeight(800)
+                                ->visibility('private')
+                                ->maxSize(5120)
+                                ->collection('recipe-images')
+                                ->imagePreviewHeight('200')
+                                ->panelLayout('integrated')
+                                ->extraAttributes([
+                                    'class' => 'custom-recipe-upload',
+                                ]),
+
+                            Forms\Components\RichEditor::make('notes')
+                                ->label('Additional Notes (Optional)')
+                                ->placeholder('Any tips, variations, or additional information about this recipe...')
+                                ->toolbarButtons([
+                                    'bold',
+                                    'italic',
+                                    'bulletList',
+                                    'orderedList',
+                                ])
+                                ->columnSpanFull(),
+                        ]),
+                ])
+                    ->columnSpanFull()
+                    ->persistStepInQueryString()
+                    ->skippable(fn($operation) => $operation === 'edit')
+                    ->submitAction(
+                        Forms\Components\Actions\Action::make('create')
+                            ->label('Done')
+                            ->icon('tabler-check')
+                            ->color('success')
+                            ->submit('create'),
+                    ),
+            ])
+            ->extraAttributes([
+                'class' => 'recipe-wizard',
             ]);
     }
 

@@ -37,6 +37,14 @@ if [ ! -d "laradock" ]; then
     exit 1
 fi
 
+# Read MySQL password from laradock/.env
+print_status "Reading configuration..."
+MYSQL_PASSWORD=$(grep -E '^MYSQL_ROOT_PASSWORD=' laradock/.env | cut -d '=' -f 2 | tr -d '\r\n')
+if [ -z "$MYSQL_PASSWORD" ]; then
+    print_warning "MYSQL_ROOT_PASSWORD not found in laradock/.env, using default 'root'"
+    MYSQL_PASSWORD="root"
+fi
+
 # 1. Fetch and pull latest changes
 print_status "Fetching latest changes from Git..."
 git fetch origin
@@ -44,51 +52,50 @@ CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 print_status "Current branch: $CURRENT_BRANCH"
 git pull origin $CURRENT_BRANCH
 
-# 2. Update submodules (in case Laradock got updated)
+# 2. Update submodules
 print_status "Updating Git submodules..."
 git submodule update --recursive
 
-# 3. Put application in maintenance mode
-print_status "Putting application in maintenance mode..."
-cd laradock
-if docker compose ps | grep -q "workspace.*Up"; then
-    docker compose exec workspace php artisan down || print_warning "Could not put app in maintenance mode (maybe it's already down)"
-else
-    print_warning "Workspace container not running, skipping maintenance mode"
-fi
-
-# 4. Stop containers
+# 3. Stop all containers
 print_status "Stopping Docker containers..."
+cd laradock
 docker compose down
 
-# 5. Build containers (with cache for speed)
-print_status "Building Docker containers..."
-docker compose up -d nginx mysql workspace php-worker
+# 4. Start MySQL and workspace for build tasks
+print_status "Starting MySQL and workspace for build tasks..."
+docker compose up -d mysql workspace
 
-# 6. Start containers
-print_status "Starting Docker containers..."
-docker compose up -d nginx mysql workspace php-worker
-
-# 7. Wait for MySQL to be ready
+# 5. Wait for MySQL to be ready
 print_status "Waiting for MySQL to be ready..."
-sleep 10
+sleep 5
 for i in {1..30}; do
-    if docker compose exec mysql mysql -u root -pstaging -e "SELECT 1" >/dev/null 2>&1; then
+    if docker compose exec mysql mysqladmin ping -u root -p"$MYSQL_PASSWORD" --silent >/dev/null 2>&1; then
         print_status "MySQL is ready!"
         break
     fi
     if [ $i -eq 30 ]; then
         print_error "MySQL failed to start after 30 attempts"
+        print_status "Checking MySQL logs..."
+        docker compose logs mysql | tail -20
         exit 1
     fi
     echo "Waiting for MySQL... ($i/30)"
     sleep 2
 done
 
-# 8. Install/update Composer dependencies
-print_status "Installing Composer dependencies..."
+# 6. Configure git in workspace
+print_status "Configuring workspace..."
 docker compose exec workspace git config --global --add safe.directory /var/www
-APP_ENV=$(docker compose exec workspace grep -E '^APP_ENV=' /var/www/.env | cut -d '=' -f 2)
+
+# 7. Get APP_ENV to determine dependency installation
+APP_ENV=$(docker compose exec workspace grep -E '^APP_ENV=' /var/www/.env | cut -d '=' -f 2 | tr -d '\r\n')
+if [ -z "$APP_ENV" ]; then
+    APP_ENV="local"
+    print_warning "APP_ENV not found, defaulting to 'local'"
+fi
+
+# 8. Install Composer dependencies in workspace
+print_status "Installing Composer dependencies..."
 if [ "${APP_ENV}" = "production" ]; then
     print_status "Detected APP_ENV=production. Installing production dependencies..."
     docker compose exec workspace composer install --no-dev --optimize-autoloader
@@ -97,41 +104,54 @@ else
     docker compose exec workspace composer install --optimize-autoloader
 fi
 
-# 9. Run database migrations
+# 9. Build assets in workspace
+print_status "Installing NPM dependencies and building assets..."
+docker compose exec workspace npm install
+docker compose exec workspace npm run build
+
+# 10. Run database migrations in workspace
 print_status "Running database migrations..."
 docker compose exec workspace php artisan migrate --force
 
-# 10. Clear all existing caches first
-print_status "Clearing existing caches..."
-docker compose exec workspace php artisan cache:clear
-docker compose exec workspace php artisan config:clear
-docker compose exec workspace php artisan route:clear
-docker compose exec workspace php artisan view:clear
+# 11. Start production containers and stop workspace
+print_status "Starting production containers..."
+docker compose up -d nginx php-fpm php-worker
+print_status "Stopping workspace container..."
+docker compose stop workspace
 
-# 11. Optimize application (rebuild all caches)
-print_status "Optimizing application..."
-docker compose exec workspace php artisan optimize
-
-# 12. Ensure storage is properly linked
-print_status "Ensuring storage link exists..."
-docker compose exec workspace php artisan storage:link || print_warning "Storage link already exists or failed"
-
-# 13. Set proper permissions (if needed)
+# 12. Set proper permissions before optimization
 print_status "Setting proper permissions..."
-# Fix permissions using php-fpm container as root
 docker compose exec --user=root php-fpm chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 docker compose exec --user=root php-fpm chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# 14. Take application out of maintenance mode
-print_status "Taking application out of maintenance mode..."
-docker compose exec workspace php artisan up
+# 13. Clear caches and optimize in php-fpm
+print_status "Clearing existing caches..."
+docker compose exec php-fpm php artisan cache:clear
+docker compose exec php-fpm php artisan config:clear
+docker compose exec php-fpm php artisan route:clear
+docker compose exec php-fpm php artisan view:clear
 
-# 15. Show final status
-print_status "Checking application status..."
-if docker compose ps | grep -q "nginx.*Up" && docker compose ps | grep -q "mysql.*Up"; then
-    print_status "🎉 Deployment completed successfully!"
+print_status "Optimizing application..."
+docker compose exec php-fpm php artisan optimize
+
+# 14. Ensure storage link exists
+print_status "Ensuring storage link exists..."
+docker compose exec php-fpm php artisan storage:link || print_warning "Storage link already exists or failed"
+
+# 15. Final health check
+print_status "Performing health check..."
+sleep 3
+if docker compose ps | grep -q "nginx.*Up" && docker compose ps | grep -q "mysql.*Up" && docker compose ps | grep -q "php-fpm.*Up"; then
+    print_status "🎉 All containers are running!"
+
+    if docker compose exec php-fpm php artisan about >/dev/null 2>&1; then
+        print_status "✅ Laravel application is healthy"
+    else
+        print_warning "⚠️  Laravel application may have issues"
+    fi
+
     echo
-    echo "Application should be available at your configured domain."
+    echo "🎉 Deployment completed successfully!"
     echo "Container status:"
     docker compose ps
 else

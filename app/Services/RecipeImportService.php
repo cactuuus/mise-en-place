@@ -3,8 +3,12 @@
 namespace App\Services;
 
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class RecipeImportService
 {
@@ -35,6 +39,7 @@ class RecipeImportService
                 'title'             => $recipeData['title'],
                 'ingredient_count'  => count($recipeData['ingredients']),
                 'instruction_count' => count($recipeData['instructions']),
+                'has_image'         => isset($recipeData['image_file']),
             ]);
 
             return $recipeData;
@@ -124,7 +129,7 @@ class RecipeImportService
      */
     private static function parseRecipeData(array $recipe): array
     {
-        return [
+        $data = [
             'title'        => self::extractTitle($recipe),
             'ingredients'  => self::extractIngredients($recipe),
             'instructions' => self::extractInstructions($recipe),
@@ -133,6 +138,23 @@ class RecipeImportService
             'serves'       => self::extractServings($recipe),
             'tags'         => self::extractTags($recipe),
         ];
+
+        // Extract and process image
+        $imageUrl = self::extractImageUrl($recipe);
+        if ($imageUrl) {
+            try {
+                $imageFile          = self::createTemporaryFileUploadFromUrl($imageUrl);
+                $data['image_file'] = $imageFile;
+            } catch (Exception $e) {
+                Log::warning('Failed to import recipe image', [
+                    'image_url' => $imageUrl,
+                    'error'     => $e->getMessage(),
+                ]);
+                // Continue without image rather than failing the entire import
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -323,5 +345,157 @@ class RecipeImportService
         });
 
         return array_values($tags);
+    }
+
+    /**
+     * Extract image URL from recipe structured data
+     */
+    private static function extractImageUrl(array $recipe): ?string
+    {
+        if (isset($recipe['image'])) {
+            $image = $recipe['image'];
+
+            if (is_string($image)) {
+                return self::validateImageUrl($image);
+            }
+
+            // Handle array of images (take the first one)
+            if (is_array($image) && ! empty($image)) {
+                $firstImage = $image[0];
+
+                // If it's an object with url property
+                if (is_array($firstImage) && isset($firstImage['url'])) {
+                    return self::validateImageUrl($firstImage['url']);
+                }
+
+                // If it's a direct URL string
+                if (is_string($firstImage)) {
+                    return self::validateImageUrl($firstImage);
+                }
+            }
+        }
+
+        // Check for photo field (alternative naming)
+        if (isset($recipe['photo']) && is_string($recipe['photo'])) {
+            return self::validateImageUrl($recipe['photo']);
+        }
+
+        return null;
+    }
+
+    /**
+     * Validate and clean image URL
+     */
+    private static function validateImageUrl(string $url): ?string
+    {
+        $url = trim($url);
+
+        if (empty($url)) {
+            return null;
+        }
+
+        // Ensure it's a valid URL
+        if ( ! filter_var($url, FILTER_VALIDATE_URL)) {
+            return null;
+        }
+
+        return $url;
+    }
+
+    /**
+     * Create a temporary file upload from an image URL (similar to the favicon example)
+     */
+    public static function createTemporaryFileUploadFromUrl(string $imageUrl): string
+    {
+        try {
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                ])
+                ->get($imageUrl);
+
+            if ( ! $response->successful()) {
+                throw new Exception('Failed to fetch image: HTTP '.$response->status());
+            }
+
+            $imageContent = $response->body();
+
+            if (empty($imageContent)) {
+                throw new Exception('Empty image content received');
+            }
+
+            // Validate content type
+            $contentType = $response->header('Content-Type');
+            if ( ! str_starts_with($contentType, 'image/')) {
+                throw new Exception('URL does not point to an image file. Content-Type: '.$contentType);
+            }
+
+            // Step 1: Save the file to a temporary location
+            $tempFilePath = tempnam(sys_get_temp_dir(), 'recipe_image');
+            file_put_contents($tempFilePath, $imageContent);
+
+            // Determine file extension from content type or URL
+            $extension = self::getImageExtension($contentType, $imageUrl);
+            $filename  = 'recipe_image_'.time().'.'.$extension;
+
+            // Step 2: Create an UploadedFile instance
+            $tempFile = new UploadedFile(
+                $tempFilePath,
+                $filename,
+                $contentType,
+                null,
+                true, // test mode - prevents validation errors
+            );
+
+            // Step 3: Store in livewire temp directory using the configured disk
+            $disk = config('livewire.temporary_file_upload.disk');
+            $path = Storage::disk($disk)->put('livewire-tmp', $tempFile);
+
+            // Step 4: Create a TemporaryUploadedFile instance
+            $file = TemporaryUploadedFile::createFromLivewire($path);
+
+            // Step 5: Return temporary signed URL
+            return URL::temporarySignedRoute(
+                'livewire.preview-file',
+                now()->addMinutes(30)->endOfHour(),
+                ['filename' => $file->getFilename()],
+            );
+        } catch (Exception $e) {
+            Log::error('Failed to create temporary file upload from URL', [
+                'url'   => $imageUrl,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Get appropriate file extension from content type or URL
+     */
+    private static function getImageExtension(string $contentType, string $imageUrl): string
+    {
+        // Map content types to extensions
+        $contentTypeMap = [
+            'image/jpeg' => 'jpg',
+            'image/jpg'  => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        ];
+
+        if (isset($contentTypeMap[$contentType])) {
+            return $contentTypeMap[$contentType];
+        }
+
+        // Fallback to URL extension
+        $urlPath   = parse_url($imageUrl, PHP_URL_PATH);
+        $extension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            return $extension === 'jpeg' ? 'jpg' : $extension;
+        }
+
+        // Default fallback
+        return 'jpg';
     }
 }

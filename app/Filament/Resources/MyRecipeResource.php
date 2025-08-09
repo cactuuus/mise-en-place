@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Livewire;
 
 class MyRecipeResource extends BaseRecipeResource
 {
@@ -40,7 +41,7 @@ class MyRecipeResource extends BaseRecipeResource
                                             ->placeholder('https://example.com/recipe')
                                             ->helperText('Enter the URL of the recipe you want to import'),
                                     ])
-                                    ->action(function (array $data, Forms\Set $set) {
+                                    ->action(function (array $data, Forms\Set $set, Livewire\Component $livewire) {
                                         try {
                                             $recipeData = RecipeImportService::importFromUrl($data['recipe_url']);
 
@@ -53,6 +54,9 @@ class MyRecipeResource extends BaseRecipeResource
                                             $set('serves', $recipeData['serves']);
                                             $set('ingredients', $recipeData['ingredients']);
                                             $set('instructions', $recipeData['instructions']);
+                                            if (isset($recipeData['image_file'])) {
+                                                $livewire->dispatch('add-recipe-image', $recipeData['image_file']);
+                                            }
 
                                             \Filament\Notifications\Notification::make()
                                                 ->title('Recipe imported successfully!')
@@ -203,6 +207,18 @@ class MyRecipeResource extends BaseRecipeResource
                                 ->collection('recipe-images')
                                 ->imagePreviewHeight('200')
                                 ->panelLayout('integrated')
+                                ->extraAlpineAttributes([
+                                    // https://silvanhagen.com/writing/background-file-upload-in-filament-forms/
+                                    'x-on:add-recipe-image.window' => '
+                                        const pond = FilePond.find($el.querySelector(".filepond--root"));
+                                        if (pond) {
+                                            setTimeout(() => {
+                                                pond.removeFiles({ revert: true });
+                                                pond.addFile($event.detail);
+                                            }, 750);
+                                        }
+                                    ',
+                                ])
                                 ->extraAttributes([
                                     'class' => 'custom-recipe-upload',
                                 ]),

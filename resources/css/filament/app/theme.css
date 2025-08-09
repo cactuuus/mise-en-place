@@ -81,48 +81,6 @@
     }
 }
 
-/* Hide drag handle on mobile, show individual up/down buttons */
-@media (max-width: 768px) {
-    /* Hide the drag handle (up/down combined icon) - works for both TableRepeater and Repeater */
-    .fi-fo-repeater-item-header li[x-sortable-handle],
-    .table-repeater-row-actions li[x-sortable-handle] {
-        @apply hidden !important;
-    }
-
-    /* Ensure individual up/down buttons are visible - TableRepeater */
-    .table-repeater-row-actions li:has(button[title*="Move up"]),
-    .table-repeater-row-actions li:has(button[title*="Move down"]) {
-        @apply block !important;
-    }
-
-    /* Ensure individual up/down buttons are visible - Regular Repeater */
-    .fi-fo-repeater-item-actions li:has(button[title*="Move up"]),
-    .fi-fo-repeater-item-actions li:has(button[title*="Move down"]) {
-        @apply block !important;
-    }
-}
-
-/* Hide individual up/down buttons on desktop, show drag handle */
-@media (min-width: 769px) {
-    /* Hide individual up/down buttons - TableRepeater */
-    .table-repeater-row-actions li:has(button[title*="Move up"]),
-    .table-repeater-row-actions li:has(button[title*="Move down"]) {
-        @apply hidden !important;
-    }
-
-    /* Hide individual up/down buttons - Regular Repeater */
-    .fi-fo-repeater-item-header li:has(button[title*="Move up"]),
-    .fi-fo-repeater-item-header li:has(button[title*="Move down"]) {
-        @apply hidden !important;
-    }
-
-    /* Ensure drag handle is visible - works for both */
-    .fi-fo-repeater-item-header li[x-sortable-handle],
-    .table-repeater-row-actions li[x-sortable-handle] {
-        @apply block !important;
-    }
-}
-
 /* File upload improvements */
 .fi-fo-file-upload {
     @apply border-2 border-dashed rounded-lg;

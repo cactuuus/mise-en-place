@@ -147,33 +147,21 @@ class MyRecipeResource extends BaseRecipeResource
                     Forms\Components\Wizard\Step::make('Ingredients')
                         ->icon('tabler-shopping-cart')
                         ->schema([
-                            TableRepeater::make('ingredients')
+                            Forms\Components\Repeater::make('ingredients')
                                 ->label(false)
-                                ->headers([
-                                    Header::make('amount')
-                                        ->label('Amount')
-                                        ->width('100px'),
-                                    Header::make('item')
-                                        ->label('Ingredient'),
-                                ])
-                                ->schema([
-                                    Forms\Components\TextInput::make('amount')
+                                ->simple(
+                                    Forms\Components\TextInput::make('ingredient')
+                                        ->label(false)
                                         ->required()
-                                        ->placeholder('2 cups')
-                                        ->extraAttributes(['class' => 'text-center font-mono']),
-
-                                    Forms\Components\TextInput::make('item')
-                                        ->required()
-                                        ->placeholder('all-purpose flour'),
-                                ])
+                                        ->placeholder('2 cups all-purpose flour')
+                                        ->extraAttributes(['class' => 'font-mono']),
+                                )
                                 ->required()
                                 ->minItems(1)
                                 ->defaultItems(3)
                                 ->addActionLabel('Add ingredient')
-                                ->stackAt('sm')
-                                ->reorderableWithButtons()
                                 ->reorderableWithDragAndDrop()
-                                ->streamlined(),
+                                ->itemLabel(fn() => 'Ingredient'),
                         ]),
 
                     Forms\Components\Wizard\Step::make('Instructions')
@@ -198,7 +186,7 @@ class MyRecipeResource extends BaseRecipeResource
                                 ->addActionLabel('Add step')
                                 ->orderColumn('step')
                                 ->reorderableWithButtons()
-                                ->reorderableWithDragAndDrop()
+                                ->reorderableWithDragAndDrop(false)
                                 ->defaultItems(1)
                                 ->itemLabel(fn() => 'Step '.BaseRecipeResource::getStepNumber())
                                 ->extraAttributes(['class' => 'seamless-repeater']),

@@ -84,14 +84,10 @@ abstract class BaseRecipeResource extends Resource
                         Infolists\Components\RepeatableEntry::make('ingredients')
                             ->label(false)
                             ->schema([
-                                Infolists\Components\TextEntry::make('amount')
-                                    ->label(false)
-                                    ->weight('bold'),
-                                Infolists\Components\TextEntry::make('item')
+                                Infolists\Components\TextEntry::make('ingredient')
                                     ->label(false),
                             ])
                             ->contained(false)
-                            ->columns(2)
                             ->grid(1),
                     ]),
 

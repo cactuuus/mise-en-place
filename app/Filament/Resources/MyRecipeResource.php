@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\Difficulty;
 use App\Enums\TagType;
 use App\Filament\Resources\MyRecipeResource\Pages;
+use App\Services\RecipeImportService;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Filament\Forms;
@@ -28,6 +29,52 @@ class MyRecipeResource extends BaseRecipeResource
                     Forms\Components\Wizard\Step::make('General info')
                         ->icon('tabler-question-mark')
                         ->schema([
+                            Forms\Components\Actions::make([
+                                Forms\Components\Actions\Action::make('import_from_url')
+                                    ->label('Import from URL')
+                                    ->icon('tabler-world-www')
+                                    ->color('info')
+                                    ->form([
+                                        Forms\Components\TextInput::make('recipe_url')
+                                            ->label('Recipe URL')
+                                            ->url()
+                                            ->required()
+                                            ->placeholder('https://example.com/recipe')
+                                            ->helperText('Enter the URL of the recipe you want to import'),
+                                    ])
+                                    ->action(function (array $data, Forms\Set $set) {
+                                        $url = $data['recipe_url'];
+
+                                        try {
+                                            // Use the service instead of making HTTP request
+                                            $importService = new RecipeImportService();
+                                            $recipeData    = $importService->importFromUrl($url);
+
+                                            // Populate form fields
+                                            $set('title', $recipeData['title']);
+                                            $set('source_url', $recipeData['source_url']);
+                                            $set('prep_time', $recipeData['prep_time']);
+                                            $set('cook_time', $recipeData['cook_time']);
+                                            $set('serves', $recipeData['serves']);
+                                            $set('difficulty_level', $recipeData['difficulty_level']);
+                                            $set('ingredients', $recipeData['ingredients']);
+                                            $set('instructions', $recipeData['instructions']);
+
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Recipe imported successfully!')
+                                                ->success()
+                                                ->send();
+                                        } catch (\Exception $e) {
+                                            \Filament\Notifications\Notification::make()
+                                                ->title('Failed to import recipe')
+                                                ->body('Please check the URL and try again. Error: '.$e->getMessage())
+                                                ->danger()
+                                                ->send();
+                                        }
+                                    }),
+                            ])
+                                ->columnSpanFull(),
+
                             Forms\Components\TextInput::make('title')
                                 ->required()
                                 ->maxLength(255)
@@ -192,7 +239,8 @@ class MyRecipeResource extends BaseRecipeResource
                 ])
                     ->columnSpanFull()
                     ->persistStepInQueryString()
-                    ->skippable(fn($operation) => $operation === 'edit')
+//                    ->skippable(fn($operation) => $operation === 'edit')
+                    ->skippable()
                     ->submitAction(
                         Forms\Components\Actions\Action::make('create')
                             ->label('Done')
@@ -206,6 +254,7 @@ class MyRecipeResource extends BaseRecipeResource
             ]);
     }
 
+    // ... rest of your methods remain the same
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

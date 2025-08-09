@@ -6,8 +6,6 @@ use App\Enums\Difficulty;
 use App\Enums\TagType;
 use App\Filament\Resources\MyRecipeResource\Pages;
 use App\Services\RecipeImportService;
-use Awcodes\TableRepeater\Components\TableRepeater;
-use Awcodes\TableRepeater\Header;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Form;
@@ -43,20 +41,16 @@ class MyRecipeResource extends BaseRecipeResource
                                             ->helperText('Enter the URL of the recipe you want to import'),
                                     ])
                                     ->action(function (array $data, Forms\Set $set) {
-                                        $url = $data['recipe_url'];
-
                                         try {
-                                            // Use the service instead of making HTTP request
-                                            $importService = new RecipeImportService();
-                                            $recipeData    = $importService->importFromUrl($url);
+                                            $recipeData = RecipeImportService::importFromUrl($data['recipe_url']);
 
                                             // Populate form fields
                                             $set('title', $recipeData['title']);
+                                            $set('tags', $recipeData['tags']);
                                             $set('source_url', $recipeData['source_url']);
                                             $set('prep_time', $recipeData['prep_time']);
                                             $set('cook_time', $recipeData['cook_time']);
                                             $set('serves', $recipeData['serves']);
-                                            $set('difficulty_level', $recipeData['difficulty_level']);
                                             $set('ingredients', $recipeData['ingredients']);
                                             $set('instructions', $recipeData['instructions']);
 

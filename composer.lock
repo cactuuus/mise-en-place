@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7dabe506102118f105eefb1caa4a9b62",
+    "content-hash": "842ad139691f4ebbb95e41beb0a025f7",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2575,6 +2575,130 @@
                 }
             ],
             "time": "2025-03-05T16:06:45+00:00"
+        },
+        {
+            "name": "inspector-apm/inspector-php",
+            "version": "3.16.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inspector-apm/inspector-php.git",
+                "reference": "40c9e72f8f973bb5ca038135f1a0b78b91bc66af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inspector-apm/inspector-php/zipball/40c9e72f8f973bb5ca038135f1a0b78b91bc66af",
+                "reference": "40c9e72f8f973bb5ca038135f1a0b78b91bc66af",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "friendsofphp/php-cs-fixer": "^3.75",
+                "inspector-apm/neuron-ai": "^1.2.22",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.0",
+                "rector/rector": "^2.0",
+                "tomasvotruba/type-coverage": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Inspector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valerio Barbera",
+                    "email": "valerio@inspector.dev"
+                }
+            ],
+            "description": "Inspector monitoring for PHP applications.",
+            "keywords": [
+                "inspector",
+                "monitoring",
+                "observability",
+                "php",
+                "telemetry"
+            ],
+            "support": {
+                "issues": "https://github.com/inspector-apm/inspector-php/issues",
+                "source": "https://github.com/inspector-apm/inspector-php/tree/3.16.1"
+            },
+            "time": "2025-07-09T17:22:19+00:00"
+        },
+        {
+            "name": "inspector-apm/neuron-ai",
+            "version": "1.16.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inspector-apm/neuron-ai.git",
+                "reference": "10c860f1b879806f90133add68476ea718de57cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inspector-apm/neuron-ai/zipball/10c860f1b879806f90133add68476ea718de57cc",
+                "reference": "10c860f1b879806f90133add68476ea718de57cc",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "inspector-apm/inspector-php": "^3.15.10",
+                "php": "^8.1",
+                "psr/http-message": "^1.0|^2.0",
+                "psr/log": "^1.0|^2.0|^3.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^3.209",
+                "doctrine/orm": "^2.20",
+                "elasticsearch/elasticsearch": "^8.0",
+                "ext-pdo": "*",
+                "friendsofphp/php-cs-fixer": "^3.75",
+                "monolog/monolog": "^3.9",
+                "php-http/curl-client": "^2.3",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^9.0",
+                "rector/rector": "^2.0",
+                "symfony/cache": "^5.4 || ^6.4 || ^7.0",
+                "symfony/process": "^5.0|^6.0|^7.0",
+                "tomasvotruba/type-coverage": "^2.0",
+                "typesense/typesense-php": "^5.0"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "^3.209",
+                "doctrine/orm": "^2.20",
+                "elasticsearch/elasticsearch": "^7.0|^8.0",
+                "php-http/curl-client": "^2.3",
+                "symfony/process": "^4.0|^5.0|^6.0|^7.0",
+                "typesense/typesense-php": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "NeuronAI\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Valerio Barbera",
+                    "email": "valerio@inspector.dev"
+                }
+            ],
+            "description": "The AI Agent Development Kit for PHP.",
+            "support": {
+                "issues": "https://github.com/inspector-apm/neuron-ai/issues",
+                "source": "https://github.com/inspector-apm/neuron-ai/tree/1.16.10"
+            },
+            "time": "2025-08-09T13:41:03+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",

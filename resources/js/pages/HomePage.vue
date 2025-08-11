@@ -1,54 +1,58 @@
 <template>
-    <q-page padding>
-        <div class="text-center q-mt-xl">
-            <h1 class="text-h4 text-primary q-mb-md">Welcome to Mise En Place</h1>
+    <div class="flex flex-col items-center justify-center">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-primary-600 mb-4">Welcome to Mise En Place</h1>
 
-            <div v-if="!authStore.isAuthenticated" class="q-gutter-md">
-                <p class="text-body1 text-grey-7">
+            <div v-if="!authStore.isAuthenticated" class="space-y-6">
+                <p class="text-lg text-surface-600">
                     Discover and share amazing recipes with the community!
                 </p>
 
-                <div class="q-gutter-sm">
-                    <q-btn
-                        color="primary"
+                <div class="flex gap-4 justify-center">
+                    <Button
                         label="Get Started"
-                        size="lg"
+                        size="large"
                         @click="goToRegister"
                     />
-                    <q-btn
-                        color="secondary"
+                    <Button
                         label="Sign In"
-                        outline
-                        size="lg"
+                        outlined
+                        severity="secondary"
+                        size="large"
                         @click="goToLogin"
                     />
                 </div>
             </div>
 
-            <div v-else class="q-gutter-md">
-                <q-card class="q-pa-md bg-blue-1">
-                    <q-card-section>
-                        <div class="text-h6">Hello, {{ authStore.user?.name }}! 👋</div>
-                        <div class="text-body2 text-grey-7">Ready to cook something delicious?</div>
-                    </q-card-section>
-                    <q-card-actions align="right">
-                        <q-btn
-                            color="negative"
-                            flat
-                            label="Logout"
-                            @click="authStore.logout"
-                        />
-                    </q-card-actions>
-                </q-card>
+            <div v-else class="max-w-md mx-auto">
+                <Card class="bg-blue-50">
+                    <template #content>
+                        <div class="text-center space-y-4">
+                            <div class="text-xl font-semibold">Hello, {{ authStore.user?.name }}! 👋</div>
+                            <div class="text-surface-600">Ready to cook something delicious?</div>
+
+                            <div class="flex justify-end pt-4">
+                                <Button
+                                    label="Logout"
+                                    severity="danger"
+                                    text
+                                    @click="authStore.logout"
+                                />
+                            </div>
+                        </div>
+                    </template>
+                </Card>
             </div>
         </div>
-    </q-page>
+    </div>
 </template>
 
 <script lang="ts" setup>
 import {onMounted} from 'vue'
 import {useRouter} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
+import Button from 'primevue/button'
+import Card from 'primevue/card'
 
 // Get access to our authentication store and router
 const authStore = useAuthStore()

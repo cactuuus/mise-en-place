@@ -8,6 +8,7 @@ export default {
         './app/Filament/**/*.php',
         './resources/views/filament/**/*.blade.php',
         './resources/views/**/*.blade.php',
+        './resources/js/**/*.vue',
         './vendor/filament/**/*.blade.php',
         './vendor/awcodes/filament-table-repeater/resources/**/*.blade.php',
         './resources/css/**/*.css',

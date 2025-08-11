@@ -1,231 +1,230 @@
 <template>
-    <q-page class="flex flex-center">
-        <q-card
-            class="q-pa-lg w-full max-w-xl"
-        >
-            <!-- Tab Navigation -->
-            <q-tabs
-                v-model="activeTab"
-                active-color="primary"
-                align="justify"
-                class="text-grey-8"
-                indicator-color="primary"
-                narrow-indicator
-            >
-                <q-tab label="Sign In" name="login"/>
-                <q-tab label="Create Account" name="register"/>
-            </q-tabs>
+    <div class="flex items-center justify-center">
+        <Card class="w-full max-w-lg">
+            <template #content>
+                <Tabs v-model:value="activeTab">
+                    <TabList>
+                        <Tab class="grow" value="login">Login</Tab>
+                        <Tab class="grow" value="register">Register</Tab>
+                    </TabList>
 
-            <q-separator/>
+                    <TabPanels id="login-panel">
+                        <TabPanel value="login">
+                            <h2 class="panel-heading">Do I know you?</h2>
 
-            <!-- Tab Panels -->
-            <q-tab-panels v-model="activeTab" animated>
+                            <Form v-slot="$form" :resolver="loginResolver" validate-on-value-update
+                                  @submit="handleLogin">
+                                <div class="form-content">
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <InputText
+                                                id="login-email"
+                                                :disabled="authStore.isLoading"
+                                                fluid
+                                                name="email"
+                                                type="email"
+                                            />
+                                            <label for="login-email">Email</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.email?.invalid" severity="error" size="small"
+                                                 variant="simple">
+                                            {{ $form.email.error.message }}
+                                        </Message>
+                                    </div>
 
-                <!-- Login Panel -->
-                <q-tab-panel name="login">
-                    <q-card-section>
-                        <q-form class="q-gutter-y-md" @submit="handleLogin">
-                            <h4 class="text-h6 sm:text-h4 q-mb-xl">Welcome Back!</h4>
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <Password
+                                                id="login-password"
+                                                :disabled="authStore.isLoading"
+                                                :feedback="false"
+                                                fluid
+                                                name="password"
+                                                toggleMask
+                                            />
+                                            <label for="login-password">Password</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.password?.invalid" severity="error" size="small"
+                                                 variant="simple">
+                                            {{ $form.password.error.message }}
+                                        </Message>
+                                    </div>
 
-                            <q-input
-                                v-model="loginForm.email"
-                                :disable="authStore.isLoading"
-                                :error="!!authStore.errorMessage"
-                                label="Email"
-                                outlined
-                                required
-                                standout
-                                type="email"
+                                    <Message v-if="authStore.errorMessage" severity="error">
+                                        {{ authStore.errorMessage }}
+                                    </Message>
+                                </div>
+                                <div class="button-container">
+                                    <Button
+                                        label="Back"
+                                        outlined
+                                        severity="secondary"
+                                        @click="router.push('/')"
+                                    />
+                                    <Button
+                                        :disabled="authStore.isLoading || !$form.valid"
+                                        :loading="authStore.isLoading"
+                                        label="Sign In"
+                                        type="submit"
+                                    />
+                                </div>
+                            </Form>
+
+                            <Button
+                                label="Don't have an account? Register now!"
+                                link
+                                @click="activeTab = 'register'"
                             />
+                        </TabPanel>
 
-                            <q-input
-                                v-model="loginForm.password"
-                                :disable="authStore.isLoading"
-                                :error="!!authStore.errorMessage"
-                                label="Password"
-                                outlined
-                                required
-                                type="password"
-                            />
-
-                            <div v-if="authStore.errorMessage" class="text-negative text-center text-caption m-0">
-                                {{ authStore.errorMessage }}
+                        <TabPanel value="register">
+                            <div class="panel-heading">
+                                <h2>Join millions* of other chefs</h2>
+                                <p class="text-gray-600 text-xs">* numbers might be severely inflated</p>
                             </div>
 
-                            <div class="flex flex-row gap-4 justify-evenly q-mt-lg">
-                                <q-btn
-                                    class="grow"
-                                    color="grey-2"
-                                    rounded
-                                    size="lg"
-                                    text-color="grey-8"
-                                    unelevated
-                                    @click="router.push('/')"
-                                >
-                                    Back
-                                </q-btn>
+                            <Form v-slot="$form" :resolver="registerResolver" validate-on-value-update
+                                  @submit="handleRegister">
+                                <div class="form-content">
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <InputText
+                                                id="register-name"
+                                                :disabled="authStore.isLoading"
+                                                fluid
+                                                name="name"
+                                                required
+                                            />
+                                            <label for="register-name">Full Name</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.name?.invalid" severity="error" size="small"
+                                                 variant="simple">
+                                            {{ $form.name.error.message }}
+                                        </Message>
+                                    </div>
 
-                                <q-btn
-                                    :disable="authStore.isLoading"
-                                    :loading="authStore.isLoading"
-                                    class="grow"
-                                    color="primary"
-                                    outlined
-                                    rounded
-                                    size="lg"
-                                    type="submit"
-                                    unelevated
-                                >
-                                    Sign In
-                                </q-btn>
-                            </div>
-                        </q-form>
-                    </q-card-section>
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <InputText
+                                                id="register-email"
+                                                :disabled="authStore.isLoading"
+                                                fluid
+                                                name="email"
+                                                required
+                                                type="email"
+                                            />
+                                            <label for="register-email">Email</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.email?.invalid" severity="error" size="small"
+                                                 variant="simple">
+                                            {{ $form.email.error.message }}
+                                        </Message>
+                                    </div>
 
-                    <q-card-section class="text-center q-pb-none">
-                        <q-btn
-                            color="grey-8"
-                            flat
-                            label="Don't have an account? Register now!"
-                            no-caps
-                            size="md"
-                            type="a"
-                            @click="activeTab = 'register'"
-                        />
-                    </q-card-section>
-                </q-tab-panel>
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <Password
+                                                id="register-password"
+                                                :disabled="authStore.isLoading"
+                                                fluid
+                                                mediumLabel="Medium"
+                                                name="password"
+                                                promptLabel="Enter a password"
+                                                required
+                                                strongLabel="Strong"
+                                                toggleMask
+                                                weakLabel="Weak"
+                                            />
+                                            <label for="register-password">Password</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.password?.invalid" severity="error" size="small"
+                                                 variant="simple">{{ $form.password.error.message }}
+                                        </Message>
+                                    </div>
 
-                <!-- Registration Panel -->
-                <q-tab-panel name="register">
-                    <q-card-section>
-                        <q-form class="q-gutter-y-md" @submit="handleRegister">
-                            <h4 class="text-h4 text-center q-mb-xl">Join millions* of other chefs</h4>
+                                    <div class="flex flex-col gap-1">
+                                        <FloatLabel variant="in">
+                                            <Password
+                                                id="register-password-confirmation"
+                                                :disabled="authStore.isLoading"
+                                                :feedback="false"
+                                                fluid
+                                                name="password_confirmation"
+                                                required
+                                                toggleMask
+                                            />
+                                            <label for="register-password-confirmation">Confirm Password</label>
+                                        </FloatLabel>
+                                        <Message v-if="$form.password_confirmation?.invalid" severity="error"
+                                                 size="small" variant="simple">
+                                            {{ $form.password_confirmation.error.message }}
+                                        </Message>
+                                    </div>
+                                </div>
 
+                                <Message v-if="authStore.errorMessage" severity="error">
+                                    {{ authStore.errorMessage }}
+                                </Message>
 
-                            <q-input
-                                v-model="registerForm.name"
-                                :disable="authStore.isLoading"
-                                :error="!!formErrors.name"
-                                :error-message="formErrors.name"
-                                label="Full Name"
-                                outlined
-                                required
-                                type="text"
-                            />
+                                <div class="button-container">
+                                    <Button
+                                        class="flex-1"
+                                        label="Back"
+                                        outlined
+                                        severity="secondary"
+                                        @click="router.push('/')"
+                                    />
+                                    <Button
+                                        :disabled="authStore.isLoading || !$form.valid"
+                                        :loading="authStore.isLoading"
+                                        class="flex-1"
+                                        label="Register"
+                                        type="submit"
+                                    />
+                                </div>
+                            </Form>
 
-                            <q-input
-                                v-model="registerForm.email"
-                                :disable="authStore.isLoading"
-                                :error="!!formErrors.email"
-                                :error-message="formErrors.email"
-                                label="Email"
-                                outlined
-                                required
-                                type="email"
-                            />
-
-                            <q-input
-                                v-model="registerForm.password"
-                                :disable="authStore.isLoading"
-                                :error="!!formErrors.password"
-                                :error-message="formErrors.password"
-                                hint="At least 8 characters"
-                                label="Password"
-                                outlined
-                                required
-                                type="password"
-                            >
-                                <template v-slot:prepend>
-                                    <q-icon name="key"></q-icon>
-                                </template>
-                            </q-input>
-
-                            <q-input
-                                v-model="registerForm.password_confirmation"
-                                :disable="authStore.isLoading"
-                                :error="!!formErrors.password_confirmation"
-                                :error-message="formErrors.password_confirmation"
-                                label="Confirm Password"
-                                outlined
-                                required
-                                type="password"
-                            />
-
-                            <div v-if="authStore.errorMessage" class="text-negative text-center text-caption">
-                                {{ authStore.errorMessage }}
-                            </div>
-
-                            <div class="flex flex-row gap-4 justify-evenly q-mt-lg">
-                                <q-btn
-                                    class="grow"
-                                    color="grey-2"
-                                    label="Back"
-                                    rounded
-                                    size="lg"
-                                    text-color="grey-8"
-                                    unelevated
-                                    @click="router.push('/')"
+                            <div class="text-center">
+                                <Button
+                                    label="Already have an account? Sign in!"
+                                    link
+                                    @click="activeTab = 'login'"
                                 />
-
-                                <q-btn
-                                    :disable="authStore.isLoading"
-                                    :loading="authStore.isLoading"
-                                    class="grow"
-                                    color="primary"
-                                    label="Register"
-                                    outlined
-                                    rounded
-                                    size="lg"
-                                    type="submit"
-                                    unelevated
-                                />
                             </div>
-                        </q-form>
-                    </q-card-section>
-
-                    <q-card-section class="text-center q-pb-none">
-                        <q-btn
-                            color="grey-8"
-                            flat
-                            label="Already have an account? Sign in!"
-                            no-caps
-                            size="md"
-                            type="a"
-                            @click="activeTab = 'login'"
-                        />
-                    </q-card-section>
-                </q-tab-panel>
-            </q-tab-panels>
-        </q-card>
-    </q-page>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+            </template>
+        </Card>
+    </div>
 </template>
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
+import Card from 'primevue/card'
+import Tabs from 'primevue/tabs'
+import Tab from 'primevue/tab'
+import TabList from 'primevue/tablist'
+import TabPanels from 'primevue/tabpanels'
+import TabPanel from 'primevue/tabpanel'
+import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
+import Button from 'primevue/button'
+import FloatLabel from 'primevue/floatlabel'
+import Message from 'primevue/message'
+import {Form} from '@primevue/forms'
+import {z} from 'zod'
+import {zodResolver} from '@primevue/forms/resolvers/zod'
+
 
 const activeTab = ref<'login' | 'register'>('login')
-
-const loginForm = ref({
-    email: '',
-    password: ''
-})
-
-const registerForm = ref({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: ''
-})
-
-const formErrors = ref<Record<string, string>>({})
 
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
-// Set initial tab based on route
 if (route.name === 'Register') {
     activeTab.value = 'register'
 }
@@ -233,15 +232,37 @@ if (route.name === 'Register') {
 // Clear errors when switching tabs
 watch(activeTab, () => {
     authStore.errorMessage = ''
-    formErrors.value = {}
 })
 
-const handleLogin = async (): Promise<void> => {
-    if (!loginForm.value.email || !loginForm.value.password) {
-        return
-    }
+const loginSchema = z.object({
+    email: z.email('Please enter a valid email'),
+    password: z.string().min(1, 'Password is required')
+})
+
+const registerSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.email('Please enter a valid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    password_confirmation: z.string()
+}).refine(data => data.password === data.password_confirmation, {
+    message: "Passwords don't match",
+    path: ['password_confirmation']
+})
+
+const loginResolver = zodResolver(loginSchema)
+const registerResolver = zodResolver(registerSchema)
+
+const handleLogin = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
+    if (!event.valid) return
+
+    // Extract values from states
+    const values = Object.keys(event.states).reduce((acc, key) => {
+        acc[key] = event.states[key].value
+        return acc
+    }, {} as Record<string, any>)
+
     try {
-        const success = await authStore.login(loginForm.value.email, loginForm.value.password)
+        const success = await authStore.login(values.email, values.password)
         if (success) {
             router.push('/')
         }
@@ -250,41 +271,21 @@ const handleLogin = async (): Promise<void> => {
     }
 }
 
-const validateRegistration = (): boolean => {
-    formErrors.value = {}
+const handleRegister = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
+    if (!event.valid) return
 
-    if (!registerForm.value.name.trim()) {
-        formErrors.value.name = 'Name is required'
-    }
-
-    if (!registerForm.value.email.trim()) {
-        formErrors.value.email = 'Email is required'
-    }
-
-    if (!registerForm.value.password) {
-        formErrors.value.password = 'Password is required'
-    } else if (registerForm.value.password.length < 8) {
-        formErrors.value.password = 'Password must be at least 8 characters'
-    }
-
-    if (registerForm.value.password !== registerForm.value.password_confirmation) {
-        formErrors.value.password_confirmation = 'Passwords do not match'
-    }
-
-    return Object.keys(formErrors.value).length === 0
-}
-
-const handleRegister = async (): Promise<void> => {
-    if (!validateRegistration()) {
-        return
-    }
+    // Extract values from states
+    const values = Object.keys(event.states).reduce((acc, key) => {
+        acc[key] = event.states[key].value
+        return acc
+    }, {} as Record<string, any>)
 
     try {
         const success = await authStore.register({
-            name: registerForm.value.name.trim(),
-            email: registerForm.value.email.trim(),
-            password: registerForm.value.password,
-            password_confirmation: registerForm.value.password_confirmation
+            name: values.name.trim(),
+            email: values.email.trim(),
+            password: values.password,
+            password_confirmation: values.password_confirmation
         })
 
         if (success) {
@@ -295,10 +296,3 @@ const handleRegister = async (): Promise<void> => {
     }
 }
 </script>
-
-<style scoped>
-/* Make the whole field yellow when autofilled */
-:deep(.q-field__control:has(.q-field__native:-webkit-autofill)) {
-    background-color: #fffcc8 !important; /* Chrome's autofill yellow */
-}
-</style>

@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia'
 import {computed, ref} from 'vue'
 import api from '@/services/api'
-import {Notify} from 'quasar'
+import {useToast} from 'primevue/usetoast'
 
 interface User {
     id: number
@@ -34,6 +34,7 @@ export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('auth_token'))
     const authState = ref<AuthState>(AuthState.IDLE)
     const errorMessage = ref<string>('')
+    const toast = useToast()
 
     const isAuthenticated = computed((): boolean => {
         return !!(token.value && user.value)
@@ -57,9 +58,11 @@ export const useAuthStore = defineStore('auth', () => {
             localStorage.setItem('auth_token', token.value)
             authState.value = AuthState.AUTHENTICATED
 
-            Notify.create({
-                type: 'positive',
-                message: `Welcome to Mise En Place, ${user.value.name}!`
+            toast.add({
+                severity: 'success',
+                summary: 'Registration Successful!',
+                detail: `Welcome to Mise En Place, ${user.value.name}!`,
+                life: 3000
             })
 
             return true
@@ -68,9 +71,11 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.ERROR
             errorMessage.value = error.response?.data?.message || 'Registration failed'
 
-            Notify.create({
-                type: 'negative',
-                message: errorMessage.value
+            toast.add({
+                severity: 'error',
+                summary: 'Registration Failed',
+                detail: errorMessage.value,
+                life: 5000
             })
 
             return false
@@ -95,9 +100,11 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.AUTHENTICATED
 
             // Show success message to user
-            Notify.create({
-                type: 'positive',
-                message: `Welcome back, ${user.value.name}!`
+            toast.add({
+                severity: 'success',
+                summary: 'Login Successful!',
+                detail: `Welcome back, ${user.value.name}!`,
+                life: 3000
             })
 
             return true // Indicate success to the calling component
@@ -110,9 +117,11 @@ export const useAuthStore = defineStore('auth', () => {
             errorMessage.value = error.response?.data?.message || 'Login failed. Please check your credentials.'
 
             // Show error to user
-            Notify.create({
-                type: 'negative',
-                message: errorMessage.value
+            toast.add({
+                severity: 'error',
+                summary: 'Login Failed',
+                detail: errorMessage.value,
+                life: 5000
             })
 
             return false // Indicate failure to the calling component
@@ -138,9 +147,11 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.IDLE
             errorMessage.value = ''
 
-            Notify.create({
-                type: 'info',
-                message: 'You have been logged out'
+            toast.add({
+                severity: 'info',
+                summary: 'Logged Out',
+                detail: 'You have been logged out',
+                life: 3000
             })
         }
     }

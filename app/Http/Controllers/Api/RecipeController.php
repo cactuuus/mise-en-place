@@ -1,0 +1,138 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Recipe;
+use Illuminate\Http\Request;
+
+class RecipeController extends Controller
+{
+    public function index(Request $request)
+    {
+        $recipes = Recipe::with(['user', 'tags'])
+            ->where('is_public', true)
+            ->latest()
+            ->paginate(20);
+
+        return response()->json($recipes);
+    }
+
+    public function show(Recipe $recipe)
+    {
+        if (!$recipe->is_public && $recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Recipe not found'], 404);
+        }
+
+        $recipe->load(['user', 'tags', 'ratings.user']);
+
+        return response()->json([
+            'recipe' => $recipe,
+            'average_rating' => $recipe->averageRating(),
+            'total_ratings' => $recipe->totalRatings(),
+            'user_rating' => auth()->check() ? $recipe->getUserRating(auth()->id()) : null,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'ingredients' => 'required|array',
+            'instructions' => 'required|array',
+            'notes' => 'nullable|string',
+            'source_url' => 'nullable|url',
+            'is_public' => 'boolean',
+            'prep_time' => 'nullable|integer|min:0',
+            'cook_time' => 'nullable|integer|min:0',
+            'serves' => 'nullable|integer|min:1',
+            'difficulty_level' => 'nullable|string|in:easy,medium,hard',
+            'tags' => 'nullable|array',
+        ]);
+
+        $recipe = Recipe::create([
+            ...$validated,
+            'user_id' => auth()->id(),
+        ]);
+
+        if (isset($validated['tags'])) {
+            $recipe->attachTags($validated['tags']);
+        }
+
+        return response()->json($recipe->load(['user', 'tags']), 201);
+    }
+
+    public function update(Request $request, Recipe $recipe)
+    {
+        if ($recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'string|max:255',
+            'ingredients' => 'array',
+            'instructions' => 'array',
+            'notes' => 'nullable|string',
+            'source_url' => 'nullable|url',
+            'is_public' => 'boolean',
+            'prep_time' => 'nullable|integer|min:0',
+            'cook_time' => 'nullable|integer|min:0',
+            'serves' => 'nullable|integer|min:1',
+            'difficulty_level' => 'nullable|string|in:easy,medium,hard',
+            'tags' => 'nullable|array',
+        ]);
+
+        $recipe->update($validated);
+
+        if (isset($validated['tags'])) {
+            $recipe->syncTags($validated['tags']);
+        }
+
+        return response()->json($recipe->load(['user', 'tags']));
+    }
+
+    public function destroy(Recipe $recipe)
+    {
+        if ($recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $recipe->delete();
+
+        return response()->json(['message' => 'Recipe deleted successfully']);
+    }
+
+    public function fork(Request $request, Recipe $recipe)
+    {
+        if (!$recipe->is_public) {
+            return response()->json(['message' => 'Cannot fork private recipe'], 403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
+        ]);
+
+        $forkedRecipe = $recipe->fork(auth()->id(), $validated['title'] ?? null);
+
+        return response()->json($forkedRecipe->load(['user', 'tags']), 201);
+    }
+
+    public function rate(Request $request, Recipe $recipe)
+    {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        if (!$recipe->is_public && $recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Cannot rate this recipe'], 403);
+        }
+
+        $rating = $recipe->rate(auth()->id(), $validated['rating']);
+
+        return response()->json([
+            'rating' => $rating,
+            'average_rating' => $recipe->averageRating(),
+            'total_ratings' => $recipe->totalRatings(),
+        ]);
+    }
+}

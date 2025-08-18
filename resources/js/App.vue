@@ -21,15 +21,13 @@
                     />
                 </div>
                 <div v-else class="flex items-center gap-2">
-                    <!-- Authenticated user - show avatar and name -->
+                    <!-- Authenticated user - show avatar -->
                     <Avatar
                         :label="userInitials"
-                        class="bg-surface-500 text-white cursor-pointer"
+                        class="bg-surface-500 cursor-pointer"
+                        shape="circle"
                         @click="toggleUserMenu"
                     />
-                    <span class="text-white font-medium hidden sm:block">
-                        {{ authStore.user?.name }}
-                    </span>
 
                     <!-- User dropdown menu -->
                     <Popover ref="userMenuRef">

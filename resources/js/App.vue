@@ -14,7 +14,6 @@
                 <div v-if="!authStore.isAuthenticated">
                     <!-- Guest user - show login button -->
                     <Button
-                        class="text-white"
                         label="Login"
                         text
                         @click="showLoginModal = true"
@@ -57,7 +56,7 @@
         </div>
 
         <!-- Toast Container -->
-        <Toast/>
+        <Toast class="max-w-[85%]" position="bottom-center"/>
 
         <!-- Login Modal -->
         <Dialog

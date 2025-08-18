@@ -53,11 +53,7 @@
                             <span>{{ recipe.serves || '-' }}</span>
                         </div>
                     </div>
-                    <!-- todo - adjust color based on enum value -->
-                    <Chip
-                        :label="recipe.difficulty_level || '-'"
-                        class="text-xs"
-                    />
+                    <DifficultyBadge :difficulty="recipe.difficulty_level"/>
                 </div>
 
                 <!-- Tags -->
@@ -85,6 +81,7 @@ import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
 import Image from 'primevue/image'
 import Recipe from '@/pages/RecipesPage.vue'
+import DifficultyBadge from "@/components/DifficultyBadge.vue";
 
 const props = defineProps<{
     recipe: Recipe
@@ -113,22 +110,6 @@ const recipeImage = computed(() => {
 // Functions
 const handleImageError = (): void => {
     imageError.value = true
-}
-
-const getDifficultySeverity = (difficulty: string | any): string => {
-    const difficultyStr = typeof difficulty === 'string' ? difficulty : String(difficulty)
-
-    switch (difficultyStr.toLowerCase()) {
-        case '1':
-            return 'success'
-        case '2':
-            return 'warn'
-        case '3':
-            return 'danger'
-        default:
-            console.error("unrecognised difficulty value: {{ difficultyStr }}")
-            return '-'
-    }
 }
 
 const getTagLabel = (tagName: string | { [key: string]: string }): string => {

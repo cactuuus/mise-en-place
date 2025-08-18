@@ -17,6 +17,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/HomePage.vue'),
         meta: {title: 'Mise en Place'}
     },
+    {
+        path: '/recipes',
+        name: 'recipes',
+        component: () => import('@/pages/RecipesPage.vue'),
+        meta: {title: 'Recipes'}
+    }
 ]
 
 const router = createRouter({

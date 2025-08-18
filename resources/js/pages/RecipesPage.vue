@@ -53,26 +53,8 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import RecipeCard from '@/components/RecipeCard.vue'
+import Recipe from '@/types/recipe.ts'
 import api from '@/services/api'
-
-// Types
-interface Recipe {
-    id: number
-    title: string
-    user: {
-        id: number
-        name: string
-    }
-    tags?: Array<{ name: string | { [key: string]: string } }>
-    prep_time?: number
-    cook_time?: number
-    total_time?: number
-    serves?: number
-    difficulty_level?: string
-    created_at: string
-    average_rating?: number
-    total_ratings?: number
-}
 
 interface ApiResponse {
     data: Recipe[]

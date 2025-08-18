@@ -80,7 +80,7 @@ import Avatar from 'primevue/avatar'
 import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
 import Image from 'primevue/image'
-import Recipe from '@/pages/RecipesPage.vue'
+import Recipe from '@/types/recipe.ts'
 import DifficultyBadge from "@/components/DifficultyBadge.vue";
 
 const props = defineProps<{

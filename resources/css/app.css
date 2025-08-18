@@ -7,7 +7,7 @@
 }
 
 #login-panel {
-    @apply px-0 w-full text-center;
+    @apply px-0 py-2 w-full text-center;
 
     .panel-heading {
         @apply text-2xl font-bold mt-4 mb-6;
@@ -22,15 +22,28 @@
     }
 
     .p-tabpanel {
-        @apply w-full max-w-sm mx-auto;
+        @apply w-full max-w-xs mx-auto px-2;
     }
 
     .button-container {
-        @apply flex gap-4 mt-6 mb-1;
+        @apply flex gap-3 mt-6 mb-1;
 
         .p-button {
-            @apply grow;
+            @apply w-full;
         }
     }
 
+    .footer-text {
+        @apply pt-3 pb-2;
+    }
+}
+
+.headless-modal {
+    .p-dialog-header {
+        @apply p-0;
+    }
+
+    .p-dialog-content {
+        @apply py-0 px-3;
+    }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-surface-50">
+    <div class="min-h-screen bg-surface-50 p-1">
         <!-- Header with Menubar -->
         <Menubar :model="menuItems" class="bg-primary-600">
             <!-- Logo/Brand on the left -->
@@ -32,7 +32,7 @@
                     </span>
 
                     <!-- User dropdown menu -->
-                    <Popover ref="userMenuRef" class="w-48">
+                    <Popover ref="userMenuRef">
                         <div class="flex flex-col gap-1">
                             <Button
                                 class="justify-start"
@@ -61,14 +61,18 @@
         <!-- Toast Container -->
         <Toast/>
 
-        <!-- Login Modal (placeholder for now) -->
+        <!-- Login Modal -->
         <Dialog
             v-model:visible="showLoginModal"
-            class="w-full max-w-md"
-            header="Login"
+            :closable="false"
+            :draggable="false"
+            class="w-full max-w-sm headless-modal mx-3"
+            close-on-escape
+            dismissable-mask
             modal
+            responsive
         >
-            <p>Login modal content will go here</p>
+            <LoginModal @close="showLoginModal = false"/>
         </Dialog>
     </div>
 </template>
@@ -83,6 +87,7 @@ import Button from 'primevue/button'
 import Avatar from 'primevue/avatar'
 import Popover from 'primevue/popover'
 import Dialog from 'primevue/dialog'
+import LoginModal from '@/components/LoginModal.vue'
 
 // Get our stores and router
 const authStore = useAuthStore()

@@ -17,18 +17,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/HomePage.vue'),
         meta: {title: 'Mise en Place'}
     },
-    {
-        path: '/login',
-        name: 'Login',
-        component: () => import('@/pages/LoginPage.vue'),
-        meta: {title: 'Login'}
-    },
-    {
-        path: '/register',
-        name: 'Register',
-        component: () => import('@/pages/LoginPage.vue'),
-        meta: {title: 'Register'}
-    }
 ]
 
 const router = createRouter({

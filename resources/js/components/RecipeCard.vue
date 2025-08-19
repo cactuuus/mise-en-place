@@ -1,32 +1,27 @@
 <template>
-    <Card class="recipe-card cursor-pointer transition-all duration-200 hover:shadow-lg">
-        <template #content>
+    <Card class="recipe-card max-w-xs cursor-pointer transition-all duration-200 hover:shadow-lg overflow-hidden">
+        <template #header>
             <!-- Recipe Image -->
-            <div class="recipe-image-container mb-4">
-                <Image
-                    :alt="recipe.title"
-                    :src="recipeImage"
-                    class="w-full object-cover rounded-lg aspect-square"
-                    @error="handleImageError"
-                />
-            </div>
+            <Image
+                :alt="recipe.title"
+                :src="recipeImage"
+                image-class="w-full object-cover aspect-square mx-auto"
+                @error="handleImageError"
+            />
+        </template>
 
+        <template #title>
+            {{ recipe.title }}
+        </template>
+
+        <template #subtitle>
+            by {{ recipe.user.name }}
+        </template>
+
+        <template #content>
             <!-- Recipe Info -->
             <div class="space-y-3">
-                <!-- Title -->
-                <h3 class="font-semibold text-lg line-clamp-2 text-surface-900">
-                    {{ recipe.title }}
-                </h3>
-
                 <!-- Author -->
-                <div class="flex items-center gap-2 text-sm text-surface-600">
-                    <Avatar
-                        :label="authorInitials"
-                        class="bg-primary-100 text-primary-600"
-                        shape="circle"
-                    />
-                    <span>by {{ recipe.user.name }}</span>
-                </div>
 
                 <!-- Rating -->
                 <div v-if="recipe.average_rating || recipe.total_ratings" class="flex items-center gap-2">
@@ -58,19 +53,21 @@
                         :difficulty="recipe.difficulty_level"
                     />
                 </div>
+            </div>
+        </template>
 
-                <!-- Tags -->
-                <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-1 items-baseline">
-                    <Chip
-                        v-for="tag in recipe.tags.slice(0, 3)"
-                        :key="getTagKey(tag)"
-                        :label="getTagLabel(tag.name)"
-                        class="text-xs"
-                    />
-                    <span v-if="recipe.tags.length > 3" class="text-xs text-surface-500">
+        <template #footer>
+            <!-- Tags -->
+            <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-1 items-baseline">
+                <Chip
+                    v-for="tag in recipe.tags.slice(0, 5)"
+                    :key="getTagKey(tag)"
+                    :label="getTagLabel(tag.name)"
+                    class="tag"
+                />
+                <span v-if="recipe.tags.length > 3" class="text-xs text-surface-500">
                         +{{ recipe.tags.length - 3 }} more
                     </span>
-                </div>
             </div>
         </template>
     </Card>
@@ -79,7 +76,6 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue'
 import Card from 'primevue/card'
-import Avatar from 'primevue/avatar'
 import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
 import Image from 'primevue/image'
@@ -127,16 +123,3 @@ const getTagKey = (tag: { name: string | { [key: string]: string } }): string =>
     return getTagLabel(tag.name)
 }
 </script>
-
-<style scoped>
-.recipe-card:hover {
-    transform: translateY(-2px);
-}
-
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-</style>

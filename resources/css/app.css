@@ -47,3 +47,27 @@
         @apply py-0 px-3;
     }
 }
+
+
+.recipe-card {
+    .p-card-caption {
+        @apply block;
+    }
+
+    .p-card-title {
+        @apply truncate;
+    }
+
+    .p-card-subtitle {
+        @apply truncate text-sm;
+    }
+
+    .tag {
+        @apply text-xs px-2 py-1 rounded-full;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+

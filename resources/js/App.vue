@@ -1,7 +1,8 @@
 <template>
-    <div class="min-h-screen bg-surface-50 p-1">
+    <div class="min-h-screen bg-zinc-200 dark:bg-zinc-800">
         <!-- Header with Menubar -->
-        <Menubar :model="menuItems" class="bg-primary-600">
+        <Menubar :model="menuItems"
+                 class="!rounded-none !border-l-0 !border-r-0 !border-t-0">
             <!-- Logo/Brand on the left -->
             <template #start>
                 <div class="text-xl font-bold">

@@ -18,5 +18,15 @@ export default {
     },
     darkMode: 'media',
     plugins: [forms],
+    safelist: [
+        {
+            pattern: /^(bg|text)-(green|yellow|red|gray)-(50|200|600|900)$/,
+            variants: ['dark'],
+        },
+        {
+            pattern: /^ring-(green|yellow|red|gray)-(200|600)\/10$/,
+            variants: ['dark'],
+        },
+    ]
 }
 

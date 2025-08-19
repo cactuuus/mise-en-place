@@ -1,43 +1,50 @@
 <template>
-    <div class="max-w-6xl mx-auto">
-        <!-- Loading State -->
-        <div v-if="loading && recipes.length === 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card v-for="i in 6" :key="i" class="animate-pulse">
-                <template #content>
-                    <div class="space-y-4">
-                        <div class="bg-surface-200 h-48 rounded"></div>
-                        <div class="bg-surface-200 h-4 rounded w-3/4"></div>
-                        <div class="bg-surface-200 h-3 rounded w-1/2"></div>
-                    </div>
-                </template>
-            </Card>
-        </div>
+    <!-- Loading State -->
+    <div v-if="loading && recipes.length === 0"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
+        <Card v-for="i in 10" :key="i" class="recipe-card max-w-xs overflow-hidden w-full">
+            <template #header>
+                <Skeleton border-radius="0" class="aspect-square" size="100%"></Skeleton>
+            </template>
+            <template #content>
+                <div class="space-y-2">
+                    <Skeleton height="1.5rem" width="90%"></Skeleton>
+                    <Skeleton width="40%"></Skeleton>
+                    <Skeleton height="2rem"></Skeleton>
+                </div>
+            </template>
+            <template #footer>
+                <div class="flex flex-row gap-4">
+                    <Skeleton v-for="i in 3" :key="i" height="1.2rem" width="25%"></Skeleton>
+                </div>
+            </template>
+        </Card>
+    </div>
 
-        <!-- Recipes Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <RecipeCard
-                v-for="recipe in recipes"
-                :key="recipe.id"
-                :recipe="recipe"
-                @click="viewRecipe(recipe)"
-            />
-        </div>
+    <!-- Recipes Grid -->
+    <div v-else
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
+        <RecipeCard
+            v-for="recipe in recipes"
+            :key="recipe.id"
+            :recipe="recipe"
+            @click="viewRecipe(recipe)"
+        />
+    </div>
 
-        <!-- Empty State -->
-        <div v-if="!loading && recipes.length === 0" class="text-center py-12">
-            <div class="text-6xl mb-4">🍽️</div>
-            <h3 class="text-xl font-semibold mb-2">No recipes found</h3>
-            <p class="text-surface-600">Be the first to share a delicious recipe!</p>
-        </div>
+    <!-- Empty State -->
+    <div v-if="!loading && recipes.length === 0" class="text-center py-12">
+        <h3 class="text-xl font-semibold mb-2">No recipes found</h3>
+        <p class="text-surface-600">Be the first to share a delicious recipe!</p>
+    </div>
 
-        <!-- Load More Button (temporary - will become infinite scroll) -->
-        <div v-if="hasMore && !loading" class="text-center mt-8">
-            <Button
-                :loading="loadingMore"
-                label="Load More"
-                @click="loadMore"
-            />
-        </div>
+    <!-- Load More Button (temporary - will become infinite scroll) -->
+    <div v-if="hasMore && !loading" class="text-center mt-8">
+        <Button
+            :loading="loadingMore"
+            label="Load More"
+            @click="loadMore"
+        />
     </div>
 </template>
 
@@ -46,6 +53,7 @@ import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
+import Skeleton from 'primevue/skeleton'
 import RecipeCard from '@/components/RecipeCard.vue'
 import {getDifficultyFromValue, Recipe} from '@/types/recipe.ts'
 import api from '@/services/api'

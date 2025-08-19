@@ -1,23 +1,17 @@
 <!-- js/components/DifficultyBadge.vue -->
 <template>
     <div
-        :class="`bg-${color}-100 text-${color}-800 dark:bg-${color}-900 dark:text-${color}-200`"
+        :class="`bg-${difficulty.color}-100 text-${difficulty.color}-800 dark:bg-${difficulty.color}-900 dark:text-${difficulty.color}-200`"
         class="px-2 py-1 rounded-full text-xs font-medium"
     >
-        {{ getDifficultyLabel(difficulty) }}
+        {{ difficulty.label }}
     </div>
 </template>
 
 <script lang="ts" setup>
-import {DifficultyLevel, getDifficultyColor, getDifficultyLabel} from '@/types/recipe'
-import {computed} from "vue";
+import {DifficultyLevel} from '@/types/recipe'
 
-const props = defineProps<{
+defineProps<{
     difficulty: DifficultyLevel
 }>()
-
-const color = computed(() => {
-    return getDifficultyColor(props.difficulty)
-})
-
 </script>

@@ -1,8 +1,22 @@
-export enum DifficultyLevel {
-    EASY = 1,
-    MEDIUM = 2,
-    HARD = 3
-}
+export const DIFFICULTY_LEVELS = {
+    EASY: {
+        value: 1,
+        label: 'Easy',
+        color: 'green'
+    },
+    MEDIUM: {
+        value: 2,
+        label: 'Medium',
+        color: 'yellow'
+    },
+    HARD: {
+        value: 3,
+        label: 'Hard',
+        color: 'red'
+    }
+} as const
+
+export type DifficultyLevel = typeof DIFFICULTY_LEVELS[keyof typeof DIFFICULTY_LEVELS]
 
 export interface Recipe {
     id: number
@@ -22,29 +36,7 @@ export interface Recipe {
     total_ratings?: number
 }
 
-export const getDifficultyLabel = (difficulty?: DifficultyLevel): string => {
-    switch (difficulty) {
-        case DifficultyLevel.EASY:
-            return 'Easy'
-        case DifficultyLevel.MEDIUM:
-            return 'Medium'
-        case DifficultyLevel.HARD:
-            return 'Hard'
-        default:
-            console.error(`Unknown difficulty level: ${difficulty}`)
-            return '???'
-    }
-}
-
-export const getDifficultyColor = (difficulty?: DifficultyLevel): string => {
-    switch (difficulty) {
-        case DifficultyLevel.EASY:
-            return `green`
-        case DifficultyLevel.MEDIUM:
-            return `yellow`
-        case DifficultyLevel.HARD:
-            return `red`
-        default:
-            return `gray`
-    }
+// Helper function to convert API number to difficulty object
+export const getDifficultyFromValue = (value?: number): DifficultyLevel | undefined => {
+    return Object.values(DIFFICULTY_LEVELS).find(d => d.value === value)
 }

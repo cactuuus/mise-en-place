@@ -51,13 +51,12 @@ import {onMounted, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
-import ProgressSpinner from 'primevue/progressspinner'
 import RecipeCard from '@/components/RecipeCard.vue'
-import {Recipe} from '@/types/recipe.ts'
+import {getDifficultyFromValue, Recipe} from '@/types/recipe.ts'
 import api from '@/services/api'
 
 interface ApiResponse {
-    data: Recipe[]
+    data: Recipe[] // not quite true: difficulty in api recipes is a simple number
     current_page: number
     last_page: number
     per_page: number
@@ -78,7 +77,15 @@ const hasMore = ref(true)
 const fetchRecipes = async (page: number = 1): Promise<void> => {
     try {
         const response = await api.get<ApiResponse>(`/recipes?page=${page}`)
-        const data = response.data
+
+        const data = {
+            ...response.data,
+            // Transform raw API data: difficulty_level goes from number to DifficultyLevel object
+            data: response.data.data.map((recipe: any) => ({
+                ...recipe,
+                difficulty_level: getDifficultyFromValue(recipe.difficulty_level)
+            }))
+        }
 
         if (page === 1) {
             recipes.value = data.data

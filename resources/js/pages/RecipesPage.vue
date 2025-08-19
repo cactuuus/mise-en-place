@@ -53,7 +53,7 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import ProgressSpinner from 'primevue/progressspinner'
 import RecipeCard from '@/components/RecipeCard.vue'
-import Recipe from '@/types/recipe.ts'
+import {Recipe} from '@/types/recipe.ts'
 import api from '@/services/api'
 
 interface ApiResponse {

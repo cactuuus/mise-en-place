@@ -53,7 +53,10 @@
                             <span>{{ recipe.serves || '-' }}</span>
                         </div>
                     </div>
-                    <DifficultyBadge :difficulty="recipe.difficulty_level"/>
+                    <DifficultyBadge
+                        v-if="recipe.difficulty_level"
+                        :difficulty="recipe.difficulty_level"
+                    />
                 </div>
 
                 <!-- Tags -->
@@ -80,8 +83,8 @@ import Avatar from 'primevue/avatar'
 import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
 import Image from 'primevue/image'
-import Recipe from '@/types/recipe.ts'
-import DifficultyBadge from "@/components/DifficultyBadge.vue";
+import {Recipe} from '@/types/recipe'
+import DifficultyBadge from "@/components/DifficultyBadge.vue"
 
 const props = defineProps<{
     recipe: Recipe
@@ -123,7 +126,6 @@ const getTagLabel = (tagName: string | { [key: string]: string }): string => {
 const getTagKey = (tag: { name: string | { [key: string]: string } }): string => {
     return getTagLabel(tag.name)
 }
-
 </script>
 
 <style scoped>

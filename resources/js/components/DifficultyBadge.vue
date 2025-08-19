@@ -1,41 +1,23 @@
+<!-- js/components/DifficultyBadge.vue -->
 <template>
     <div
-        :class="badgeClasses"
+        :class="`bg-${color}-100 text-${color}-800 dark:bg-${color}-900 dark:text-${color}-200`"
+        class="px-2 py-1 rounded-full text-xs font-medium"
     >
-        {{ getLabel(difficulty) }}
+        {{ getDifficultyLabel(difficulty) }}
     </div>
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue'
+import {DifficultyLevel, getDifficultyColor, getDifficultyLabel} from '@/types/recipe'
+import {computed} from "vue";
 
 const props = defineProps<{
-    difficulty?: number
+    difficulty: DifficultyLevel
 }>()
 
-const getLabel = (value: number): string => {
-    switch (value) {
-        case 1:
-            return 'Easy'
-        case 2:
-            return 'Medium'
-        case 3:
-            return 'Hard'
-        default:
-            console.error('unrecognized difficulty value: ' + value)
-    }
-}
-
-const badgeClasses = computed(() => {
-    const base = 'px-2 py-1 rounded-full text-xs font-medium'
-
-    switch (props.difficulty) {
-        case 1:
-            return `${base} bg-green-100 text-green-800`
-        case 2:
-            return `${base} bg-yellow-100 text-yellow-800`
-        case 3:
-            return `${base} bg-red-100 text-red-800`
-    }
+const color = computed(() => {
+    return getDifficultyColor(props.difficulty)
 })
+
 </script>

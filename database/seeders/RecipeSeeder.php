@@ -18,17 +18,17 @@ class RecipeSeeder extends Seeder
         // Get all existing users (created by UserSeeder)
         $users = User::all();
 
-        // Create 1 to 10 recipes per user
+        // Create 1 to 5 recipes per user
         $recipes = collect();
         foreach ($users as $user) {
-            $userRecipes = Recipe::factory(rand(1, 10))->create([
+            $userRecipes = Recipe::factory(rand(1, 5))->create([
                 'user_id' => $user->id,
             ]);
             $recipes     = $recipes->merge($userRecipes);
         }
 
         // Create some forked recipes
-        $originalRecipes = $recipes->where('forked_from_recipe_id', null)->take(30);
+        $originalRecipes = $recipes->where('forked_from_recipe_id', null)->take(10);
         foreach ($originalRecipes as $originalRecipe) {
             // Random user forks this recipe
             $forker = $users->where('id', '!=', $originalRecipe->user_id)->random();

@@ -38,11 +38,6 @@
                 @click="loadMore"
             />
         </div>
-
-        <!-- Loading More Indicator -->
-        <div v-if="loadingMore" class="text-center mt-8">
-            <ProgressSpinner style="width: 50px; height: 50px"/>
-        </div>
     </div>
 </template>
 

@@ -34,6 +34,11 @@ export interface Recipe {
     created_at: string
     average_rating?: number
     total_ratings?: number
+    image_urls: {
+        small: string | null
+        medium: string | null
+        large: string | null
+    }
 }
 
 // Helper function to convert API number to difficulty object

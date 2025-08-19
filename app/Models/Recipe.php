@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -18,8 +19,9 @@ class Recipe extends Model implements HasMedia
     use HasFactory, InteractsWithMedia, HasTags;
 
     private static array $IMAGE_SIZES = [
-        'sm' => 150,
-        'lg' => 800,
+        'small'  => 150,
+        'medium' => 300,
+        'large'  => 800,
     ];
 
     protected $fillable = [
@@ -38,6 +40,7 @@ class Recipe extends Model implements HasMedia
         'serves',
         'difficulty_level',
     ];
+
     protected $casts = [
         'ingredients'      => 'array',
         'instructions'     => 'array',
@@ -47,6 +50,10 @@ class Recipe extends Model implements HasMedia
         'total_time'       => 'integer',
         'serves'           => 'integer',
         'difficulty_level' => Difficulty::class,
+    ];
+
+    protected $appends = [
+        'image_urls',
     ];
 
     protected static function booted(): void
@@ -137,5 +144,27 @@ class Recipe extends Model implements HasMedia
     public function getUserRating(int $userId): ?int
     {
         return $this->ratings()->where('user_id', $userId)->first()?->rating;
+    }
+
+    public function getImageUrlsAttribute(): array
+    {
+        if ( ! $this->hasMedia('recipe-images')) {
+            // Return null for each size when no media
+            return array_fill_keys(array_keys(self::$IMAGE_SIZES), null);
+        }
+
+        $media = $this->getFirstMedia('recipe-images');
+        $urls  = [];
+
+        // Loop through each image size and generate cached temporary URL
+        foreach (self::$IMAGE_SIZES as $sizeName => $sizeValue) {
+            $urls[$sizeName] = Cache::remember(
+                "recipe_image_{$sizeName}_{$media->id}",
+                now()->addMinutes(30),
+                fn() => $media->getTemporaryUrl(now()->addHour(), $sizeName),
+            );
+        }
+
+        return $urls;
     }
 }

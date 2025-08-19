@@ -103,15 +103,15 @@ const authorInitials = computed(() => {
 })
 
 const recipeImage = computed(() => {
-    if (imageError.value) {
+    if (imageError.value || !props.recipe.image_urls.medium || props.recipe.image_urls.medium.trim() === '') {
         return '/images/recipe-placeholder.svg'
     }
-    // TODO: Return actual recipe image URL when available
-    return '/images/recipe-placeholder.svg'
+    return props.recipe.image_urls.medium
 })
 
 // Functions
 const handleImageError = (): void => {
+    console.log(`Image error occurred for recipe: ${props.recipe.title} - id ${props.recipe.id}`)
     imageError.value = true
 }
 

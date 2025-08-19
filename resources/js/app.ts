@@ -5,6 +5,7 @@ import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
 import router from './router'
 import App from './App.vue'
+import {useAuthStore} from './stores/auth'
 import 'primeicons/primeicons.css'
 
 const app = createApp(App)
@@ -25,4 +26,11 @@ app.use(PrimeVue, {
 });
 app.use(ToastService);
 
-app.mount('#app')
+// Initialize authentication before mounting
+const initializeApp = async () => {
+    const authStore = useAuthStore()
+    await authStore.initializeAuth()
+    app.mount('#app')
+}
+
+initializeApp().catch(console.error)

@@ -1,11 +1,11 @@
 <template>
-    <Card class="recipe-card max-w-xs cursor-pointer transition-all duration-200 hover:shadow-lg overflow-hidden">
+    <Card class="recipe-card transition-all duration-200 hover:shadow-lg">
         <template #header>
             <!-- Recipe Image -->
             <Image
                 :alt="recipe.title"
                 :src="recipeImage"
-                image-class="w-full object-cover aspect-square mx-auto"
+                image-class="image-preview"
                 @error="handleImageError"
             />
         </template>

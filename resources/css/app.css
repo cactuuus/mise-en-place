@@ -50,6 +50,12 @@
 
 
 .recipe-card {
+    @apply max-w-sm cursor-pointer overflow-hidden w-full;
+
+    .image-preview {
+        @apply w-full object-cover aspect-square mx-auto;
+    }
+
     .p-card-caption {
         @apply block;
     }

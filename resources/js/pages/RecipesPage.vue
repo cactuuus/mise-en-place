@@ -1,10 +1,13 @@
 <template>
     <!-- Loading State -->
-    <div v-if="loading && recipes.length === 0"
-         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
-        <Card v-for="i in 10" :key="i" class="recipe-card max-w-xs overflow-hidden w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
+        <Card
+            v-for="i in 10"
+            v-if="loading && recipes.length === 0"
+            :key="i"
+            class="recipe-card">
             <template #header>
-                <Skeleton border-radius="0" class="aspect-square" size="100%"></Skeleton>
+                <Skeleton border-radius="0" class="image-preview" size="100%"></Skeleton>
             </template>
             <template #content>
                 <div class="space-y-2">
@@ -19,13 +22,11 @@
                 </div>
             </template>
         </Card>
-    </div>
 
-    <!-- Recipes Grid -->
-    <div v-else
-         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
+        <!-- Recipes Grid -->
         <RecipeCard
             v-for="recipe in recipes"
+            v-else
             :key="recipe.id"
             :recipe="recipe"
             @click="viewRecipe(recipe)"

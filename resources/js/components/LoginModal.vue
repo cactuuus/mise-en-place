@@ -190,7 +190,7 @@
 </template>
 
 <script lang="ts" setup>
-import {defineEmits, ref, watch} from 'vue'
+import {ref, watch} from 'vue'
 import {useAuthStore} from '@/stores/auth'
 import Tabs from 'primevue/tabs'
 import Tab from 'primevue/tab'

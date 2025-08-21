@@ -29,7 +29,6 @@
                         text
                         @click="toggleUserMenu"
                     >
-                        <span class="text-sm">{{ authStore.user?.name }}</span>
                         <Avatar
                             :image="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
                             class="bg-surface-500 cursor-pointer"
@@ -73,7 +72,7 @@
             v-model:visible="showLoginModal"
             :closable="false"
             :draggable="false"
-            class="w-full max-w-sm headless-modal mx-3"
+            class="base-modal headless-modal"
             close-on-escape
             dismissable-mask
             modal

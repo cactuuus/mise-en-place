@@ -1,34 +1,32 @@
 <template>
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-4xl mx-auto space-y-4">
         <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-6">Account settings</h1>
 
         <!-- Profile Information Display -->
-        <Panel>
+        <Panel id="user-settings-panel">
             <template #header>
-                <div class="flex items-center gap-2">
-                    <i class="pi pi-user text-primary"></i>
+                <div class="panel-header">
+                    <i class="pi pi-user"></i>
                     Profile Information
                 </div>
             </template>
 
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <!-- Avatar Section -->
-                <div
-                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
-                    <div class="flex items-center gap-4">
-                        <Avatar
-                            :image="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
-                            shape="circle"
-                            size="xlarge"
-                        />
-                        <div>
-                            <p class="font-medium text-surface-900 dark:text-surface-0">Profile Picture</p>
-                            <p class="text-sm text-surface-600 dark:text-surface-400">
-                                JPG, PNG, or WebP. Max 2MB.
-                            </p>
-                        </div>
-                    </div>
+                <Fieldset legend="Profile Picture">
+                    <Image
+                        :src="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
+                        image-class="w-[90px] rounded-full object-cover"
+                    />
                     <div class="flex gap-2">
+                        <Button
+                            v-if="authStore.user?.avatar_urls?.small"
+                            icon="pi pi-trash"
+                            label="Delete"
+                            severity="danger"
+                            size="small"
+                            @click="showDeleteAvatarModal = true"
+                        />
                         <Button
                             icon="pi pi-pencil"
                             label="Edit"
@@ -36,25 +34,12 @@
                             size="small"
                             @click="showAvatarModal = true"
                         />
-                        <Button
-                            v-if="authStore.user?.avatar_urls?.small"
-                            icon="pi pi-trash"
-                            label="Delete"
-                            outlined
-                            severity="danger"
-                            size="small"
-                            @click="showDeleteAvatarModal = true"
-                        />
                     </div>
-                </div>
+                </Fieldset>
 
                 <!-- Name Section -->
-                <div
-                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
-                    <div>
-                        <p class="font-medium text-surface-900 dark:text-surface-0">Name</p>
-                        <p class="text-surface-600 dark:text-surface-400">{{ authStore.user?.name }}</p>
-                    </div>
+                <Fieldset legend="Name">
+                    <p>{{ authStore.user?.name }}</p>
                     <Button
                         icon="pi pi-pencil"
                         label="Edit"
@@ -62,85 +47,82 @@
                         size="small"
                         @click="showNameModal = true"
                     />
-                </div>
+                </Fieldset>
 
                 <!-- Email Section -->
-                <div
-                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg opacity-60">
-                    <div>
-                        <p class="font-medium text-surface-900 dark:text-surface-0">Email Address</p>
-                        <p class="text-surface-600 dark:text-surface-400">{{ authStore.user?.email }}</p>
-                    </div>
+                <Fieldset legend="Email">
+                    <p>{{ authStore.user?.email }}</p>
                     <Button
                         disabled
                         icon="pi pi-lock"
-                        label="Locked"
+                        label="Edit"
                         outlined
                         size="small"
                     />
-                </div>
+                </Fieldset>
 
                 <!-- Password Section -->
-                <div
-                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
-                    <div>
-                        <p class="font-medium text-surface-900 dark:text-surface-0">Password</p>
-                        <p class="text-surface-600 dark:text-surface-400">••••••••••••</p>
-                    </div>
+                <Fieldset legend="Password">
+                    <p>••••••••••••</p>
                     <Button
-                        icon="pi pi-key"
-                        label="Change"
+                        icon="pi pi-pencil"
+                        label="Edit"
                         outlined
                         size="small"
                         @click="showPasswordModal = true"
                     />
-                </div>
+                </Fieldset>
             </div>
         </Panel>
 
         <!-- Danger Zone -->
-        <Card class="mt-6">
-            <template #title>
-                <div class="flex items-center gap-2">
-                    <i class="pi pi-exclamation-triangle text-red-500"></i>
-                    Danger Zone
+        <Panel id="danger-zone-panel" collapsed toggleable>
+            <template #header>
+                <div class="panel-header text-red-500">
+                    <i class="pi pi-exclamation-triangle "></i>
+                    <div class="flex items-center gap-2">
+                        Danger Zone
+                    </div>
                 </div>
             </template>
-            <template #content>
-                <div class="space-y-3">
-                    <p class="text-sm text-surface-600 dark:text-surface-400">
-                        Once you delete your account, all of your data will be permanently removed.
-                    </p>
-                    <Button
-                        icon="pi pi-trash"
-                        label="Delete Account"
-                        outlined
-                        severity="danger"
-                        @click="showDeleteModal = true"
-                    />
-                </div>
-            </template>
-        </Card>
+
+            <Fieldset legend="Delete Account">
+
+                <p class="text-sm font-semibold">
+                    Once you delete your account, all of your data will be permanently removed.
+                </p>
+                <Button
+                    icon="pi pi-trash"
+                    label="Delete Account"
+                    severity="danger"
+                    @click="showDeleteModal = true"
+                />
+
+            </Fieldset>
+        </Panel>
     </div>
 
     <!-- Edit Name Modal -->
     <Dialog
         v-model:visible="showNameModal"
         :closable="false"
+        :close-on-escape="false"
         :draggable="false"
-        class="w-full max-w-md mx-3"
+        class="base-modal"
+        dismissable-mask
         header="Edit Name"
         modal
+        responsive
     >
         <Form v-slot="$form" :initial-values="{ name: authStore.user?.name }" :resolver="nameResolver"
               validate-on-value-update @submit="handleNameUpdate">
             <div class="space-y-4">
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col gap-1 mt-1">
                     <FloatLabel variant="on">
                         <InputText
                             id="name"
                             :disabled="nameLoading"
-                            fluid
+                            class="w-full"
                             name="name"
                             type="text"
                         />
@@ -151,17 +133,18 @@
                     </Message>
                 </div>
 
-                <div class="flex justify-end gap-2 pt-4">
+                <div class="button-container">
                     <Button
                         label="Cancel"
                         outlined
+                        severity="secondary"
                         @click="showNameModal = false"
                     />
                     <Button
                         :disabled="nameLoading || !$form.valid"
                         :loading="nameLoading"
                         icon="pi pi-save"
-                        label="Save Changes"
+                        label="Save"
                         type="submit"
                     />
                 </div>
@@ -173,14 +156,17 @@
     <Dialog
         v-model:visible="showPasswordModal"
         :closable="false"
+        :close-on-escape="false"
         :draggable="false"
-        class="w-full max-w-md mx-3"
+        class="base-modal"
+        dismissable-mask
         header="Change Password"
         modal
+        responsive
     >
         <Form v-slot="$form" :resolver="passwordResolver" validate-on-value-update @submit="handlePasswordChange">
             <div class="space-y-4">
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col gap-1 mt-1">
                     <FloatLabel variant="on">
                         <Password
                             id="currentPassword"
@@ -196,6 +182,8 @@
                         {{ $form.currentPassword.error.message }}
                     </Message>
                 </div>
+
+                <hr/>
 
                 <div class="flex flex-col gap-1">
                     <FloatLabel variant="on">
@@ -234,17 +222,18 @@
                     {{ authStore.errorMessage }}
                 </Message>
 
-                <div class="flex justify-end gap-2 pt-4">
+                <div class="button-container">
                     <Button
                         label="Cancel"
                         outlined
+                        severity="secondary"
                         @click="showPasswordModal = false"
                     />
                     <Button
                         :disabled="passwordLoading || !$form.valid"
                         :loading="passwordLoading"
                         icon="pi pi-save"
-                        label="Change Password"
+                        label="Save"
                         type="submit"
                     />
                 </div>
@@ -254,78 +243,55 @@
 
     <!-- Avatar Upload Modal -->
     <Dialog
+        id="avatar-modal"
         v-model:visible="showAvatarModal"
         :closable="false"
+        :close-on-escape="false"
         :draggable="false"
-        class="w-full max-w-md mx-3"
+        class="base-modal"
+        dismissable-mask
         header="Edit Avatar"
         modal
+        responsive
     >
-        <div class="space-y-6">
+        <div class="grid grid-cols-[1.5fr_2fr] place-items-center gap-4">
             <!-- Avatar Preview -->
-            <div class="text-center">
-                <Avatar
-                    :image="avatarPreviewUrl || authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
-                    class="mb-4"
-                    shape="circle"
-                    size="xlarge"
-                />
-                <p class="text-sm text-surface-600 dark:text-surface-400">
-                    {{ selectedAvatar ? 'New avatar selected' : 'Current avatar' }}
-                </p>
-            </div>
-
+            <Image
+                :src="avatarPreviewUrl || authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
+                image-class="w-full min-w-[90px] max-w-[200px] mx-auto rounded-full aspect-square object-cover border-4 border-dashed outline-offset-2 border-surface-300 dark:border-surface-500"
+            />
             <!-- File Upload -->
             <FileUpload
                 ref="fileUploadRef"
                 :file-limit="1"
                 :max-file-size="2097152"
-                :multiple="false"
                 :show-cancel-button="false"
                 :show-upload-button="false"
                 accept="image/*"
                 choose-icon="pi pi-upload"
-                choose-label="Choose New Avatar"
+                choose-label="Upload New"
+                mode="basic"
                 @remove="handleAvatarRemove"
                 @select="handleAvatarSelect"
             >
-                <template #empty>
-                    <div class="flex flex-col items-center gap-2 py-4">
-                        <i class="pi pi-cloud-upload text-2xl text-surface-400"></i>
-                        <p class="text-sm text-surface-600 dark:text-surface-400">
-                            Drag and drop an image here or click to browse
-                        </p>
-                    </div>
-                </template>
             </FileUpload>
+        </div>
 
-            <!-- Clear selection button -->
-            <div v-if="selectedAvatar" class="text-center">
-                <Button
-                    icon="pi pi-times"
-                    label="Clear Selection"
-                    outlined
-                    severity="secondary"
-                    size="small"
-                    @click="clearAvatarSelection"
-                />
-            </div>
-
-            <!-- Action buttons -->
-            <div class="flex justify-end gap-2 pt-4">
-                <Button
-                    label="Cancel"
-                    outlined
-                    @click="cancelAvatarEdit"
-                />
-                <Button
-                    :disabled="avatarLoading || !selectedAvatar"
-                    :loading="avatarLoading"
-                    icon="pi pi-save"
-                    label="Save Avatar"
-                    @click="handleAvatarSave"
-                />
-            </div>
+        <!-- Action buttons -->
+        <div class="button-container">
+            <Button
+                label="Cancel"
+                outlined
+                severity="secondary"
+                @click="cancelAvatarEdit"
+            />
+            <Button
+                :disabled="avatarLoading || !selectedAvatar"
+                :loading="avatarLoading"
+                icon="pi pi-save"
+                label="Save"
+                @click="handleAvatarSave"
+            />
         </div>
     </Dialog>
 
@@ -333,10 +299,13 @@
     <Dialog
         v-model:visible="showDeleteAvatarModal"
         :closable="false"
+        :close-on-escape="false"
         :draggable="false"
-        class="w-full max-w-md mx-3"
+        class="base-modal"
+        dismissable-mask
         header="Delete Avatar"
         modal
+        responsive
     >
         <div class="space-y-4">
             <div
@@ -350,10 +319,11 @@
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-4">
+            <div class="button-container">
                 <Button
                     label="Cancel"
                     outlined
+                    severity="secondary"
                     @click="showDeleteAvatarModal = false"
                 />
                 <Button
@@ -371,10 +341,13 @@
     <Dialog
         v-model:visible="showDeleteModal"
         :closable="false"
+        :close-on-escape="false"
         :draggable="false"
-        class="w-full max-w-md mx-3"
+        class="base-modal !max-w-md"
+        dismissable-mask
         header="Delete Account"
         modal
+        responsive
     >
         <Form v-slot="$form" :resolver="deleteResolver" validate-on-value-update @submit="handleAccountDelete">
             <div class="space-y-4">
@@ -396,7 +369,6 @@
                             :disabled="deleteLoading"
                             fluid
                             name="confirmation"
-                            placeholder="Type 'DELETE' to confirm"
                         />
                         <label for="confirmDelete">Type 'DELETE' to confirm</label>
                     </FloatLabel>
@@ -405,17 +377,18 @@
                     </Message>
                 </div>
 
-                <div class="flex justify-end gap-2 pt-4">
+                <div class="button-container">
                     <Button
                         label="Cancel"
                         outlined
+                        severity="secondary"
                         @click="showDeleteModal = false"
                     />
                     <Button
                         :disabled="deleteLoading || !$form.valid"
                         :loading="deleteLoading"
                         icon="pi pi-trash"
-                        label="Delete Account"
+                        label="Confirm Deletion"
                         severity="danger"
                         type="submit"
                     />
@@ -429,7 +402,6 @@
 import {ref, watch} from 'vue'
 import {useAuthStore} from '@/stores/auth'
 import {useToast} from 'primevue/usetoast'
-import Card from 'primevue/card'
 import Panel from 'primevue/panel'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -441,7 +413,8 @@ import FileUpload from 'primevue/fileupload'
 import {Form} from '@primevue/forms'
 import {z} from 'zod'
 import {zodResolver} from '@primevue/forms/resolvers/zod'
-import Avatar from "primevue/avatar"
+import Fieldset from 'primevue/fieldset'
+import Image from "primevue/image";
 
 // Stores and composables
 const authStore = useAuthStore()
@@ -644,25 +617,13 @@ const handleAccountDelete = async (event: { valid: boolean; states: Record<strin
     deleteLoading.value = true
 
     try {
-        const values = Object.keys(event.states).reduce((acc, key) => {
-            acc[key] = event.states[key].value
-            return acc
-        }, {} as Record<string, any>)
-
-        const success = await authStore.deleteAccount({
-            confirmation: values.confirmation
-        })
+        const success = await authStore.deleteAccount()
 
         if (success) {
             showDeleteModal.value = false
         }
     } catch (error) {
-        toast.add({
-            severity: 'error',
-            summary: 'Deletion Failed',
-            detail: 'Failed to delete account. Please try again.',
-            life: 5000
-        })
+        console.error('Account deletion failed:', error)
     } finally {
         deleteLoading.value = false
     }

@@ -25,14 +25,6 @@
         @apply w-full max-w-xs mx-auto px-2;
     }
 
-    .button-container {
-        @apply flex gap-3 mt-6 mb-1;
-
-        .p-button {
-            @apply w-full;
-        }
-    }
-
     .footer-text {
         @apply pt-3 pb-2;
     }
@@ -77,3 +69,54 @@
     }
 }
 
+#user-settings-panel, #danger-zone-panel {
+    .panel-header {
+        @apply flex items-center gap-2 text-lg font-semibold;
+    }
+
+    .p-fieldset {
+        @apply w-full min-w-0 max-w-full;
+    }
+
+    .p-fieldset-content {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .p-button {
+        @apply shrink-0 min-w-20;
+    }
+}
+
+#user-settings-panel .p-fieldset-content > p {
+    @apply truncate;
+}
+
+#danger-zone-panel .p-fieldset-content {
+    @apply flex-wrap;
+}
+
+.base-modal {
+    @apply w-full max-w-sm mx-3;
+
+    .button-container {
+        @apply flex gap-3 mt-6 mb-1;
+
+        .p-button {
+            @apply grow;
+        }
+    }
+}
+
+#avatar-modal {
+    .p-fileupload-basic {
+        @apply min-w-0 w-full max-w-full;
+
+        .p-fileupload-basic-content {
+            @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
+
+            > span {
+                @apply text-xs truncate block w-full;
+            }
+        }
+    }
+}

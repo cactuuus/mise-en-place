@@ -290,6 +290,36 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const deleteAccount = async (): Promise<boolean> => {
+        try {
+            const response = await api.delete<{ message: string }>('/user/account')
+
+            // Clear all authentication state
+            user.value = null
+            token.value = null
+            localStorage.removeItem('auth_token')
+            authState.value = AuthState.IDLE
+            errorMessage.value = ''
+
+            toast.add({
+                severity: 'success',
+                summary: 'Account Deleted',
+                detail: response.data.message,
+                life: 5000
+            })
+
+            return true
+        } catch (error: any) {
+            toast.add({
+                severity: 'error',
+                summary: 'Delete Failed',
+                detail: error.response?.data?.message || 'Failed to delete account',
+                life: 5000
+            })
+            return false
+        }
+    }
+
     // Return all the state and functions that components can use
     return {
         // State that components can read
@@ -311,5 +341,6 @@ export const useAuthStore = defineStore('auth', () => {
         updateAvatar,
         deleteAvatar,
         updatePassword,
+        deleteAccount
     }
 })

@@ -140,11 +140,6 @@ class UserController extends Controller
     public function deleteAccount(Request $request): JsonResponse
     {
         $user = auth()->user();
-
-        $request->validate([
-            'confirmation' => 'required|string|in:DELETE',
-        ]);
-
         $user->clearMediaCollection('avatar');
         $user->delete();
 

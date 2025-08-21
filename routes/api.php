@@ -24,15 +24,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
-    
+
     // Recipe management
     Route::post('/recipes', [RecipeController::class, 'store']);
     Route::put('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
     Route::post('/recipes/{recipe}/fork', [RecipeController::class, 'fork']);
     Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate']);
-    
+
     // User social features
     Route::post('/users/{user}/follow', [UserController::class, 'follow']);
     Route::delete('/users/{user}/follow', [UserController::class, 'unfollow']);
+
+    // User profile management
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/password', [UserController::class, 'updatePassword']);
+    Route::delete('/user/account', [UserController::class, 'deleteAccount']);
 });

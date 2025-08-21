@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function show(User $user)
     {
         return response()->json([
-            'user'            => $user->only(['id', 'name', 'email', 'created_at']),
+            'user'            => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url']),
             'followers_count' => $user->followersCount(),
             'following_count' => $user->followingCount(),
             'recipes_count'   => $user->publicRecipes()->count(),
@@ -74,6 +76,77 @@ class UserController extends Controller
         return response()->json([
             'message'      => 'User unfollowed successfully',
             'is_following' => false,
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        // Update basic profile info
+        $user->update([
+            'name' => $request->name,
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            $user->clearMediaCollection('avatar');
+            $user
+                ->addMediaFromRequest('avatar')
+                ->usingName('avatar')
+                ->toMediaCollection('avatar');
+        }
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
+        ]);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'new_password'     => 'required|string|min:8|confirmed',
+        ]);
+
+        if ( ! Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect',
+                'errors'  => [
+                    'current_password' => ['Current password is incorrect'],
+                ],
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return response()->json([
+            'message' => 'Password updated successfully',
+        ]);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'confirmation' => 'required|string|in:DELETE',
+        ]);
+
+        $user->clearMediaCollection('avatar');
+        $user->delete();
+
+        return response()->json([
+            'message' => 'Account deleted successfully',
         ]);
     }
 }

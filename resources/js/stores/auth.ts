@@ -183,6 +183,64 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    const updateProfile = async (profileData: FormData): Promise<boolean> => {
+        try {
+            // Using POST with multipart/form-data to handle file uploads, PUT doesn't seem to work. We set however the
+            // method override header to simulate a PUT request.
+            const response = await api.post<{ user: User; message: string }>('/user/profile', profileData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-HTTP-Method-Override': 'PUT'
+                }
+            })
+            user.value = response.data.user
+
+            toast.add({
+                severity: 'success',
+                summary: 'Profile Updated',
+                detail: response.data.message,
+                life: 3000
+            })
+
+            return true
+        } catch (error: any) {
+            toast.add({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: error.response?.data?.message || 'Failed to update profile',
+                life: 5000
+            })
+            return false
+        }
+    }
+
+    const updatePassword = async (passwordData: {
+        current_password: string;
+        new_password: string;
+        new_password_confirmation: string
+    }): Promise<boolean> => {
+        try {
+            const response = await api.put<{ message: string }>('/user/password', passwordData)
+
+            toast.add({
+                severity: 'success',
+                summary: 'Password Updated',
+                detail: response.data.message,
+                life: 3000
+            })
+
+            return true
+        } catch (error: any) {
+            toast.add({
+                severity: 'error',
+                summary: 'Password Update Failed',
+                detail: error.response?.data?.message || 'Failed to update password',
+                life: 5000
+            })
+            return false
+        }
+    }
+
     // Return all the state and functions that components can use
     return {
         // State that components can read
@@ -199,6 +257,8 @@ export const useAuthStore = defineStore('auth', () => {
         login,
         register,
         logout,
-        initializeAuth
+        initializeAuth,
+        updateProfile,
+        updatePassword,
     }
 })

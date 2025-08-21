@@ -2,7 +2,7 @@
     <div class="max-w-4xl mx-auto">
         <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-6">Account settings</h1>
 
-        <!-- Profile Section -->
+        <!-- Profile Information Display -->
         <Panel>
             <template #header>
                 <div class="flex items-center gap-2">
@@ -10,153 +10,164 @@
                     Profile Information
                 </div>
             </template>
+
             <div class="space-y-6">
                 <!-- Avatar Section -->
-                <div class="flex items-start gap-4">
-                    <div class="flex flex-col items-center gap-3">
-                        <!-- Current or preview avatar -->
-                        <Image
-                            :src="avatarPreviewUrl || authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
-                            class="max-w-56"
+                <div
+                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
+                    <div class="flex items-center gap-4">
+                        <Avatar
+                            :image="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
                             shape="circle"
-                        >
-                        </Image>
-
-                        <!-- File Upload -->
-                        <FileUpload
-                            ref="fileUploadRef"
-                            :file-limit="1"
-                            :max-file-size="2097152"
-                            :multiple="false"
-                            :show-cancel-button="false"
-                            :show-upload-button="false"
-                            accept="image/*"
-                            choose-icon="pi pi-upload"
-                            choose-label="Upload Avatar"
-                            @remove="handleAvatarRemove"
-                            @select="handleAvatarSelect"
-                        >
-                            <template #empty>
-                                <div class="flex flex-col items-center gap-2">
-                                    <i class="pi pi-cloud-upload text-4xl text-surface-400"></i>
-                                    <p class="text-sm text-surface-600 dark:text-surface-400">
-                                        Drag and drop files here to upload.
-                                    </p>
-                                </div>
-                            </template>
-                        </FileUpload>
-
-                        <!-- Clear selection button -->
-                        <Button
-                            v-if="selectedAvatar"
-                            icon="pi pi-times"
-                            label="Clear Selection"
-                            outlined
-                            severity="secondary"
-                            size="small"
-                            @click="clearAvatarSelection"
+                            size="xlarge"
                         />
+                        <div>
+                            <p class="font-medium text-surface-900 dark:text-surface-0">Profile Picture</p>
+                            <p class="text-sm text-surface-600 dark:text-surface-400">
+                                JPG, PNG, or WebP. Max 2MB.
+                            </p>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <p class="text-sm text-surface-600 dark:text-surface-400 mb-2">
-                            Upload a profile picture. Recommended size is 500x500 pixels.
-                            JPG, PNG, or WebP files are accepted.
-                        </p>
-                        <div class="text-xs text-surface-500 dark:text-surface-500">
-                            Maximum file size: 2MB
-                        </div>
-                        <div v-if="selectedAvatar" class="text-xs text-primary mt-1">
-                            New avatar selected: {{ selectedAvatar.name }}
-                        </div>
+                    <div class="flex gap-2">
+                        <Button
+                            icon="pi pi-pencil"
+                            label="Edit"
+                            outlined
+                            size="small"
+                            @click="showAvatarModal = true"
+                        />
+                        <Button
+                            v-if="authStore.user?.avatar_urls?.small"
+                            icon="pi pi-trash"
+                            label="Delete"
+                            outlined
+                            severity="danger"
+                            size="small"
+                            @click="showDeleteAvatarModal = true"
+                        />
                     </div>
                 </div>
 
-                <Divider/>
-
-                <!-- Profile Form -->
-                <Form
-                    v-slot="$form"
-                    :initial-values="{ name: authStore.user?.name }"
-                    :resolver="profileResolver" validate-on-value-update
-                    @submit="handleProfileUpdate"
-                >
-                    <div class="form-content space-y-4">
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <InputText
-                                    id="name"
-                                    :disabled="profileLoading" fluid
-                                    name="name"
-                                    type="text"
-                                />
-                                <label for="name">Name</label>
-                            </FloatLabel>
-                            <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">
-                                {{ $form.name.error.message }}
-                            </Message>
-                        </div>
-
-                        <div class="flex justify-end gap-2">
-                            <Button
-                                :disabled="profileLoading || !$form.valid"
-                                :loading="profileLoading"
-                                icon="pi pi-save"
-                                label="Save Changes"
-                                type="submit"
-                            />
-                        </div>
+                <!-- Name Section -->
+                <div
+                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
+                    <div>
+                        <p class="font-medium text-surface-900 dark:text-surface-0">Name</p>
+                        <p class="text-surface-600 dark:text-surface-400">{{ authStore.user?.name }}</p>
                     </div>
-                </Form>
+                    <Button
+                        icon="pi pi-pencil"
+                        label="Edit"
+                        outlined
+                        size="small"
+                        @click="showNameModal = true"
+                    />
+                </div>
+
+                <!-- Email Section -->
+                <div
+                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg opacity-60">
+                    <div>
+                        <p class="font-medium text-surface-900 dark:text-surface-0">Email Address</p>
+                        <p class="text-surface-600 dark:text-surface-400">{{ authStore.user?.email }}</p>
+                    </div>
+                    <Button
+                        disabled
+                        icon="pi pi-lock"
+                        label="Locked"
+                        outlined
+                        size="small"
+                    />
+                </div>
+
+                <!-- Password Section -->
+                <div
+                    class="flex items-center justify-between p-4 border border-surface-200 dark:border-surface-700 rounded-lg">
+                    <div>
+                        <p class="font-medium text-surface-900 dark:text-surface-0">Password</p>
+                        <p class="text-surface-600 dark:text-surface-400">••••••••••••</p>
+                    </div>
+                    <Button
+                        icon="pi pi-key"
+                        label="Change"
+                        outlined
+                        size="small"
+                        @click="showPasswordModal = true"
+                    />
+                </div>
             </div>
         </Panel>
 
-        <!-- Account Actions -->
-        <div class="space-y-4">
-            <Card>
-                <template #title>
-                    <div class="flex items-center gap-2">
-                        <i class="pi pi-shield text-primary"></i>
-                        Security
-                    </div>
-                </template>
-                <template #content>
-                    <div class="space-y-3">
-                        <Button
-                            class="w-full justify-start"
-                            icon="pi pi-key"
-                            label="Change Password"
-                            outlined
-                            @click="showPasswordModal = true"
-                        />
-                    </div>
-                </template>
-            </Card>
-
-            <Card>
-                <template #title>
-                    <div class="flex items-center gap-2">
-                        <i class="pi pi-trash text-red-500"></i>
-                        Danger Zone
-                    </div>
-                </template>
-                <template #content>
-                    <div class="space-y-3">
-                        <p class="text-sm text-surface-600 dark:text-surface-400">
-                            Once you delete your account, all of your data will be permanently removed.
-                        </p>
-                        <Button
-                            class="w-full justify-start"
-                            icon="pi pi-trash"
-                            label="Delete Account"
-                            outlined
-                            severity="danger"
-                            @click="showDeleteModal = true"
-                        />
-                    </div>
-                </template>
-            </Card>
-        </div>
+        <!-- Danger Zone -->
+        <Card class="mt-6">
+            <template #title>
+                <div class="flex items-center gap-2">
+                    <i class="pi pi-exclamation-triangle text-red-500"></i>
+                    Danger Zone
+                </div>
+            </template>
+            <template #content>
+                <div class="space-y-3">
+                    <p class="text-sm text-surface-600 dark:text-surface-400">
+                        Once you delete your account, all of your data will be permanently removed.
+                    </p>
+                    <Button
+                        icon="pi pi-trash"
+                        label="Delete Account"
+                        outlined
+                        severity="danger"
+                        @click="showDeleteModal = true"
+                    />
+                </div>
+            </template>
+        </Card>
     </div>
+
+    <!-- Edit Name Modal -->
+    <Dialog
+        v-model:visible="showNameModal"
+        :closable="false"
+        :draggable="false"
+        class="w-full max-w-md mx-3"
+        header="Edit Name"
+        modal
+    >
+        <Form v-slot="$form" :initial-values="{ name: authStore.user?.name }" :resolver="nameResolver"
+              validate-on-value-update @submit="handleNameUpdate">
+            <div class="space-y-4">
+                <div class="flex flex-col gap-1">
+                    <FloatLabel variant="on">
+                        <InputText
+                            id="name"
+                            :disabled="nameLoading"
+                            fluid
+                            name="name"
+                            type="text"
+                        />
+                        <label for="name">Full Name</label>
+                    </FloatLabel>
+                    <Message v-if="$form.name?.invalid" severity="error" size="small" variant="simple">
+                        {{ $form.name.error.message }}
+                    </Message>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <Button
+                        label="Cancel"
+                        outlined
+                        @click="showNameModal = false"
+                    />
+                    <Button
+                        :disabled="nameLoading || !$form.valid"
+                        :loading="nameLoading"
+                        icon="pi pi-save"
+                        label="Save Changes"
+                        type="submit"
+                    />
+                </div>
+            </div>
+        </Form>
+    </Dialog>
 
     <!-- Change Password Modal -->
     <Dialog
@@ -168,7 +179,7 @@
         modal
     >
         <Form v-slot="$form" :resolver="passwordResolver" validate-on-value-update @submit="handlePasswordChange">
-            <div class="form-content space-y-4">
+            <div class="space-y-4">
                 <div class="flex flex-col gap-1">
                     <FloatLabel variant="on">
                         <Password
@@ -241,6 +252,121 @@
         </Form>
     </Dialog>
 
+    <!-- Avatar Upload Modal -->
+    <Dialog
+        v-model:visible="showAvatarModal"
+        :closable="false"
+        :draggable="false"
+        class="w-full max-w-md mx-3"
+        header="Edit Avatar"
+        modal
+    >
+        <div class="space-y-6">
+            <!-- Avatar Preview -->
+            <div class="text-center">
+                <Avatar
+                    :image="avatarPreviewUrl || authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
+                    class="mb-4"
+                    shape="circle"
+                    size="xlarge"
+                />
+                <p class="text-sm text-surface-600 dark:text-surface-400">
+                    {{ selectedAvatar ? 'New avatar selected' : 'Current avatar' }}
+                </p>
+            </div>
+
+            <!-- File Upload -->
+            <FileUpload
+                ref="fileUploadRef"
+                :file-limit="1"
+                :max-file-size="2097152"
+                :multiple="false"
+                :show-cancel-button="false"
+                :show-upload-button="false"
+                accept="image/*"
+                choose-icon="pi pi-upload"
+                choose-label="Choose New Avatar"
+                @remove="handleAvatarRemove"
+                @select="handleAvatarSelect"
+            >
+                <template #empty>
+                    <div class="flex flex-col items-center gap-2 py-4">
+                        <i class="pi pi-cloud-upload text-2xl text-surface-400"></i>
+                        <p class="text-sm text-surface-600 dark:text-surface-400">
+                            Drag and drop an image here or click to browse
+                        </p>
+                    </div>
+                </template>
+            </FileUpload>
+
+            <!-- Clear selection button -->
+            <div v-if="selectedAvatar" class="text-center">
+                <Button
+                    icon="pi pi-times"
+                    label="Clear Selection"
+                    outlined
+                    severity="secondary"
+                    size="small"
+                    @click="clearAvatarSelection"
+                />
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex justify-end gap-2 pt-4">
+                <Button
+                    label="Cancel"
+                    outlined
+                    @click="cancelAvatarEdit"
+                />
+                <Button
+                    :disabled="avatarLoading || !selectedAvatar"
+                    :loading="avatarLoading"
+                    icon="pi pi-save"
+                    label="Save Avatar"
+                    @click="handleAvatarSave"
+                />
+            </div>
+        </div>
+    </Dialog>
+
+    <!-- Delete Avatar Confirmation Modal -->
+    <Dialog
+        v-model:visible="showDeleteAvatarModal"
+        :closable="false"
+        :draggable="false"
+        class="w-full max-w-md mx-3"
+        header="Delete Avatar"
+        modal
+    >
+        <div class="space-y-4">
+            <div
+                class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
+                <div>
+                    <p class="font-semibold text-red-800 dark:text-red-200">Remove profile picture?</p>
+                    <p class="text-sm text-red-600 dark:text-red-300">
+                        Your avatar will be set to the default placeholder.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-4">
+                <Button
+                    label="Cancel"
+                    outlined
+                    @click="showDeleteAvatarModal = false"
+                />
+                <Button
+                    :loading="deleteAvatarLoading"
+                    icon="pi pi-trash"
+                    label="Delete Avatar"
+                    severity="danger"
+                    @click="handleAvatarDelete"
+                />
+            </div>
+        </div>
+    </Dialog>
+
     <!-- Delete Account Modal -->
     <Dialog
         v-model:visible="showDeleteModal"
@@ -251,14 +377,15 @@
         modal
     >
         <Form v-slot="$form" :resolver="deleteResolver" validate-on-value-update @submit="handleAccountDelete">
-            <div class="form-content space-y-4">
+            <div class="space-y-4">
                 <div
                     class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                     <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
                     <div>
                         <p class="font-semibold text-red-800 dark:text-red-200">This action cannot be undone</p>
-                        <p class="text-sm text-red-600 dark:text-red-300">All your recipes and data will be
-                            permanently deleted.</p>
+                        <p class="text-sm text-red-600 dark:text-red-300">
+                            All your recipes and data will be permanently deleted.
+                        </p>
                     </div>
                 </div>
 
@@ -303,26 +430,28 @@ import {ref, watch} from 'vue'
 import {useAuthStore} from '@/stores/auth'
 import {useToast} from 'primevue/usetoast'
 import Card from 'primevue/card'
+import Panel from 'primevue/panel'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
 import Password from 'primevue/password'
 import Dialog from 'primevue/dialog'
-import Divider from 'primevue/divider'
-import Panel from 'primevue/panel'
-import Image from 'primevue/image'
 import Message from 'primevue/message'
 import FileUpload from 'primevue/fileupload'
 import {Form} from '@primevue/forms'
 import {z} from 'zod'
 import {zodResolver} from '@primevue/forms/resolvers/zod'
+import Avatar from "primevue/avatar"
 
 // Stores and composables
 const authStore = useAuthStore()
 const toast = useToast()
 
-// Refs for modals
+// Modal visibility
+const showNameModal = ref(false)
 const showPasswordModal = ref(false)
+const showAvatarModal = ref(false)
+const showDeleteAvatarModal = ref(false)
 const showDeleteModal = ref(false)
 
 // Avatar handling
@@ -331,12 +460,14 @@ const avatarPreviewUrl = ref<string | null>(null)
 const fileUploadRef = ref()
 
 // Loading states
-const profileLoading = ref(false)
+const nameLoading = ref(false)
 const passwordLoading = ref(false)
+const avatarLoading = ref(false)
+const deleteAvatarLoading = ref(false)
 const deleteLoading = ref(false)
 
 // Zod schemas
-const profileSchema = z.object({
+const nameSchema = z.object({
     name: z.string().min(1, 'Name is required').max(255, 'Name must be less than 255 characters')
 })
 
@@ -356,7 +487,7 @@ const deleteSchema = z.object({
 })
 
 // Form resolvers
-const profileResolver = zodResolver(profileSchema)
+const nameResolver = zodResolver(nameSchema)
 const passwordResolver = zodResolver(passwordSchema)
 const deleteResolver = zodResolver(deleteSchema)
 
@@ -367,7 +498,7 @@ watch(showPasswordModal, (isOpen) => {
     }
 })
 
-// Functions
+// Avatar Functions
 const handleAvatarSelect = (event: { files: File[] }) => {
     const file = event.files[0]
     if (!file) return
@@ -419,9 +550,50 @@ const clearAvatarSelection = () => {
     }
 }
 
-const handleProfileUpdate = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
+const cancelAvatarEdit = () => {
+    clearAvatarSelection()
+    showAvatarModal.value = false
+}
+
+const handleAvatarSave = async () => {
+    if (!selectedAvatar.value) return
+
+    avatarLoading.value = true
+
+    try {
+        const success = await authStore.updateAvatar(selectedAvatar.value)
+
+        if (success) {
+            clearAvatarSelection()
+            showAvatarModal.value = false
+        }
+    } catch (error) {
+        console.error('Avatar update failed:', error)
+    }
+
+    avatarLoading.value = false
+}
+
+const handleAvatarDelete = async () => {
+    deleteAvatarLoading.value = true
+
+    try {
+        const success = await authStore.deleteAvatar()
+
+        if (success) {
+            showDeleteAvatarModal.value = false
+        }
+    } catch (error) {
+        console.error('Avatar deletion failed:', error)
+    }
+
+    deleteAvatarLoading.value = false
+}
+
+// Other Functions
+const handleNameUpdate = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
     if (!event.valid) return
-    profileLoading.value = true
+    nameLoading.value = true
 
     try {
         const values = Object.keys(event.states).reduce((acc, key) => {
@@ -429,41 +601,23 @@ const handleProfileUpdate = async (event: { valid: boolean; states: Record<strin
             return acc
         }, {} as Record<string, any>)
 
-        console.log('Form values:', values) // Debug what we get from the form
-
-        const formData = new FormData()
-        formData.append('name', values.name.trim())
-
-        if (selectedAvatar.value) {
-            formData.append('avatar', selectedAvatar.value)
-        }
-
-        // Debug what's in FormData
-        console.log('FormData contents:')
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value)
-
-        }
-
-        const success = await authStore.updateProfile(formData)
+        const success = await authStore.updateName(values.name.trim())
 
         if (success) {
-            clearAvatarSelection()
+            showNameModal.value = false
         }
     } catch (error) {
-        console.error('Profile update failed:', error)
+        console.error('Name update failed:', error)
     }
 
-    profileLoading.value = false
+    nameLoading.value = false
 }
 
 const handlePasswordChange = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
     if (!event.valid) return
-
     passwordLoading.value = true
 
     try {
-        // Extract values from states
         const values = Object.keys(event.states).reduce((acc, key) => {
             acc[key] = event.states[key].value
             return acc
@@ -487,11 +641,9 @@ const handlePasswordChange = async (event: { valid: boolean; states: Record<stri
 
 const handleAccountDelete = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
     if (!event.valid) return
-
     deleteLoading.value = true
 
     try {
-        // Extract values from states
         const values = Object.keys(event.states).reduce((acc, key) => {
             acc[key] = event.states[key].value
             return acc
@@ -502,7 +654,6 @@ const handleAccountDelete = async (event: { valid: boolean; states: Record<strin
         })
 
         if (success) {
-            // User will be redirected by the auth store
             showDeleteModal.value = false
         }
     } catch (error) {

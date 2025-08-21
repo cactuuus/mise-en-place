@@ -37,7 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{user}/follow', [UserController::class, 'unfollow']);
 
     // User profile management
-    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/name', [UserController::class, 'updateName']);
+    Route::post('/user/avatar', [UserController::class, 'uploadAvatar']);
+    Route::delete('/user/avatar', [UserController::class, 'deleteAvatar']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
     Route::delete('/user/account', [UserController::class, 'deleteAccount']);
 });

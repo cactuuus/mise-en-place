@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function show(User $user)
+    public function show(User $user): JsonResponse
     {
         return response()->json([
             'user'            => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url']),
@@ -20,7 +21,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function recipes(User $user)
+    public function recipes(User $user): JsonResponse
     {
         $recipes = $user
             ->publicRecipes()
@@ -31,7 +32,7 @@ class UserController extends Controller
         return response()->json($recipes);
     }
 
-    public function followers(User $user)
+    public function followers(User $user): JsonResponse
     {
         $followers = $user
             ->followers()
@@ -41,7 +42,7 @@ class UserController extends Controller
         return response()->json($followers);
     }
 
-    public function following(User $user)
+    public function following(User $user): JsonResponse
     {
         $following = $user
             ->following()
@@ -51,7 +52,7 @@ class UserController extends Controller
         return response()->json($following);
     }
 
-    public function follow(User $user)
+    public function follow(User $user): JsonResponse
     {
         if (auth()->id() === $user->id) {
             return response()->json(['message' => 'Cannot follow yourself'], 400);
@@ -65,7 +66,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function unfollow(User $user)
+    public function unfollow(User $user): JsonResponse
     {
         if (auth()->id() === $user->id) {
             return response()->json(['message' => 'Cannot unfollow yourself'], 400);
@@ -79,35 +80,37 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateProfile(Request $request)
+    public function uploadAvatar(Request $request): JsonResponse
     {
         $user = auth()->user();
-
         $request->validate([
-            'name'   => 'required|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
-        // Update basic profile info
-        $user->update([
-            'name' => $request->name,
-        ]);
-
-        if ($request->hasFile('avatar')) {
-            $user->clearMediaCollection('avatar');
-            $user
-                ->addMediaFromRequest('avatar')
-                ->usingName('avatar')
-                ->toMediaCollection('avatar');
-        }
+        $user->clearMediaCollection('avatar');
+        $user
+            ->addMediaFromRequest('avatar')
+            ->usingName('avatar')
+            ->toMediaCollection('avatar');
 
         return response()->json([
-            'message' => 'Profile updated successfully',
+            'message' => 'Avatar uploaded successfully',
             'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
         ]);
     }
 
-    public function updatePassword(Request $request)
+    public function deleteAvatar(): JsonResponse
+    {
+        $user = auth()->user();
+        $user->clearMediaCollection('avatar');
+
+        return response()->json([
+            'message' => 'Avatar removed successfully',
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
+        ]);
+    }
+
+    public function updatePassword(Request $request): JsonResponse
     {
         $user = auth()->user();
 
@@ -134,7 +137,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function deleteAccount(Request $request)
+    public function deleteAccount(Request $request): JsonResponse
     {
         $user = auth()->user();
 
@@ -147,6 +150,22 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Account deleted successfully',
+        ]);
+    }
+
+    public function updateName(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $user->update(['name' => $request->name]);
+
+        return response()->json([
+            'message' => 'Name updated successfully',
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
         ]);
     }
 }

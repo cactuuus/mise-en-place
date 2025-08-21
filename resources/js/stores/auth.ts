@@ -183,21 +183,14 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    const updateProfile = async (profileData: FormData): Promise<boolean> => {
+    const updateName = async (name: string): Promise<boolean> => {
         try {
-            // Using POST with multipart/form-data to handle file uploads, PUT doesn't seem to work. We set however the
-            // method override header to simulate a PUT request.
-            const response = await api.post<{ user: User; message: string }>('/user/profile', profileData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'X-HTTP-Method-Override': 'PUT'
-                }
-            })
+            const response = await api.put<{ user: User; message: string }>('/user/name', {name})
             user.value = response.data.user
 
             toast.add({
                 severity: 'success',
-                summary: 'Profile Updated',
+                summary: 'Name Updated',
                 detail: response.data.message,
                 life: 3000
             })
@@ -207,7 +200,63 @@ export const useAuthStore = defineStore('auth', () => {
             toast.add({
                 severity: 'error',
                 summary: 'Update Failed',
-                detail: error.response?.data?.message || 'Failed to update profile',
+                detail: error.response?.data?.message || 'Failed to update name',
+                life: 5000
+            })
+            return false
+        }
+    }
+
+    const updateAvatar = async (avatarFile: File): Promise<boolean> => {
+        try {
+            const formData = new FormData()
+            formData.append('avatar', avatarFile)
+
+            const response = await api.post<{ user: User; message: string }>('/user/avatar', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            })
+            user.value = response.data.user
+
+            toast.add({
+                severity: 'success',
+                summary: 'Avatar Updated',
+                detail: response.data.message,
+                life: 3000
+            })
+
+            return true
+        } catch (error: any) {
+            toast.add({
+                severity: 'error',
+                summary: 'Upload Failed',
+                detail: error.response?.data?.message || 'Failed to upload avatar',
+                life: 5000
+            })
+            return false
+        }
+    }
+
+    const deleteAvatar = async (): Promise<boolean> => {
+        try {
+            const response = await api.delete<{ user: User; message: string }>('/user/avatar')
+
+            user.value = response.data.user
+
+            toast.add({
+                severity: 'success',
+                summary: 'Avatar Removed',
+                detail: response.data.message,
+                life: 3000
+            })
+
+            return true
+        } catch (error: any) {
+            toast.add({
+                severity: 'error',
+                summary: 'Delete Failed',
+                detail: error.response?.data?.message || 'Failed to delete avatar',
                 life: 5000
             })
             return false
@@ -258,7 +307,9 @@ export const useAuthStore = defineStore('auth', () => {
         register,
         logout,
         initializeAuth,
-        updateProfile,
+        updateName,
+        updateAvatar,
+        deleteAvatar,
         updatePassword,
     }
 })

@@ -2,6 +2,7 @@ import {defineStore} from 'pinia'
 import {computed, ref} from 'vue'
 import api from '@/services/api'
 import {useToast} from 'primevue/usetoast'
+import {useRouter} from 'vue-router'
 
 interface User {
     id: number
@@ -39,6 +40,7 @@ export const useAuthStore = defineStore('auth', () => {
     const authState = ref<AuthState>(AuthState.IDLE)
     const errorMessage = ref<string>('')
     const toast = useToast()
+    const router = useRouter()
 
     const isAuthenticated = computed((): boolean => {
         return !!(token.value && user.value)
@@ -151,6 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.IDLE
             errorMessage.value = ''
 
+            await router.push('/')
             toast.add({
                 severity: 'info',
                 summary: 'Logged Out',
@@ -301,6 +304,7 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.IDLE
             errorMessage.value = ''
 
+            await router.push('/')
             toast.add({
                 severity: 'success',
                 summary: 'Account Deleted',

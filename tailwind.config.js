@@ -1,32 +1,47 @@
-import preset from './vendor/filament/support/tailwind.config.preset'
-import forms from '@tailwindcss/forms'
-
 /** @type {import('tailwindcss').Config} */
 export default {
-    presets: [preset],
     content: [
-        './app/Filament/**/*.php',
-        './resources/views/filament/**/*.blade.php',
         './resources/views/**/*.blade.php',
-        './resources/js/**/*.vue',
-        './vendor/filament/**/*.blade.php',
-        './vendor/awcodes/filament-table-repeater/resources/**/*.blade.php',
+        './resources/js/**/*.{vue,js,ts}',
         './resources/css/**/*.css',
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                primary: {
+                    50: '#eff6ff',
+                    100: '#dbeafe',
+                    200: '#bfdbfe',
+                    300: '#93c5fd',
+                    400: '#60a5fa',
+                    500: '#3b82f6',
+                    600: '#2563eb',
+                    700: '#1d4ed8',
+                    800: '#1e40af',
+                    900: '#1e3a8a',
+                },
+                surface: {
+                    0: '#ffffff',
+                    50: '#f8fafc',
+                    100: '#f1f5f9',
+                    200: '#e2e8f0',
+                    300: '#cbd5e1',
+                    400: '#94a3b8',
+                    500: '#64748b',
+                    600: '#475569',
+                    700: '#334155',
+                    800: '#1e293b',
+                    900: '#0f172a',
+                }
+            }
+        },
     },
-    darkMode: 'media',
-    plugins: [forms],
     safelist: [
         {
             pattern: /^(bg|text)-(green|yellow|red|gray)-(50|200|600|900)$/,
             variants: ['dark'],
-        },
-        {
-            pattern: /^ring-(green|yellow|red|gray)-(200|600)\/10$/,
-            variants: ['dark'],
-        },
-    ]
+        }
+    ],
+    darkMode: 'media',
+    plugins: [],
 }
-

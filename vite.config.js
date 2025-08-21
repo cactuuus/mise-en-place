@@ -9,7 +9,6 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.ts',
-                'resources/css/filament/app/theme.css'
             ],
             refresh: true,
         }),

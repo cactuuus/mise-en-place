@@ -1,11 +1,13 @@
 <template>
     <div class="min-h-screen bg-zinc-200 dark:bg-zinc-800">
         <!-- Header with Menubar -->
-        <Menubar :model="menuItems"
-                 class="!rounded-none !border-l-0 !border-r-0 !border-t-0">
+        <Menubar
+            :model="menuItems"
+            class="!rounded-none !border-l-0 !border-r-0 !border-t-0"
+        >
             <!-- Logo/Brand on the left -->
             <template #start>
-                <div class="text-xl font-bold">
+                <div class="text-2xl font-bold">
                     Mise En Place
                 </div>
             </template>
@@ -22,13 +24,18 @@
                 </div>
                 <div v-else class="flex items-center gap-2">
                     <!-- Authenticated user - show avatar -->
-                    <Avatar
-                        :label="userInitials"
-                        class="bg-surface-500 cursor-pointer"
-                        shape="circle"
+                    <Button
+                        class="!py-1"
+                        text
                         @click="toggleUserMenu"
-                    />
-
+                    >
+                        <span class="text-sm">{{ authStore.user?.name }}</span>
+                        <Avatar
+                            :image="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
+                            class="bg-surface-500 cursor-pointer"
+                            shape="circle"
+                        />
+                    </Button>
                     <!-- User dropdown menu -->
                     <Popover ref="userMenuRef">
                         <div class="flex flex-col gap-1">
@@ -37,11 +44,13 @@
                                 icon="pi pi-cog"
                                 label="Settings"
                                 text
+                                @click="navigateToSettings"
                             />
                             <Button
                                 class="justify-start"
                                 icon="pi pi-sign-out"
                                 label="Logout"
+                                severity="danger"
                                 text
                                 @click="handleLogout"
                             />
@@ -76,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
+import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
 import Toast from 'primevue/toast'
@@ -104,20 +113,14 @@ const menuItems = ref([
     }
 ])
 
-// Computed property to get user initials for avatar
-const userInitials = computed(() => {
-    if (!authStore.user?.name) return 'U'
-
-    const names = authStore.user.name.split(' ')
-    if (names.length >= 2) {
-        return names[0][0] + names[1][0]
-    }
-    return names[0][0]
-})
-
 // Functions
 const toggleUserMenu = (event: Event) => {
     userMenuRef.value?.toggle(event)
+}
+
+const navigateToSettings = () => {
+    userMenuRef.value?.hide()
+    router.push('/settings')
 }
 
 const handleLogout = () => {

@@ -8,6 +8,10 @@ interface User {
     name: string
     email: string
     created_at: string
+    avatar_urls: {
+        small: string | null
+        large: string | null
+    }
 }
 
 interface LoginResponse {

@@ -10,11 +10,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia;
+
+    private static array $AVATAR_SIZES = [
+        'small' => 100,
+        'large' => 500,
+    ];
 
     protected $fillable = [
         'name',
@@ -31,6 +41,24 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
     ];
+
+    protected $appends = [
+        'avatar_urls',
+    ];
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        foreach (self::$AVATAR_SIZES as $name => $size) {
+            $this
+                ->addMediaConversion($name)
+                ->fit(Fit::Max, $size, $size)
+                ->format('webp')
+                ->optimize()
+                ->quality(90)
+                ->performOnCollections('avatar')
+                ->queued();
+        }
+    }
 
     public function ratings(): HasMany
     {
@@ -97,5 +125,25 @@ class User extends Authenticatable implements FilamentUser
     {
         // for now we only have a single panel, accessible for all users
         return true;
+    }
+
+    public function getAvatarUrlsAttribute(): array
+    {
+        if ( ! $this->hasMedia('avatar')) {
+            return array_fill_keys(array_keys(self::$AVATAR_SIZES), null);
+        }
+
+        $media = $this->getFirstMedia('avatar');
+        $urls  = [];
+
+        foreach (self::$AVATAR_SIZES as $sizeName => $sizeValue) {
+            $urls[$sizeName] = Cache::remember(
+                "user_avatar_{$sizeName}_{$media->id}",
+                now()->addMinutes(30),
+                fn() => $media->getTemporaryUrl(now()->addHour(), $sizeName),
+            );
+        }
+
+        return $urls;
     }
 }

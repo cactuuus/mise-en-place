@@ -1,6 +1,5 @@
 <template>
     <BaseModal
-        :error-message="authStore.errorMessage"
         :on-submit="onSubmit"
         :on-visibility-change="onVisibilityChange"
         :visible="visible"
@@ -19,6 +18,7 @@
                 <!-- File Upload -->
                 <FileUpload
                     ref="fileUploadRef"
+                    :disabled="loading"
                     :file-limit="1"
                     :max-file-size="2097152"
                     :show-cancel-button="false"
@@ -37,8 +37,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, watch} from 'vue'
-import {useAuthStore} from '@/stores/auth'
+import {ref} from 'vue'
+import {updateAvatar} from "@/services/userService.ts";
 import BaseModal from '@/baseComponents/baseModal.vue'
 import FileUpload from 'primevue/fileupload'
 import Image from 'primevue/image'
@@ -52,20 +52,13 @@ interface Emits {
     'update:visible': [value: boolean]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const authStore = useAuthStore()
 const selectedAvatar = ref<File | null>(null)
 const avatarPreviewUrl = ref<string | null>(null)
 const fileUploadRef = ref()
 
-// Watch for visibility changes to clear state
-watch(() => props.visible, (isOpen) => {
-    if (!isOpen) {
-        clearAvatarSelection()
-    }
-})
 
 // Avatar handling functions
 const handleAvatarSelect = (event: { files: File[] }) => {
@@ -73,8 +66,6 @@ const handleAvatarSelect = (event: { files: File[] }) => {
     if (!file) return
 
     selectedAvatar.value = file
-
-    // Create preview URL
     if (avatarPreviewUrl.value) {
         URL.revokeObjectURL(avatarPreviewUrl.value)
     }
@@ -99,12 +90,12 @@ const clearAvatarSelection = () => {
 // Events
 const onVisibilityChange = (isOpen: boolean) => {
     if (!isOpen) {
-        authStore.errorMessage = ''
+        clearAvatarSelection()
     }
 }
 
 const onSubmit = async () => {
     if (!selectedAvatar.value) return false
-    return await authStore.updateAvatar(selectedAvatar.value)
+    return await updateAvatar(selectedAvatar.value)
 }
 </script>

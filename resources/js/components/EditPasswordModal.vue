@@ -1,8 +1,6 @@
 <template>
     <BaseModal
-        :error-message="authStore.errorMessage"
         :on-submit="onSubmit"
-        :on-visibility-change="onVisibilityChange"
         :schema="passwordSchema"
         :visible="visible"
         submit-icon="pi pi-save"
@@ -69,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useAuthStore} from '@/stores/auth'
+import {updatePassword} from "@/services/userService.ts";
 import BaseModal from '@/baseComponents/baseModal.vue'
 import Password from 'primevue/password'
 import FloatLabel from 'primevue/floatlabel'
@@ -86,9 +84,7 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const authStore = useAuthStore()
 
-// Form validation schema
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, 'Current password is required'),
     newPassword: z.string().min(8, 'Password must be at least 8 characters'),
@@ -101,15 +97,8 @@ const passwordSchema = z.object({
     path: ['newPassword']
 })
 
-// Events
-const onVisibilityChange = (isOpen: boolean) => {
-    if (!isOpen) {
-        authStore.errorMessage = ''
-    }
-}
-
 const onSubmit = async (formData: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
-    return await authStore.updatePassword({
+    return await updatePassword({
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
         new_password_confirmation: formData.confirmPassword

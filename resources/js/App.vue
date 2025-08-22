@@ -94,10 +94,12 @@ import Avatar from 'primevue/avatar'
 import Popover from 'primevue/popover'
 import Dialog from 'primevue/dialog'
 import LoginModal from '@/components/LoginModal.vue'
+import {initializeToast} from "@/services/toastService.ts"
 
 // Get our stores and router
 const authStore = useAuthStore()
 const router = useRouter()
+initializeToast()
 
 // Refs for UI state
 const showLoginModal = ref(false)

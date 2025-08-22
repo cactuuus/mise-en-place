@@ -1,8 +1,6 @@
 <template>
     <BaseModal
-        :error-message="authStore.errorMessage"
         :on-submit="onSubmit"
-        :on-visibility-change="onVisibilityChange"
         :visible="visible"
         submit-icon="pi pi-trash"
         submit-label="Delete Avatar"
@@ -26,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useAuthStore} from '@/stores/auth'
+import {deleteAvatar} from "@/services/userService.ts";
 import BaseModal from '@/baseComponents/baseModal.vue'
 
 interface Props {
@@ -39,16 +37,8 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const authStore = useAuthStore()
-
-// Events
-const onVisibilityChange = (isOpen: boolean) => {
-    if (!isOpen) {
-        authStore.errorMessage = ''
-    }
-}
 
 const onSubmit = async () => {
-    return await authStore.deleteAvatar()
+    return await deleteAvatar()
 }
 </script>

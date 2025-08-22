@@ -1,8 +1,6 @@
 <template>
     <BaseModal
-        :error-message="authStore.errorMessage"
         :on-submit="onSubmit"
-        :on-visibility-change="onVisibilityChange"
         :schema="deleteSchema"
         :visible="visible"
         modal-class="!max-w-md"
@@ -45,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useAuthStore} from '@/stores/auth'
+import {deleteAccount} from "@/services/userService.ts";
 import BaseModal from '@/baseComponents/baseModal.vue'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
@@ -62,23 +60,14 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const authStore = useAuthStore()
 
-// Form validation schema
 const deleteSchema = z.object({
     confirmation: z.string().refine(val => val === 'DELETE', {
         message: "You must type 'DELETE' to confirm"
     })
 })
 
-// Events
-const onVisibilityChange = (isOpen: boolean) => {
-    if (!isOpen) {
-        authStore.errorMessage = ''
-    }
-}
-
 const onSubmit = async () => {
-    return await authStore.deleteAccount()
+    return await deleteAccount()
 }
 </script>

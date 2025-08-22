@@ -1,9 +1,7 @@
 <template>
     <BaseModal
-        :error-message="authStore.errorMessage"
         :initial-values="{ name: initialName }"
         :on-submit="onSubmit"
-        :on-visibility-change="onVisibilityChange"
         :schema="nameSchema"
         :visible="visible"
         submit-icon="pi pi-save"
@@ -32,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import {useAuthStore} from '@/stores/auth'
+import {updateName} from "@/services/userService.ts";
 import BaseModal from '@/baseComponents/baseModal.vue'
 import InputText from 'primevue/inputtext'
 import FloatLabel from 'primevue/floatlabel'
@@ -50,23 +48,14 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const authStore = useAuthStore()
 
-// Form validation schema
 const nameSchema = z.object({
     name: z.string()
         .min(1, 'Name is required')
         .max(255, 'Name must be less than 255 characters')
 })
 
-// Events
-const onVisibilityChange = (isOpen: boolean) => {
-    if (!isOpen) {
-        authStore.errorMessage = ''
-    }
-}
-
 const onSubmit = async (formData: { name: string }) => {
-    return await authStore.updateName(formData.name.trim())
+    return await updateName(formData.name.trim())
 }
 </script>

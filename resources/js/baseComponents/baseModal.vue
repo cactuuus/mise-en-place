@@ -25,13 +25,6 @@
                     <slot :form="$form" :loading="loading"/>
                 </div>
 
-                <!-- Error message slot (with default) -->
-                <slot name="error">
-                    <Message v-if="errorMessage" severity="error">
-                        {{ errorMessage }}
-                    </Message>
-                </slot>
-
                 <!-- Button container -->
                 <div class="button-container">
                     <Button
@@ -59,7 +52,6 @@
 import {computed, ref, watch} from 'vue'
 import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
-import Message from 'primevue/message'
 import {Form} from '@primevue/forms'
 import {zodResolver} from '@primevue/forms/resolvers/zod'
 
@@ -68,7 +60,6 @@ interface Props {
     title: string
     schema?: any
     loading?: boolean
-    errorMessage?: string
     onSubmit?: (formData?: any) => Promise<boolean>
     submitLabel?: string
     submitIcon?: string
@@ -85,7 +76,6 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    errorMessage: '',
     submitLabel: 'Save',
     submitIcon: 'pi pi-save',
     submitSeverity: 'primary',
@@ -129,8 +119,6 @@ const handleFormSubmit = async (event: { valid: boolean; states: Record<string, 
         if (success) {
             emit('update:visible', false)
         }
-    } catch (error) {
-        console.error('Submit failed:', error)
     } finally {
         loading.value = false
     }
@@ -145,8 +133,6 @@ const handleNonFormSubmit = async () => {
         if (success) {
             emit('update:visible', false)
         }
-    } catch (error) {
-        console.error('Submit failed:', error)
     } finally {
         loading.value = false
     }

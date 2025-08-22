@@ -1,16 +1,16 @@
 <template>
-    <Dialog
-        v-model:visible="isVisible"
-        :closable="false"
-        :close-on-escape="false"
-        :draggable="false"
-        class="base-modal"
-        dismissable-mask
-        header="Delete Avatar"
-        modal
-        responsive
+    <BaseModal
+        :error-message="authStore.errorMessage"
+        :on-submit="onSubmit"
+        :on-visibility-change="onVisibilityChange"
+        :visible="visible"
+        submit-icon="pi pi-trash"
+        submit-label="Delete Avatar"
+        submit-severity="danger"
+        title="Delete Avatar"
+        @update:visible="emit('update:visible', $event)"
     >
-        <div class="space-y-4">
+        <template #default>
             <div
                 class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
                 <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
@@ -21,36 +21,13 @@
                     </p>
                 </div>
             </div>
-
-            <Message v-if="authStore.errorMessage" severity="error">
-                {{ authStore.errorMessage }}
-            </Message>
-
-            <div class="button-container">
-                <Button
-                    label="Cancel"
-                    outlined
-                    severity="secondary"
-                    @click="handleCancel"
-                />
-                <Button
-                    :loading="loading"
-                    icon="pi pi-trash"
-                    label="Delete Avatar"
-                    severity="danger"
-                    @click="handleDelete"
-                />
-            </div>
-        </div>
-    </Dialog>
+        </template>
+    </BaseModal>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
 import {useAuthStore} from '@/stores/auth'
-import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
-import Message from 'primevue/message'
+import BaseModal from '@/baseComponents/baseModal.vue'
 
 interface Props {
     visible: boolean
@@ -60,43 +37,18 @@ interface Emits {
     'update:visible': [value: boolean]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
-
 const authStore = useAuthStore()
-const loading = ref(false)
 
-// Computed properties
-const isVisible = computed({
-    get: () => props.visible,
-    set: (value: boolean) => emit('update:visible', value)
-})
-
-// Clear auth errors when modal opens/closes
-watch(isVisible, (isOpen) => {
+// Events
+const onVisibilityChange = (isOpen: boolean) => {
     if (!isOpen) {
         authStore.errorMessage = ''
     }
-})
-
-// Event handlers
-const handleDelete = async () => {
-    loading.value = true
-
-    try {
-        const success = await authStore.deleteAvatar()
-
-        if (success) {
-            emit('update:visible', false)
-        }
-    } catch (error) {
-        console.error('Avatar deletion failed:', error)
-    }
-
-    loading.value = false
 }
 
-const handleCancel = () => {
-    emit('update:visible', false)
+const onSubmit = async () => {
+    return await authStore.deleteAvatar()
 }
 </script>

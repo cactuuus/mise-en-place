@@ -1,16 +1,16 @@
 <template>
-    <Dialog
-        v-model:visible="isVisible"
-        :closable="false"
-        :close-on-escape="false"
-        :draggable="false"
-        class="base-modal"
-        dismissable-mask
-        header="Change Password"
-        modal
-        responsive
+    <BaseModal
+        :error-message="authStore.errorMessage"
+        :on-submit="onSubmit"
+        :on-visibility-change="onVisibilityChange"
+        :schema="passwordSchema"
+        :visible="visible"
+        submit-icon="pi pi-save"
+        submit-label="Save"
+        title="Change Password"
+        @update:visible="emit('update:visible', $event)"
     >
-        <Form v-slot="$form" :resolver="passwordResolver" validate-on-value-update @submit="handleSubmit">
+        <template #default="{ form, loading }">
             <div class="space-y-4">
                 <div class="flex flex-col gap-1 mt-1">
                     <FloatLabel variant="on">
@@ -24,8 +24,8 @@
                         />
                         <label for="currentPassword">Current Password</label>
                     </FloatLabel>
-                    <Message v-if="$form.currentPassword?.invalid" severity="error" size="small" variant="simple">
-                        {{ $form.currentPassword.error.message }}
+                    <Message v-if="form.currentPassword?.invalid" severity="error" size="small" variant="simple">
+                        {{ form.currentPassword.error.message }}
                     </Message>
                 </div>
 
@@ -42,8 +42,8 @@
                         />
                         <label for="newPassword">New Password</label>
                     </FloatLabel>
-                    <Message v-if="$form.newPassword?.invalid" severity="error" size="small" variant="simple">
-                        {{ $form.newPassword.error.message }}
+                    <Message v-if="form.newPassword?.invalid" severity="error" size="small" variant="simple">
+                        {{ form.newPassword.error.message }}
                     </Message>
                 </div>
 
@@ -59,46 +59,22 @@
                         />
                         <label for="confirmPassword">Confirm New Password</label>
                     </FloatLabel>
-                    <Message v-if="$form.confirmPassword?.invalid" severity="error" size="small" variant="simple">
-                        {{ $form.confirmPassword.error.message }}
+                    <Message v-if="form.confirmPassword?.invalid" severity="error" size="small" variant="simple">
+                        {{ form.confirmPassword.error.message }}
                     </Message>
                 </div>
-
-                <Message v-if="authStore.errorMessage" severity="error">
-                    {{ authStore.errorMessage }}
-                </Message>
-
-                <div class="button-container">
-                    <Button
-                        label="Cancel"
-                        outlined
-                        severity="secondary"
-                        @click="handleCancel"
-                    />
-                    <Button
-                        :disabled="loading || !$form.valid"
-                        :loading="loading"
-                        icon="pi pi-save"
-                        label="Save"
-                        type="submit"
-                    />
-                </div>
             </div>
-        </Form>
-    </Dialog>
+        </template>
+    </BaseModal>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue'
 import {useAuthStore} from '@/stores/auth'
-import Dialog from 'primevue/dialog'
+import BaseModal from '@/baseComponents/baseModal.vue'
 import Password from 'primevue/password'
-import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import Message from 'primevue/message'
-import {Form} from '@primevue/forms'
 import {z} from 'zod'
-import {zodResolver} from '@primevue/forms/resolvers/zod'
 
 interface Props {
     visible: boolean
@@ -108,11 +84,9 @@ interface Emits {
     'update:visible': [value: boolean]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
-
 const authStore = useAuthStore()
-const loading = ref(false)
 
 // Form validation schema
 const passwordSchema = z.object({
@@ -126,50 +100,19 @@ const passwordSchema = z.object({
     message: "New password must be different from current password",
     path: ['newPassword']
 })
-const passwordResolver = zodResolver(passwordSchema)
 
-// Computed properties
-const isVisible = computed({
-    get: () => props.visible,
-    set: (value: boolean) => emit('update:visible', value)
-})
-
-// Clear auth errors when modal opens/closes
-watch(isVisible, (isOpen) => {
+// Events
+const onVisibilityChange = (isOpen: boolean) => {
     if (!isOpen) {
         authStore.errorMessage = ''
     }
-})
-
-// Event handlers
-const handleSubmit = async (event: { valid: boolean; states: Record<string, any> }): Promise<void> => {
-    if (!event.valid) return
-
-    const values = Object.keys(event.states).reduce((acc, key) => {
-        acc[key] = event.states[key].value
-        return acc
-    }, {} as Record<string, any>)
-
-    loading.value = true
-
-    try {
-        const success = await authStore.updatePassword({
-            current_password: values.currentPassword,
-            new_password: values.newPassword,
-            new_password_confirmation: values.confirmPassword
-        })
-
-        if (success) {
-            emit('update:visible', false)
-        }
-    } catch (error) {
-        console.error('Password update failed:', error)
-    }
-
-    loading.value = false
 }
 
-const handleCancel = () => {
-    emit('update:visible', false)
+const onSubmit = async (formData: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+    return await authStore.updatePassword({
+        current_password: formData.currentPassword,
+        new_password: formData.newPassword,
+        new_password_confirmation: formData.confirmPassword
+    })
 }
 </script>

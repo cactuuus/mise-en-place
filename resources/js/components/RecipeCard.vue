@@ -33,7 +33,7 @@
                         readonly
                     />
                     <span class="text-sm text-surface-600">
-                        {{ '(' + recipe.total_ratings + ')' || 'Not yet rated!' }}
+                        ({{ recipe.total_ratings }})
                     </span>
                 </div>
 
@@ -60,14 +60,15 @@
         <template #footer>
             <!-- Tags -->
             <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-1 items-baseline">
-                <Chip
-                    v-for="tag in recipe.tags.slice(0, 5)"
+                <Tag
+                    v-for="tag in recipe.tags.slice(0, MAX_TAGS)"
                     :key="getTagKey(tag)"
-                    :label="getTagLabel(tag.name)"
-                    class="tag"
+                    :value="getTagLabel(tag.name)"
+                    class="!text-xs"
+                    severity="secondary"
                 />
-                <span v-if="recipe.tags.length > 3" class="text-xs text-surface-500">
-                        +{{ recipe.tags.length - 3 }} more
+                <span v-if="recipe.tags.length > MAX_TAGS" class="text-xs text-surface-500">
+                        +{{ recipe.tags.length - MAX_TAGS }} more
                     </span>
             </div>
         </template>
@@ -77,15 +78,17 @@
 <script lang="ts" setup>
 import Card from 'primevue/card'
 import Rating from 'primevue/rating'
-import Chip from 'primevue/chip'
+import Tag from 'primevue/tag'
 import DeferredContent from 'primevue/deferredcontent'
 import {RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue";
 
+const MAX_TAGS = 3
 const props = defineProps<{
     recipe: RecipePreview
 }>()
+
 
 // Functions
 const onImageLoad = (): void => {

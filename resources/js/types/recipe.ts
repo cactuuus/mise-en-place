@@ -2,17 +2,20 @@ export const DIFFICULTY_LEVELS = {
     EASY: {
         value: 1,
         label: 'Easy',
-        color: 'green'
+        color: 'green',
+        severity: 'success',
     },
     MEDIUM: {
         value: 2,
         label: 'Medium',
-        color: 'yellow'
+        color: 'yellow',
+        severity: 'warning',
     },
     HARD: {
         value: 3,
         label: 'Hard',
-        color: 'red'
+        color: 'red',
+        severity: 'danger',
     }
 } as const
 

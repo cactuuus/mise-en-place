@@ -19,12 +19,14 @@
         <!-- Hero Section -->
         <div class="relative">
             <SmartImage
+                v-if="recipe.image_urls?.large"
                 :alt="recipe.title"
                 :max-retries="5"
                 :retry-delay="2000"
-                :src="recipe.image_urls.large || '/images/recipe-placeholder.svg'"
-                image-class="w-full h-64 md:h-80 object-cover rounded-lg"
+                :src="recipe.image_urls.large"
+                image-class="w-full h-48 md:h-64 object-cover rounded-lg"
             />
+            <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover rounded-lg"/>
         </div>
 
         <!-- Header Info -->
@@ -204,6 +206,7 @@ import {Recipe} from '@/types/recipe'
 import {fetchRecipeById} from '@/services/recipeService'
 import SmartImage from '@/components/SmartImage.vue'
 import DifficultyBadge from '@/components/DifficultyBadge.vue'
+import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 
 const route = useRoute()
 const router = useRouter()

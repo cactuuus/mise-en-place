@@ -7,7 +7,7 @@
             :key="i"
             class="recipe-card">
             <template #header>
-                <Skeleton border-radius="0" class="image-preview" size="100%"></Skeleton>
+                <Skeleton border-radius="0" class="image-preview aspect-video" size="100%"></Skeleton>
             </template>
             <template #content>
                 <div class="space-y-2">
@@ -17,8 +17,8 @@
                 </div>
             </template>
             <template #footer>
-                <div class="flex flex-row gap-4">
-                    <Skeleton v-for="i in 3" :key="i" height="1.2rem" width="25%"></Skeleton>
+                <div class="flex flex-row gap-2">
+                    <Skeleton v-for="i in 3" :key="i" height="0.8rem" width="20%"></Skeleton>
                 </div>
             </template>
         </Card>

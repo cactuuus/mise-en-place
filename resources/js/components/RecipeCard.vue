@@ -2,12 +2,14 @@
     <Card class="recipe-card transition-all duration-200 hover:shadow-lg">
         <template #header>
             <!-- Deferred Image Loading -->
-            <DeferredContent @load="onImageLoad">
+            <DeferredContent>
                 <SmartImage
+                    v-if="props.recipe.image_urls?.medium"
                     :alt="recipe.title"
-                    :src="props.recipe.image_urls.medium || '/images/recipe-placeholder.svg'"
+                    :src="props.recipe.image_urls.medium"
                     image-class="image-preview"
                 />
+                <PlaceholderRecipeImage v-else class="image-preview"/>
             </DeferredContent>
         </template>
 
@@ -22,7 +24,6 @@
         <template #content>
             <!-- Recipe Info -->
             <div class="space-y-3">
-                <!-- Author -->
 
                 <!-- Rating -->
                 <div v-if="recipe.average_rating || recipe.total_ratings" class="flex items-center gap-2">
@@ -32,13 +33,13 @@
                         class="text-sm"
                         readonly
                     />
-                    <span class="text-sm text-surface-600">
+                    <span class="text-sm">
                         ({{ recipe.total_ratings }})
                     </span>
                 </div>
 
                 <!-- Recipe Details -->
-                <div class="flex items-center justify-between text-sm text-surface-600">
+                <div class="flex items-center justify-between text-sm">
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-1">
                             <i class="pi pi-clock text-xs"></i>
@@ -52,6 +53,7 @@
                     <DifficultyBadge
                         v-if="recipe.difficulty_level"
                         :difficulty="recipe.difficulty_level"
+                        class="!text-xs"
                     />
                 </div>
             </div>
@@ -67,7 +69,7 @@
                     class="!text-xs"
                     severity="secondary"
                 />
-                <span v-if="recipe.tags.length > MAX_TAGS" class="text-xs text-surface-500">
+                <span v-if="recipe.tags.length > MAX_TAGS" class="text-xs">
                         +{{ recipe.tags.length - MAX_TAGS }} more
                     </span>
             </div>
@@ -83,17 +85,12 @@ import DeferredContent from 'primevue/deferredcontent'
 import {RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue";
+import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 
-const MAX_TAGS = 3
+const MAX_TAGS = 5
 const props = defineProps<{
     recipe: RecipePreview
 }>()
-
-
-// Functions
-const onImageLoad = (): void => {
-    console.log(`Deferred content loaded for recipe: ${props.recipe.title}`)
-}
 
 const getTagLabel = (tagName: string | { [key: string]: string }): string => {
     if (typeof tagName === 'string') {

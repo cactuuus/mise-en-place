@@ -45,7 +45,11 @@
     @apply max-w-sm cursor-pointer overflow-hidden w-full;
 
     .image-preview {
-        @apply w-full object-cover aspect-square mx-auto;
+        @apply w-full object-cover mx-auto h-36;
+    }
+
+    .p-card-body {
+        @apply pt-2 pb-3;
     }
 
     .p-card-caption {

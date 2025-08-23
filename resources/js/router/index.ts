@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router'
+import {useAuthStore} from '@/stores/auth'
 
 // This is TypeScript's way of extending existing types
 // Extend custom properties we want to add to routes
@@ -34,6 +35,18 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+})
+
+// Global navigation guard
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore()
+
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        // Redirect to home if not authenticated
+        next('/')
+    } else {
+        next()
+    }
 })
 
 export default router

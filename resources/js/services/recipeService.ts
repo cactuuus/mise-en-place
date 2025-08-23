@@ -64,7 +64,5 @@ export const fetchRecipeById = async (id: number): Promise<Recipe | null> => {
         }
     })
 
-    console.log('Fetched recipe:', result)
-
     return result
 }

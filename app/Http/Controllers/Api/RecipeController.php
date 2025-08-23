@@ -4,15 +4,30 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Recipe;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
 {
     public function index(Request $request)
     {
-        $recipes = Recipe::with(['user', 'tags'])
-            ->where('is_public', true)
-            ->latest()
+        $recipes = Recipe::with(['user:id,name', 'tags'])
+            ->leftJoin('recipe_ratings', 'recipes.id', '=', 'recipe_ratings.recipe_id')
+            ->where('recipes.is_public', true)
+            ->select([
+                'recipes.id', 'recipes.title', 'recipes.user_id',
+                'recipes.prep_time', 'recipes.cook_time', 'recipes.total_time',
+                'recipes.serves', 'recipes.difficulty_level', 'recipes.created_at',
+                DB::raw('AVG(recipe_ratings.rating) as average_rating'),
+                DB::raw('COUNT(recipe_ratings.rating) as total_ratings'),
+            ])
+            ->groupBy([
+                'recipes.id', 'recipes.title', 'recipes.user_id',
+                'recipes.prep_time', 'recipes.cook_time', 'recipes.total_time',
+                'recipes.serves', 'recipes.difficulty_level', 'recipes.created_at',
+            ])
+            ->latest('recipes.created_at')
             ->paginate(20);
 
         return response()->json($recipes);

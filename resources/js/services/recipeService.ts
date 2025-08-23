@@ -49,3 +49,22 @@ export const fetchRecipes = async (page: number): Promise<RecipesResponse | null
 
     return result
 }
+
+export const fetchRecipeById = async (id: number): Promise<Recipe | null> => {
+    let result: Recipe | null = null
+
+    await executeApiCall({
+        call: () => api.get<any>(`/recipes/${id}`),
+        errorMessage: 'Failed to load recipe',
+        onSuccess: (response) => {
+            result = {
+                ...response.data,
+                difficulty_level: getDifficultyFromValue(response.data.difficulty_level),
+            }
+        }
+    })
+
+    console.log('Fetched recipe:', result)
+
+    return result
+}

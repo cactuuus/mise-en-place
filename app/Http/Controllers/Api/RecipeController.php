@@ -35,17 +35,17 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe)
     {
-        if (!$recipe->is_public && $recipe->user_id !== auth()->id()) {
+        if ( ! $recipe->is_public && $recipe->user_id !== auth()->id()) {
             return response()->json(['message' => 'Recipe not found'], 404);
         }
 
         $recipe->load(['user', 'tags', 'ratings.user']);
 
         return response()->json([
-            'recipe' => $recipe,
+            ...$recipe->toArray(),
             'average_rating' => $recipe->averageRating(),
-            'total_ratings' => $recipe->totalRatings(),
-            'user_rating' => auth()->check() ? $recipe->getUserRating(auth()->id()) : null,
+            'total_ratings'  => $recipe->totalRatings(),
+            'user_rating'    => auth()->check() ? $recipe->getUserRating(auth()->id()) : null,
         ]);
     }
 

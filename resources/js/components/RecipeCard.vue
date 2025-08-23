@@ -79,12 +79,12 @@ import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
 import DeferredContent from 'primevue/deferredcontent'
-import {Recipe} from '@/types/recipe'
+import {RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue";
 
 const props = defineProps<{
-    recipe: Recipe
+    recipe: RecipePreview
 }>()
 
 // Functions

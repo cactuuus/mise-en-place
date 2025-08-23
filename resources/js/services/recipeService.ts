@@ -1,6 +1,6 @@
 import api from './api'
 import executeApiCall from './apiService'
-import {getDifficultyFromValue, Recipe} from '@/types/recipe'
+import {getDifficultyFromValue, Recipe, RecipePreview} from '@/types/recipe'
 
 interface RecipesApiResponse {
     data: any[] // Raw API data with numeric difficulty_level
@@ -11,7 +11,7 @@ interface RecipesApiResponse {
 }
 
 interface RecipesResponse {
-    recipes: Recipe[]
+    recipes: RecipePreview[]
     pagination: {
         currentPage: number
         lastPage: number

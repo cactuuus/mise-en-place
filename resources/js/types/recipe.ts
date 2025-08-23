@@ -18,7 +18,8 @@ export const DIFFICULTY_LEVELS = {
 
 export type DifficultyLevel = typeof DIFFICULTY_LEVELS[keyof typeof DIFFICULTY_LEVELS]
 
-export interface Recipe {
+// Base recipe for previews/cards
+export interface RecipePreview {
     id: number
     title: string
     user: {
@@ -39,6 +40,16 @@ export interface Recipe {
         medium: string | null
         large: string | null
     }
+}
+
+// Complete recipe
+export interface Recipe extends RecipePreview {
+    ingredients: string[]
+    instructions: string[]
+    notes?: string
+    source_url?: string
+    is_public: boolean
+    forked_from_recipe_id?: number
 }
 
 // Helper function to convert API number to difficulty object

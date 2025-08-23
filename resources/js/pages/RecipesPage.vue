@@ -56,11 +56,11 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
 import RecipeCard from '@/components/RecipeCard.vue'
-import {Recipe} from '@/types/recipe'
+import {RecipePreview} from '@/types/recipe'
 import {fetchRecipes} from '@/services/recipeService'
 
 const router = useRouter()
-const recipes = ref<Recipe[]>([])
+const recipes = ref<RecipePreview[]>([])
 const loading = ref(true)
 const loadingMore = ref(false)
 const pagination = ref<{
@@ -93,7 +93,7 @@ const loadMore = async (): Promise<void> => {
     loadingMore.value = false
 }
 
-const viewRecipe = (recipe: Recipe): void => {
+const viewRecipe = (recipe: RecipePreview): void => {
     router.push(`/recipes/${recipe.id}`)
 }
 

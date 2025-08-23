@@ -9,7 +9,7 @@ export const DIFFICULTY_LEVELS = {
         value: 2,
         label: 'Medium',
         color: 'yellow',
-        severity: 'warning',
+        severity: 'warn',
     },
     HARD: {
         value: 3,

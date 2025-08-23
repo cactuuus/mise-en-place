@@ -1,13 +1,14 @@
 <template>
     <Card class="recipe-card transition-all duration-200 hover:shadow-lg">
         <template #header>
-            <!-- Recipe Image -->
-            <Image
-                :alt="recipe.title"
-                :src="recipeImage"
-                image-class="image-preview"
-                @error="handleImageError"
-            />
+            <!-- Deferred Image Loading -->
+            <DeferredContent @load="onImageLoad">
+                <SmartImage
+                    :alt="recipe.title"
+                    :src="props.recipe.image_urls.medium || '/images/recipe-placeholder.svg'"
+                    image-class="image-preview"
+                />
+            </DeferredContent>
         </template>
 
         <template #title>
@@ -74,41 +75,21 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue'
 import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Chip from 'primevue/chip'
-import Image from 'primevue/image'
+import DeferredContent from 'primevue/deferredcontent'
 import {Recipe} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
+import SmartImage from "@/components/SmartImage.vue";
 
 const props = defineProps<{
     recipe: Recipe
 }>()
 
-// Reactive data
-const imageError = ref(false)
-
-// Computed properties
-const authorInitials = computed(() => {
-    const names = props.recipe.user.name.split(' ')
-    if (names.length >= 2) {
-        return names[0][0] + names[1][0]
-    }
-    return names[0][0]
-})
-
-const recipeImage = computed(() => {
-    if (imageError.value || !props.recipe.image_urls.medium || props.recipe.image_urls.medium.trim() === '') {
-        return '/images/recipe-placeholder.svg'
-    }
-    return props.recipe.image_urls.medium
-})
-
 // Functions
-const handleImageError = (): void => {
-    console.log(`Image error occurred for recipe: ${props.recipe.title} - id ${props.recipe.id}`)
-    imageError.value = true
+const onImageLoad = (): void => {
+    console.log(`Deferred content loaded for recipe: ${props.recipe.title}`)
 }
 
 const getTagLabel = (tagName: string | { [key: string]: string }): string => {

@@ -24,17 +24,11 @@
                 </div>
                 <div v-else class="flex items-center gap-2">
                     <!-- Authenticated user - show avatar -->
-                    <Button
-                        class="!py-1"
-                        text
+                    <SmartImage
+                        :src="authStore.user?.avatar_urls?.small  || '/images/avatar-placeholder.svg'"
+                        image-class="w-10 rounded-full object-cover aspect-square cursor-pointer"
                         @click="toggleUserMenu"
-                    >
-                        <Avatar
-                            :image="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
-                            class="bg-surface-500 cursor-pointer"
-                            shape="circle"
-                        />
-                    </Button>
+                    />
                     <!-- User dropdown menu -->
                     <Popover ref="userMenuRef">
                         <div class="flex flex-col gap-1">
@@ -90,11 +84,11 @@ import {useAuthStore} from '@/stores/auth'
 import Toast from 'primevue/toast'
 import Menubar from 'primevue/menubar'
 import Button from 'primevue/button'
-import Avatar from 'primevue/avatar'
 import Popover from 'primevue/popover'
 import Dialog from 'primevue/dialog'
 import LoginModal from '@/components/LoginModal.vue'
 import {initializeToast} from "@/services/toastService.ts"
+import SmartImage from "@/components/SmartImage.vue";
 
 // Get our stores and router
 const authStore = useAuthStore()

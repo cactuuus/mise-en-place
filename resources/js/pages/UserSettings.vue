@@ -14,9 +14,10 @@
             <div class="space-y-4">
                 <!-- Avatar Section -->
                 <Fieldset legend="Profile Picture">
-                    <Image
-                        :src="authStore.user?.avatar_urls?.small || '/images/avatar-placeholder.svg'"
-                        image-class="w-[90px] rounded-full object-cover"
+                    <SmartImage
+                        :alt="authStore.user?.name"
+                        :src="authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
+                        image-class="w-[90px] rounded-full object-cover aspect-square"
                     />
                     <div class="flex gap-2">
                         <Button
@@ -132,12 +133,12 @@ import {useAuthStore} from '@/stores/auth'
 import Panel from 'primevue/panel'
 import Button from 'primevue/button'
 import Fieldset from 'primevue/fieldset'
-import Image from "primevue/image";
 import EditNameModal from '@/components/EditNameModal.vue'
 import EditPasswordModal from '@/components/EditPasswordModal.vue'
 import EditAvatarModal from '@/components/EditAvatarModal.vue'
 import DeleteAvatarModal from "@/components/DeleteAvatarModal.vue";
 import DeleteAccountModal from "@/components/DeleteAccountModal.vue";
+import SmartImage from "@/components/SmartImage.vue";
 
 // Stores and composables
 const authStore = useAuthStore()

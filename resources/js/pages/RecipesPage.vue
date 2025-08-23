@@ -40,7 +40,7 @@
     </div>
 
     <!-- Load More Button (temporary - will become infinite scroll) -->
-    <div v-if="hasMore && !loading" class="text-center mt-8">
+    <div v-if="pagination?.hasMore && !loading" class="text-center mt-8">
         <Button
             :loading="loadingMore"
             label="Load More"
@@ -56,72 +56,50 @@ import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
 import RecipeCard from '@/components/RecipeCard.vue'
-import {getDifficultyFromValue, Recipe} from '@/types/recipe.ts'
-import api from '@/services/api'
+import {Recipe} from '@/types/recipe'
+import {fetchRecipes} from '@/services/recipeService'
 
-interface ApiResponse {
-    data: Recipe[] // not quite true: difficulty in api recipes is a simple number
-    current_page: number
-    last_page: number
-    per_page: number
-    total: number
-}
-
-// Router
 const router = useRouter()
-
-// Reactive data
 const recipes = ref<Recipe[]>([])
 const loading = ref(true)
 const loadingMore = ref(false)
-const currentPage = ref(1)
-const hasMore = ref(true)
+const pagination = ref<{
+    currentPage: number
+    lastPage: number
+    perPage: number
+    total: number
+    hasMore: boolean
+} | null>(null)
 
 // Functions
-const fetchRecipes = async (page: number = 1): Promise<void> => {
-    try {
-        const response = await api.get<ApiResponse>(`/recipes?page=${page}`)
+const loadRecipes = async (page: number = 1): Promise<void> => {
+    const result = await fetchRecipes(page)
+    if (!result) return
 
-        const data = {
-            ...response.data,
-            // Transform raw API data: difficulty_level goes from number to DifficultyLevel object
-            data: response.data.data.map((recipe: any) => ({
-                ...recipe,
-                difficulty_level: getDifficultyFromValue(recipe.difficulty_level)
-            }))
-        }
-
-        if (page === 1) {
-            recipes.value = data.data
-        } else {
-            recipes.value.push(...data.data)
-        }
-
-        hasMore.value = data.current_page < data.last_page
-        currentPage.value = data.current_page
-
-    } catch (error) {
-        console.error('Failed to fetch recipes:', error)
-        // TODO: Show error toast
+    if (page === 1) {
+        recipes.value = result.recipes
+    } else {
+        recipes.value.push(...result.recipes)
     }
+
+    pagination.value = result.pagination
 }
 
 const loadMore = async (): Promise<void> => {
-    if (loadingMore.value || !hasMore.value) return
+    if (loadingMore.value || !pagination.value?.hasMore) return
 
     loadingMore.value = true
-    await fetchRecipes(currentPage.value + 1)
+    await loadRecipes(pagination.value.currentPage + 1)
     loadingMore.value = false
 }
 
 const viewRecipe = (recipe: Recipe): void => {
-    // TODO: Navigate to recipe detail page
-    console.log('View recipe:', recipe.title)
+    router.push(`/recipes/${recipe.id}`)
 }
 
 // Lifecycle
 onMounted(async () => {
-    await fetchRecipes()
+    await loadRecipes()
     loading.value = false
 })
 </script>

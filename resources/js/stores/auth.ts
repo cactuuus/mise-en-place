@@ -4,20 +4,10 @@ import api from '@/services/api'
 import {useRouter} from 'vue-router'
 import executeApiCall from '@/services/apiService'
 import {showSuccess} from "@/services/toastService.ts";
-
-interface User {
-    id: number
-    name: string
-    email: string
-    created_at: string
-    avatar_urls: {
-        small: string | null
-        large: string | null
-    }
-}
+import {AuthenticatedUser} from "@/types/user.ts";
 
 interface LoginResponse {
-    user: User
+    user: AuthenticatedUser
     token: string
 }
 
@@ -36,7 +26,7 @@ enum AuthState {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-    const user = ref<User | null>(null)
+    const user = ref<AuthenticatedUser | null>(null)
     const token = ref<string | null>(localStorage.getItem('auth_token'))
     const authState = ref<AuthState>(AuthState.IDLE)
     const errorMessage = ref<string>('')
@@ -118,7 +108,7 @@ export const useAuthStore = defineStore('auth', () => {
             authState.value = AuthState.LOADING
 
             const success = await executeApiCall({
-                call: () => api.get<User>('/user'),
+                call: () => api.get<AuthenticatedUser>('/user'),
                 onSuccess: (response) => {
                     user.value = response.data
                     authState.value = AuthState.AUTHENTICATED
@@ -144,7 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    const setUser = (userData: User): void => {
+    const setUser = (userData: AuthenticatedUser): void => {
         user.value = userData
     }
 

@@ -12,7 +12,7 @@ class RecipeController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $recipes = Recipe::with(['user:id,name', 'tags'])
+        $recipes = Recipe::with(['user:id,name', 'tags:id,name'])
             ->leftJoin('recipe_ratings', 'recipes.id', '=', 'recipe_ratings.recipe_id')
             ->where('recipes.is_public', true)
             ->select([
@@ -39,7 +39,13 @@ class RecipeController extends Controller
             return response()->json(['message' => 'Recipe not found'], 404);
         }
 
-        $recipe->load(['user', 'tags', 'ratings.user']);
+        $recipe->load([
+            'user:id,name',
+            'tags:id,name',
+            'ratings.user',
+            'parentRecipe:id,title,user_id',
+            'parentRecipe.user:id,name',
+        ]);
 
         return response()->json([
             ...$recipe->toArray(),

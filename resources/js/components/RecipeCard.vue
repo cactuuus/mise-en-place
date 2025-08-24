@@ -4,9 +4,9 @@
             <!-- Deferred Image Loading -->
             <DeferredContent>
                 <SmartImage
-                    v-if="props.recipe.image_urls?.medium"
+                    v-if="recipe.image_urls?.medium"
                     :alt="recipe.title"
-                    :src="props.recipe.image_urls.medium"
+                    :src="recipe.image_urls.medium"
                     image-class="image-preview"
                 />
                 <PlaceholderRecipeImage v-else class="image-preview"/>
@@ -64,7 +64,7 @@
             <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-1 items-baseline">
                 <Tag
                     v-for="tag in recipe.tags.slice(0, MAX_TAGS)"
-                    :key="getTagKey(tag)"
+                    :key="tag.id"
                     :value="getTagLabel(tag.name)"
                     class="!text-xs"
                     severity="secondary"
@@ -82,25 +82,13 @@ import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
 import DeferredContent from 'primevue/deferredcontent'
-import {RecipePreview} from '@/types/recipe'
+import {getTagLabel, RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue";
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 
 const MAX_TAGS = 5
-const props = defineProps<{
+defineProps<{
     recipe: RecipePreview
 }>()
-
-const getTagLabel = (tagName: string | { [key: string]: string }): string => {
-    if (typeof tagName === 'string') {
-        return tagName
-    }
-    // If it's an object with language keys, try to get English first, then any value
-    return tagName.en || tagName.eng || Object.values(tagName)[0] || 'tag'
-}
-
-const getTagKey = (tag: { name: string | { [key: string]: string } }): string => {
-    return getTagLabel(tag.name)
-}
 </script>

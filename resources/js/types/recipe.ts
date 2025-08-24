@@ -25,11 +25,11 @@ export type DifficultyLevel = typeof DIFFICULTY_LEVELS[keyof typeof DIFFICULTY_L
 export interface RecipePreview {
     id: number
     title: string
-    user: {
+    user: UserPreview
+    tags?: Array<{
         id: number
-        name: string
-    }
-    tags?: Array<{ name: string | { [key: string]: string } }>
+        name: string | { [key: string]: string }
+    }>
     prep_time?: number
     cook_time?: number
     total_time?: number
@@ -53,9 +53,37 @@ export interface Recipe extends RecipePreview {
     source_url?: string
     is_public: boolean
     forked_from_recipe_id?: number
+    parent_recipe?: {
+        user: UserPreview
+    }
 }
 
 // Helper function to convert API number to difficulty object
 export const getDifficultyFromValue = (value?: number): DifficultyLevel | undefined => {
     return Object.values(DIFFICULTY_LEVELS).find(d => d.value === value)
+}
+
+// Helper function to combine recipe times
+export function getTimeBreakdown(recipe: Recipe | RecipePreview): string {
+    const hints = []
+
+    if (recipe.prep_time) {
+        hints.push(`${recipe.prep_time} prep`)
+    }
+
+    if (recipe.cook_time) {
+        hints.push(`${recipe.cook_time} cook`)
+    }
+
+    return `${recipe.total_time} mins` + (hints.length > 0 ? ` (${hints.join(' + ')})` : '')
+}
+
+// Helper function to extract the label from a tag name which may be localized
+export const getTagLabel = (tagName: string | { [key: string]: string }): string => {
+    if (typeof tagName === 'string') {
+        return tagName
+    }
+
+    // Extract from JSON object - prefer English, fallback to first available
+    return tagName.en || tagName.eng || Object.values(tagName)[0]
 }

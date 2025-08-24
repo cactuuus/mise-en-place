@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $recipes = Recipe::with(['user:id,name', 'tags'])
             ->leftJoin('recipe_ratings', 'recipes.id', '=', 'recipe_ratings.recipe_id')
@@ -33,7 +33,7 @@ class RecipeController extends Controller
         return response()->json($recipes);
     }
 
-    public function show(Recipe $recipe)
+    public function show(Recipe $recipe): JsonResponse
     {
         if ( ! $recipe->is_public && $recipe->user_id !== auth()->id()) {
             return response()->json(['message' => 'Recipe not found'], 404);
@@ -49,20 +49,20 @@ class RecipeController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'ingredients' => 'required|array',
-            'instructions' => 'required|array',
-            'notes' => 'nullable|string',
-            'source_url' => 'nullable|url',
-            'is_public' => 'boolean',
-            'prep_time' => 'nullable|integer|min:0',
-            'cook_time' => 'nullable|integer|min:0',
-            'serves' => 'nullable|integer|min:1',
+            'title'            => 'required|string|max:255',
+            'ingredients'      => 'required|array',
+            'instructions'     => 'required|array',
+            'notes'            => 'nullable|string',
+            'source_url'       => 'nullable|url',
+            'is_public'        => 'boolean',
+            'prep_time'        => 'nullable|integer|min:0',
+            'cook_time'        => 'nullable|integer|min:0',
+            'serves'           => 'nullable|integer|min:1',
             'difficulty_level' => 'nullable|string|in:easy,medium,hard',
-            'tags' => 'nullable|array',
+            'tags'             => 'nullable|array',
         ]);
 
         $recipe = Recipe::create([
@@ -77,24 +77,24 @@ class RecipeController extends Controller
         return response()->json($recipe->load(['user', 'tags']), 201);
     }
 
-    public function update(Request $request, Recipe $recipe)
+    public function update(Request $request, Recipe $recipe): JsonResponse
     {
         if ($recipe->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
-            'title' => 'string|max:255',
-            'ingredients' => 'array',
-            'instructions' => 'array',
-            'notes' => 'nullable|string',
-            'source_url' => 'nullable|url',
-            'is_public' => 'boolean',
-            'prep_time' => 'nullable|integer|min:0',
-            'cook_time' => 'nullable|integer|min:0',
-            'serves' => 'nullable|integer|min:1',
+            'title'            => 'string|max:255',
+            'ingredients'      => 'array',
+            'instructions'     => 'array',
+            'notes'            => 'nullable|string',
+            'source_url'       => 'nullable|url',
+            'is_public'        => 'boolean',
+            'prep_time'        => 'nullable|integer|min:0',
+            'cook_time'        => 'nullable|integer|min:0',
+            'serves'           => 'nullable|integer|min:1',
             'difficulty_level' => 'nullable|string|in:easy,medium,hard',
-            'tags' => 'nullable|array',
+            'tags'             => 'nullable|array',
         ]);
 
         $recipe->update($validated);
@@ -106,7 +106,7 @@ class RecipeController extends Controller
         return response()->json($recipe->load(['user', 'tags']));
     }
 
-    public function destroy(Recipe $recipe)
+    public function destroy(Recipe $recipe): JsonResponse
     {
         if ($recipe->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -117,9 +117,9 @@ class RecipeController extends Controller
         return response()->json(['message' => 'Recipe deleted successfully']);
     }
 
-    public function fork(Request $request, Recipe $recipe)
+    public function fork(Request $request, Recipe $recipe): JsonResponse
     {
-        if (!$recipe->is_public) {
+        if ( ! $recipe->is_public) {
             return response()->json(['message' => 'Cannot fork private recipe'], 403);
         }
 
@@ -132,22 +132,22 @@ class RecipeController extends Controller
         return response()->json($forkedRecipe->load(['user', 'tags']), 201);
     }
 
-    public function rate(Request $request, Recipe $recipe)
+    public function rate(Request $request, Recipe $recipe): JsonResponse
     {
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
         ]);
 
-        if (!$recipe->is_public && $recipe->user_id !== auth()->id()) {
+        if ( ! $recipe->is_public && $recipe->user_id !== auth()->id()) {
             return response()->json(['message' => 'Cannot rate this recipe'], 403);
         }
 
         $rating = $recipe->rate(auth()->id(), $validated['rating']);
 
         return response()->json([
-            'rating' => $rating,
+            'rating'         => $rating,
             'average_rating' => $recipe->averageRating(),
-            'total_ratings' => $recipe->totalRatings(),
+            'total_ratings'  => $recipe->totalRatings(),
         ]);
     }
 }

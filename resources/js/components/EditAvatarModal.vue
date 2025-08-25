@@ -20,7 +20,7 @@
                     ref="fileUploadRef"
                     :disabled="loading"
                     :file-limit="1"
-                    :max-file-size="2097152"
+                    :max-file-size="MAX_FILESIZE"
                     :show-cancel-button="false"
                     :show-upload-button="false"
                     accept="image/*"
@@ -43,6 +43,7 @@ import BaseModal from '@/baseComponents/baseModal.vue'
 import FileUpload from 'primevue/fileupload'
 import Image from 'primevue/image'
 
+const MAX_FILESIZE = 5242880 // 5MB
 interface Props {
     visible: boolean
     currentAvatarUrl?: string | null

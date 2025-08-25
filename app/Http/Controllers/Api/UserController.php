@@ -84,7 +84,7 @@ class UserController extends Controller
     {
         $user = auth()->user();
         $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
         ]);
 
         $user->clearMediaCollection('avatar');

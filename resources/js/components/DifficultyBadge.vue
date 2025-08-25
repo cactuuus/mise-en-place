@@ -2,6 +2,7 @@
     <Tag
         :severity="difficulty.severity"
         :value="difficulty.label"
+        class="difficulty-tag"
     />
 </template>
 

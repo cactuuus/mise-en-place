@@ -2,6 +2,22 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+.difficulty-tag {
+    /* overrides bg colors for dark theme, to avoid high transparency issues*/
+
+    &.p-tag-danger {
+        @apply dark:!bg-red-900/70;
+    }
+
+    &.p-tag-warn {
+        @apply dark:!bg-yellow-900/70;
+    }
+
+    &.p-tag-success {
+        @apply dark:!bg-emerald-900/70;
+    }
+}
+
 .p-password > .p-password-input {
     @apply w-full;
 }

@@ -28,7 +28,9 @@
             />
             <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover rounded-lg"/>
 
-            <div class="absolute top-0 left-0 flex justify-between p-2 w-full backdrop-blur-sm bg-white/5">
+            <div
+                class="absolute bottom-0 left-0 flex justify-between p-1 w-full backdrop-blur-sm dark:bg-black/20"
+                style="mask: linear-gradient(to top, black 95%, transparent 100%);">
                 <DifficultyBadge
                     v-if="recipe.difficulty_level"
                     :difficulty="recipe.difficulty_level"

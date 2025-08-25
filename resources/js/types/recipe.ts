@@ -1,3 +1,5 @@
+import {UserPreview} from "@/types/user.ts";
+
 export const DIFFICULTY_LEVELS = {
     EASY: {
         value: 1,

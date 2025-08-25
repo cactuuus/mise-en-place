@@ -13,7 +13,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json([
-            'user'            => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url']),
+            'user'            => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
             'followers_count' => $user->followersCount(),
             'following_count' => $user->followingCount(),
             'recipes_count'   => $user->publicRecipes()->count(),
@@ -95,7 +95,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Avatar uploaded successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
         ]);
     }
 
@@ -106,7 +106,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Avatar removed successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
         ]);
     }
 
@@ -160,7 +160,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'Name updated successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_url', 'avatar_urls']),
+            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
         ]);
     }
 }

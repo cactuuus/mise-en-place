@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
     alt: '',
     imageClass: '',
     containerClass: '',
-    maxRetries: 3,
+    maxRetries: 5,
     retryDelay: 1000,
 })
 
@@ -83,7 +83,8 @@ const onLoad = () => {
 
 const onError = () => {
     if (retryCount.value < props.maxRetries) {
-        const delay = props.retryDelay * Math.pow(2, retryCount.value)
+        // const delay = props.retryDelay * Math.pow(2, retryCount.value, 5000) // exponential
+        const delay = Math.min(props.retryDelay * (retryCount.value + 1), 5000) // linear
         retryCount.value++
 
         console.log(`SmartImage retry ${retryCount.value}/${props.maxRetries} in ${delay}ms for: ${props.src}`)

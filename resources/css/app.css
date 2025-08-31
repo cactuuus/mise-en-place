@@ -61,7 +61,7 @@
     @apply max-w-sm cursor-pointer overflow-hidden w-full;
 
     .image-preview {
-        @apply w-full object-cover mx-auto h-36;
+        @apply w-full object-cover mx-auto h-36 bg-surface-100 dark:bg-surface-800/50;
     }
 
     .p-card-body {
@@ -138,5 +138,62 @@
                 @apply text-xs truncate block w-full;
             }
         }
+    }
+}
+
+Header {
+    @apply sticky top-0 z-50 bg-surface-0 dark:bg-surface-900 border-b-2 border-b-surface-200 dark:border-b-surface-800;
+
+    #header-content {
+        @apply container mx-auto min-h-14 px-4 py-2 grid grid-cols-2 items-center gap-1;
+        @apply sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
+
+        #banner {
+            @apply text-2xl font-bold;
+        }
+
+        #user-section {
+            @apply flex justify-end;
+
+            .user-avatar {
+                @apply w-8 rounded-full object-cover aspect-square cursor-pointer;
+                @apply sm:w-10;
+            }
+        }
+
+        #main-nav {
+            @apply flex justify-start items-center text-sm w-full mt-1 gap-2 col-span-2 row-start-2;
+            @apply sm:col-span-1 sm:row-start-1 sm:col-start-2 sm:mt-0 sm:items-end sm:text-base;
+
+            .nav-link {
+                @apply inline-flex items-center gap-1 font-medium rounded-md text-surface-500 dark:text-surface-400
+                transition-all duration-200;
+                @apply sm:px-2 sm:pt-1 sm:gap-2 sm:hover:pb-1 sm:hover:bg-primary-100 sm:dark:hover:bg-primary-900/50 sm:hover:-translate-y-0.5;
+
+                &.active, &:hover {
+                    @apply text-primary-700 dark:text-primary-400;
+                }
+
+                &.disabled {
+                    @apply opacity-50 pointer-events-none;
+                }
+            }
+
+            .separator {
+                @apply w-px h-5 bg-surface-500 dark:bg-surface-400 mx-1 sm:hidden;
+            }
+        }
+    }
+}
+
+#user-menu {
+    @apply min-w-36;
+
+    .p-popover-content {
+        @apply p-2 flex flex-col gap-1;
+    }
+
+    .p-button {
+        @apply justify-start;
     }
 }

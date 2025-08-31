@@ -2,6 +2,8 @@ import {createApp} from 'vue'
 import {createPinia} from "pinia";
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
+import {definePreset} from "@primevue/themes";
+import {colors} from './colors';
 import ToastService from 'primevue/toastservice';
 import router from './router'
 import App from './App.vue'
@@ -16,7 +18,19 @@ app.use(pinia)
 app.use(router)
 app.use(PrimeVue, {
     theme: {
-        preset: Aura,
+        preset: definePreset(Aura, {
+            semantic: {
+                primary: colors.primary,
+                colorScheme: {
+                    light: {
+                        surface: colors.surface
+                    },
+                    dark: {
+                        surface: colors.surface
+                    }
+                }
+            }
+        }),
         options: {
             prefix: 'p',
             darkModeSelector: 'system',

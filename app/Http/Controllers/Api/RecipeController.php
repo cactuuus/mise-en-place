@@ -156,4 +156,29 @@ class RecipeController extends Controller
             'total_ratings'  => $recipe->totalRatings(),
         ]);
     }
+
+    public function mine(Request $request): JsonResponse
+    {
+        $recipes = Recipe::with(['tags:id,name'])
+            ->leftJoin('recipe_ratings', 'recipes.id', '=', 'recipe_ratings.recipe_id')
+            ->where('recipes.user_id', auth()->id())
+            ->select([
+                'recipes.id', 'recipes.title', 'recipes.user_id',
+                'recipes.prep_time', 'recipes.cook_time', 'recipes.total_time',
+                'recipes.serves', 'recipes.difficulty_level', 'recipes.is_public',
+                'recipes.created_at', 'recipes.updated_at',
+                DB::raw('AVG(recipe_ratings.rating) as average_rating'),
+                DB::raw('COUNT(recipe_ratings.rating) as total_ratings'),
+            ])
+            ->groupBy([
+                'recipes.id', 'recipes.title', 'recipes.user_id',
+                'recipes.prep_time', 'recipes.cook_time', 'recipes.total_time',
+                'recipes.serves', 'recipes.difficulty_level', 'recipes.is_public',
+                'recipes.created_at', 'recipes.updated_at',
+            ])
+            ->latest('recipes.updated_at')
+            ->paginate(50);
+
+        return response()->json($recipes);
+    }
 }

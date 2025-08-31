@@ -35,6 +35,12 @@ const routes: RouteRecordRaw[] = [
         ]
     },
     {
+        path: '/cookbook',
+        name: 'cookbook',
+        component: () => import('@/pages/CookbookPage.vue'),
+        meta: {title: 'Cookbook', requiresAuth: true}
+    },
+    {
         path: '/settings',
         name: 'settings',
         component: () => import('@/pages/UserSettingsPage.vue'),

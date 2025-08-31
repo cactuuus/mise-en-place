@@ -66,3 +66,32 @@ export const fetchRecipeById = async (id: number): Promise<Recipe | null> => {
 
     return result
 }
+
+export const fetchMyRecipes = async (page: number = 1): Promise<RecipesResponse | null> => {
+    let result: RecipesResponse | null = null
+
+    await executeApiCall({
+        call: () => api.get<RecipesApiResponse>(`/recipes/mine?page=${page}`),
+        errorMessage: 'Failed to load your recipes',
+        onSuccess: (response) => {
+            // Transform raw API data (same logic as fetchRecipes)
+            const transformedRecipes = response.data.data.map((recipe: any) => ({
+                ...recipe,
+                difficulty_level: getDifficultyFromValue(recipe.difficulty_level)
+            }))
+
+            result = {
+                recipes: transformedRecipes,
+                pagination: {
+                    currentPage: response.data.current_page,
+                    lastPage: response.data.last_page,
+                    perPage: response.data.per_page,
+                    total: response.data.total,
+                    hasMore: response.data.current_page < response.data.last_page
+                }
+            }
+        }
+    })
+
+    return result
+}

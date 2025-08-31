@@ -14,9 +14,7 @@ declare module 'vue-router' {
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        name: 'Home',
-        component: () => import('@/pages/HomePage.vue'),
-        meta: {title: 'Mise en Place'}
+        redirect: '/discover'
     },
     {
         path: '/discover',

@@ -2,49 +2,85 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-.difficulty-tag {
-    /* overrides bg colors for dark theme, to avoid high transparency issues*/
+/* GLOBAL *************************************************************************************************************/
 
-    &.p-tag-danger {
-        @apply dark:!bg-red-900/70;
-    }
-
-    &.p-tag-warn {
-        @apply dark:!bg-yellow-900/70;
-    }
-
-    &.p-tag-success {
-        @apply dark:!bg-emerald-900/70;
-    }
+html {
+    font-size: 14px;
 }
 
-.p-password > .p-password-input {
-    @apply w-full;
+.secondary-text {
+    @apply text-surface-500 dark:text-surface-400;
 }
 
-#login-panel {
-    @apply px-0 py-2 w-full text-center;
+.secondary-border {
+    @apply border-surface-200 dark:border-surface-800;
+}
 
-    .panel-heading {
-        @apply text-2xl font-bold mt-4 mb-6;
-    }
+.secondary-bg {
+    @apply bg-surface-100 dark:bg-surface-800/50;
+}
 
-    .form-content {
-        @apply flex flex-col gap-6;
+/* HEADER *************************************************************************************************************/
 
-        .p-component {
-            @apply w-full;
+Header {
+    @apply sticky top-0 z-50 bg-surface-0 dark:bg-surface-900 border-b-2 secondary-border;
+
+    #header-content {
+        @apply container mx-auto px-4 py-2 grid grid-cols-2 items-center gap-1;
+        @apply sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
+
+        #banner {
+            @apply text-2xl font-bold;
+        }
+
+        #user-section {
+            @apply flex justify-end;
+
+            .user-avatar {
+                @apply w-8 rounded-full object-cover aspect-square cursor-pointer;
+                @apply sm:w-10;
+            }
+        }
+
+        #main-nav {
+            @apply flex justify-start items-center w-full mt-1 gap-2 col-span-2 row-start-2;
+            @apply sm:col-span-1 sm:row-start-1 sm:col-start-2 sm:mt-0 sm:items-end sm:text-base;
+
+            .nav-link {
+                @apply inline-flex items-center gap-1 font-medium rounded-md secondary-text;
+                @apply sm:px-2 sm:pt-1 sm:gap-2 sm:mt-1;
+
+                &.enabled {
+                    @apply sm:hover:mt-0 sm:hover:pb-1 sm:hover:bg-primary-100 sm:dark:hover:bg-primary-900/50 sm:hover:-translate-y-0.5 transition-all duration-200;
+
+                    &.active, &:hover {
+                        @apply text-primary-700 dark:text-primary-400;
+                    }
+                }
+
+                &.disabled {
+                    @apply opacity-50 cursor-not-allowed hover:bg-transparent;
+                }
+            }
+
+            .separator {
+                @apply w-px h-5 bg-surface-500 dark:bg-surface-400 mx-1 sm:hidden;
+            }
         }
     }
+}
 
-    .p-tabpanel {
-        @apply w-full max-w-xs mx-auto px-2;
+#user-menu {
+    .p-popover-content {
+        @apply p-2 flex flex-col gap-1;
     }
 
-    .footer-text {
-        @apply pt-3 pb-2;
+    .p-button {
+        @apply justify-start gap-3;
     }
 }
+
+/* MODALS *************************************************************************************************************/
 
 .headless-modal {
     .p-dialog-header {
@@ -56,6 +92,57 @@
     }
 }
 
+.base-modal {
+    @apply w-full max-w-sm mx-3;
+
+    .button-container {
+        @apply flex gap-3 mt-6 mb-1;
+
+        .p-button {
+            @apply grow;
+        }
+    }
+}
+
+#login-panel {
+    @apply px-0 py-2 w-full text-center;
+
+    .panel-heading {
+        @apply text-2xl font-bold mt-4 mb-6;
+
+        .sub-heading {
+            @apply text-sm font-normal secondary-text;
+        }
+    }
+
+    .form-content {
+        @apply flex flex-col gap-4;
+    }
+
+    .p-tabpanel {
+        @apply w-full max-w-xs mx-auto px-2;
+    }
+
+    .footer-text {
+        @apply pt-3 pb-2;
+    }
+}
+
+#avatar-modal {
+    .p-fileupload-basic {
+        @apply min-w-0 w-full max-w-full;
+
+        .p-fileupload-basic-content {
+            @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
+
+            > span {
+                @apply text-xs truncate block w-full;
+            }
+        }
+    }
+}
+
+/* RECIPES ************************************************************************************************************/
 
 .recipe-card {
     @apply max-w-sm cursor-pointer overflow-hidden w-full;
@@ -80,18 +167,16 @@
         @apply truncate text-sm;
     }
 
-    .tag {
-        @apply text-xs px-2 py-1 rounded-full;
-    }
-
     &:hover {
         transform: translateY(-2px);
     }
 }
 
+/* USER SETTINGS ******************************************************************************************************/
+
 #user-settings-panel, #danger-zone-panel {
     .panel-header {
-        @apply flex items-center gap-2 text-lg font-semibold;
+        @apply flex items-center gap-2 font-semibold;
     }
 
     .p-fieldset {
@@ -113,87 +198,4 @@
 
 #danger-zone-panel .p-fieldset-content {
     @apply flex-wrap;
-}
-
-.base-modal {
-    @apply w-full max-w-sm mx-3;
-
-    .button-container {
-        @apply flex gap-3 mt-6 mb-1;
-
-        .p-button {
-            @apply grow;
-        }
-    }
-}
-
-#avatar-modal {
-    .p-fileupload-basic {
-        @apply min-w-0 w-full max-w-full;
-
-        .p-fileupload-basic-content {
-            @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
-
-            > span {
-                @apply text-xs truncate block w-full;
-            }
-        }
-    }
-}
-
-Header {
-    @apply sticky top-0 z-50 bg-surface-0 dark:bg-surface-900 border-b-2 border-b-surface-200 dark:border-b-surface-800;
-
-    #header-content {
-        @apply container mx-auto min-h-14 px-4 py-2 grid grid-cols-2 items-center gap-1;
-        @apply sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
-
-        #banner {
-            @apply text-2xl font-bold;
-        }
-
-        #user-section {
-            @apply flex justify-end;
-
-            .user-avatar {
-                @apply w-8 rounded-full object-cover aspect-square cursor-pointer;
-                @apply sm:w-10;
-            }
-        }
-
-        #main-nav {
-            @apply flex justify-start items-center text-sm w-full mt-1 gap-2 col-span-2 row-start-2;
-            @apply sm:col-span-1 sm:row-start-1 sm:col-start-2 sm:mt-0 sm:items-end sm:text-base;
-
-            .nav-link {
-                @apply inline-flex items-center gap-1 font-medium rounded-md text-surface-500 dark:text-surface-400
-                transition-all duration-200;
-                @apply sm:px-2 sm:pt-1 sm:gap-2 sm:hover:pb-1 sm:hover:bg-primary-100 sm:dark:hover:bg-primary-900/50 sm:hover:-translate-y-0.5;
-
-                &.active, &:hover {
-                    @apply text-primary-700 dark:text-primary-400;
-                }
-
-                &.disabled {
-                    @apply opacity-50 pointer-events-none;
-                }
-            }
-
-            .separator {
-                @apply w-px h-5 bg-surface-500 dark:bg-surface-400 mx-1 sm:hidden;
-            }
-        }
-    }
-}
-
-#user-menu {
-    @apply min-w-36;
-
-    .p-popover-content {
-        @apply p-2 flex flex-col gap-1;
-    }
-
-    .p-button {
-        @apply justify-start;
-    }
 }

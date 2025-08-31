@@ -1,6 +1,6 @@
 <template>
-    <div class="image-preview bg-surface-100 dark:bg-surface-800/50 flex items-center justify-center">
-        <svg class="icon text-surface-600 dark:text-surface-400 w-1/2 max-w-32 aspect-square"
+    <div class="w-full h-full bg-surface-100 dark:bg-surface-800/50 flex items-center justify-center">
+        <svg class="icon text-surface-600 dark:text-surface-400 w-4/5 h-4/5 max-w-64 aspect-square"
              height="800px"
              viewBox="0 0 1024 1024"
              width="800px"

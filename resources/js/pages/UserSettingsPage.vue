@@ -1,7 +1,5 @@
 <template>
     <div class="max-w-4xl mx-auto space-y-4">
-        <h1 class="text-3xl font-bold text-surface-900 dark:text-surface-0 mb-6">Account settings</h1>
-
         <!-- Profile Information Display -->
         <Panel id="user-settings-panel">
             <template #header>
@@ -19,7 +17,15 @@
                         :src="authStore.user?.avatar_urls?.large || '/images/avatar-placeholder.svg'"
                         image-class="w-[90px] rounded-full object-cover aspect-square"
                     />
-                    <div class="flex gap-2">
+                    <div class="flex flex-col gap-2">
+                        <Button
+                            icon="pi pi-pencil"
+                            label="Edit"
+                            outlined
+                            severity="secondary"
+                            size="small"
+                            @click="showAvatarModal = true"
+                        />
                         <Button
                             v-if="authStore.user?.avatar_urls?.small"
                             icon="pi pi-trash"
@@ -27,13 +33,6 @@
                             severity="danger"
                             size="small"
                             @click="showDeleteAvatarModal = true"
-                        />
-                        <Button
-                            icon="pi pi-pencil"
-                            label="Edit"
-                            outlined
-                            size="small"
-                            @click="showAvatarModal = true"
                         />
                     </div>
                 </Fieldset>
@@ -45,6 +44,7 @@
                         icon="pi pi-pencil"
                         label="Edit"
                         outlined
+                        severity="secondary"
                         size="small"
                         @click="showNameModal = true"
                     />
@@ -58,6 +58,7 @@
                         icon="pi pi-lock"
                         label="Edit"
                         outlined
+                        severity="secondary"
                         size="small"
                     />
                 </Fieldset>
@@ -69,6 +70,7 @@
                         icon="pi pi-pencil"
                         label="Edit"
                         outlined
+                        severity="secondary"
                         size="small"
                         @click="showPasswordModal = true"
                     />
@@ -88,7 +90,6 @@
             </template>
 
             <Fieldset legend="Delete Account">
-
                 <p class="text-sm font-semibold">
                     Once you delete your account, all of your data will be permanently removed.
                 </p>
@@ -98,7 +99,6 @@
                     severity="danger"
                     @click="showDeleteAccountModal = true"
                 />
-
             </Fieldset>
         </Panel>
     </div>

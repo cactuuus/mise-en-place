@@ -44,14 +44,24 @@
       <nav id="main-nav">
         <template v-for="(item, index) in navItems" :key="item.key">
           <RouterLink
-              :class="{ disabled: item.disabled }"
+              v-if="!item.disabled"
               :to="item.to"
               active-class="active"
-              class="nav-link"
+              class="nav-link enabled"
           >
             <i :class="item.icon"></i>
             <span class="label">{{ item.label }}</span>
           </RouterLink>
+
+          <!-- Disabled link -->
+          <button
+              v-else
+              class="nav-link disabled"
+              @click="item.alternateAction()"
+          >
+            <i :class="item.icon"></i>
+            <span class="label">{{ item.label }}</span>
+          </button>
           <div
               v-if="index < navItems.length - 1"
               class="separator"
@@ -66,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 import {useRouter} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
 import Button from 'primevue/button'
@@ -74,7 +84,7 @@ import Popover from 'primevue/popover'
 import SmartImage from '@/components/SmartImage.vue'
 
 // Emits
-defineEmits<{
+const emit = defineEmits<{
   showLoginModal: []
 }>()
 
@@ -84,20 +94,25 @@ const authStore = useAuthStore()
 const userMenuRef = ref()
 
 // Navigation items
-const navItems = ref([
+const navItems = computed(() => [
   {
     key: 'discover',
     label: 'Discover',
     icon: 'pi pi-compass',
     to: '/discover',
-    disabled: false
+    disabled: false,
+    alternateAction: () => {
+    },
   },
   {
     key: 'cookbook',
     label: 'My Cookbook',
     icon: 'pi pi-bookmark',
     to: '/cookbook',
-    disabled: true
+    disabled: !authStore.isAuthenticated,
+    alternateAction: () => {
+      emit('showLoginModal')
+    },
   },
 ])
 

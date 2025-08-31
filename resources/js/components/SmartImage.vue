@@ -3,7 +3,7 @@
         <!-- Loading skeleton -->
         <div
             v-if="loading"
-            :class="['bg-surface-100 dark:bg-surface-800 flex items-center justify-center', imageClass]"
+            :class="['secondary-bg flex items-center justify-center', imageClass]"
         >
             <ProgressSpinner
                 animation-duration="2s"

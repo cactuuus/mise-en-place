@@ -17,16 +17,16 @@
 
     <div v-else-if="recipe" class="max-w-4xl mx-auto space-y-6  text-sm">
         <!-- Hero Section -->
-        <div class="relative overflow-hidden rounded-lg">
+        <div class="relative overflow-hidden rounded-lg dark:bg-surface-900">
             <SmartImage
                 v-if="recipe.image_urls?.large"
                 :alt="recipe.title"
                 :max-retries="5"
                 :retry-delay="2000"
                 :src="recipe.image_urls.large"
-                image-class="w-full h-48 md:h-64 object-cover rounded-lg"
+                image-class="w-full h-48 md:h-64 object-cover"
             />
-            <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover rounded-lg"/>
+            <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover"/>
 
             <div
                 class="absolute bottom-0 left-0 flex justify-between p-1 w-full backdrop-blur-sm dark:bg-black/20"
@@ -108,7 +108,7 @@
                         />
                         <label
                             :class="{ 'line-through text-surface-500': checkedIngredients[index] }"
-                            :for="index"
+                            :for="index.toString()"
                             class="cursor-pointer flex-1"
                         >
                             {{ ingredient.ingredient }}

@@ -38,6 +38,7 @@ export interface RecipePreview {
     serves?: number
     difficulty_level?: DifficultyLevel
     created_at: string
+    is_public?: boolean
     average_rating?: number
     total_ratings?: number
     image_urls: {
@@ -49,8 +50,8 @@ export interface RecipePreview {
 
 // Complete recipe
 export interface Recipe extends RecipePreview {
-    ingredients: string[]
-    instructions: string[]
+    ingredients: [{ [key: string]: string }]
+    instructions: [{ [key: string]: string }]
     notes?: string
     source_url?: string
     is_public: boolean

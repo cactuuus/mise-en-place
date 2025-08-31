@@ -12,40 +12,36 @@
                 <Form v-slot="$form" :resolver="loginResolver" validate-on-value-update
                       @submit="handleLogin">
                     <div class="form-content">
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <InputText
-                                    id="login-email"
-                                    :disabled="authStore.isLoading"
-                                    fluid
-                                    name="email"
-                                    type="email"
-                                />
-                                <label for="login-email">Email</label>
-                            </FloatLabel>
-                            <Message v-if="$form.email?.invalid" severity="error" size="small"
-                                     variant="simple">
-                                {{ $form.email.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <InputText
+                                id="login-email"
+                                :disabled="authStore.isLoading"
+                                fluid
+                                name="email"
+                                type="email"
+                            />
+                            <label for="login-email">Email</label>
+                        </FloatLabel>
+                        <Message v-if="$form.email?.invalid" severity="error" size="small"
+                                 variant="simple">
+                            {{ $form.email.error.message }}
+                        </Message>
 
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <Password
-                                    id="login-password"
-                                    :disabled="authStore.isLoading"
-                                    :feedback="false"
-                                    fluid
-                                    name="password"
-                                    toggleMask
-                                />
-                                <label for="login-password">Password</label>
-                            </FloatLabel>
-                            <Message v-if="$form.password?.invalid" severity="error" size="small"
-                                     variant="simple">
-                                {{ $form.password.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <Password
+                                id="login-password"
+                                :disabled="authStore.isLoading"
+                                :feedback="false"
+                                fluid
+                                name="password"
+                                toggleMask
+                            />
+                            <label for="login-password">Password</label>
+                        </FloatLabel>
+                        <Message v-if="$form.password?.invalid" severity="error" size="small"
+                                 variant="simple">
+                            {{ $form.password.error.message }}
+                        </Message>
 
                         <Message v-if="authStore.errorMessage" severity="error">
                             {{ authStore.errorMessage }}
@@ -77,86 +73,78 @@
             <TabPanel value="register">
                 <div class="panel-heading">
                     <h2>Join millions* of chefs</h2>
-                    <p class="text-gray-600 text-xs">* numbers might be severely inflated</p>
+                    <p class="sub-heading">* numbers might be severely inflated</p>
                 </div>
 
                 <Form v-slot="$form" :resolver="registerResolver" validate-on-value-update
                       @submit="handleRegister">
                     <div class="form-content">
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <InputText
-                                    id="register-name"
-                                    :disabled="authStore.isLoading"
-                                    fluid
-                                    name="name"
-                                    required
-                                />
-                                <label for="register-name">Full Name</label>
-                            </FloatLabel>
-                            <Message v-if="$form.name?.invalid" severity="error" size="small"
-                                     variant="simple">
-                                {{ $form.name.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <InputText
+                                id="register-name"
+                                :disabled="authStore.isLoading"
+                                fluid
+                                name="name"
+                                required
+                            />
+                            <label for="register-name">Full Name</label>
+                        </FloatLabel>
+                        <Message v-if="$form.name?.invalid" severity="error" size="small"
+                                 variant="simple">
+                            {{ $form.name.error.message }}
+                        </Message>
 
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <InputText
-                                    id="register-email"
-                                    :disabled="authStore.isLoading"
-                                    fluid
-                                    name="email"
-                                    required
-                                    type="email"
-                                />
-                                <label for="register-email">Email</label>
-                            </FloatLabel>
-                            <Message v-if="$form.email?.invalid" severity="error" size="small"
-                                     variant="simple">
-                                {{ $form.email.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <InputText
+                                id="register-email"
+                                :disabled="authStore.isLoading"
+                                fluid
+                                name="email"
+                                required
+                                type="email"
+                            />
+                            <label for="register-email">Email</label>
+                        </FloatLabel>
+                        <Message v-if="$form.email?.invalid" severity="error" size="small"
+                                 variant="simple">
+                            {{ $form.email.error.message }}
+                        </Message>
 
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <Password
-                                    id="register-password"
-                                    :disabled="authStore.isLoading"
-                                    fluid
-                                    mediumLabel="Medium"
-                                    name="password"
-                                    promptLabel="Enter a password"
-                                    required
-                                    strongLabel="Strong"
-                                    toggleMask
-                                    weakLabel="Weak"
-                                />
-                                <label for="register-password">Password</label>
-                            </FloatLabel>
-                            <Message v-if="$form.password?.invalid" severity="error" size="small"
-                                     variant="simple">{{ $form.password.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <Password
+                                id="register-password"
+                                :disabled="authStore.isLoading"
+                                fluid
+                                mediumLabel="Medium"
+                                name="password"
+                                promptLabel="Enter a password"
+                                required
+                                strongLabel="Strong"
+                                toggleMask
+                                weakLabel="Weak"
+                            />
+                            <label for="register-password">Password</label>
+                        </FloatLabel>
+                        <Message v-if="$form.password?.invalid" severity="error" size="small"
+                                 variant="simple">{{ $form.password.error.message }}
+                        </Message>
 
-                        <div class="flex flex-col gap-1">
-                            <FloatLabel variant="on">
-                                <Password
-                                    id="register-password-confirmation"
-                                    :disabled="authStore.isLoading"
-                                    :feedback="false"
-                                    fluid
-                                    name="password_confirmation"
-                                    required
-                                    toggleMask
-                                />
-                                <label for="register-password-confirmation">Confirm Password</label>
-                            </FloatLabel>
-                            <Message v-if="$form.password_confirmation?.invalid" severity="error"
-                                     size="small" variant="simple">
-                                {{ $form.password_confirmation.error.message }}
-                            </Message>
-                        </div>
+                        <FloatLabel variant="on">
+                            <Password
+                                id="register-password-confirmation"
+                                :disabled="authStore.isLoading"
+                                :feedback="false"
+                                fluid
+                                name="password_confirmation"
+                                required
+                                toggleMask
+                            />
+                            <label for="register-password-confirmation">Confirm Password</label>
+                        </FloatLabel>
+                        <Message v-if="$form.password_confirmation?.invalid" severity="error"
+                                 size="small" variant="simple">
+                            {{ $form.password_confirmation.error.message }}
+                        </Message>
                     </div>
 
                     <Message v-if="authStore.errorMessage" severity="error">

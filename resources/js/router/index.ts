@@ -19,10 +19,22 @@ const routes: RouteRecordRaw[] = [
         meta: {title: 'Mise en Place'}
     },
     {
-        path: '/recipes',
-        name: 'recipes',
-        component: () => import('@/pages/RecipesPage.vue'),
-        meta: {title: 'Recipes'}
+        path: '/discover',
+        children: [
+            {
+                path: '',
+                name: 'discover',
+                component: () => import('@/pages/DiscoverPage.vue'),
+                meta: {title: 'Discover'}
+            },
+            {
+                path: ':id',
+                name: 'recipe-detail',
+                component: () => import('@/pages/RecipePage.vue'),
+                props: true,
+                meta: {title: 'Recipe Detail'}
+            }
+        ]
     },
     {
         path: '/settings',
@@ -30,12 +42,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/UserSettingsPage.vue'),
         meta: {title: 'Settings', requiresAuth: true}
     },
-    {
-        path: '/recipes/:id',
-        name: 'recipe-detail',
-        component: () => import('@/pages/RecipePage.vue'),
-        props: true
-    }
+
 ]
 
 const router = createRouter({

@@ -94,7 +94,7 @@ const loadMore = async (): Promise<void> => {
 }
 
 const viewRecipe = (recipe: RecipePreview): void => {
-    router.push(`/recipes/${recipe.id}`)
+    router.push(`/discover/${recipe.id}`)
 }
 
 // Lifecycle

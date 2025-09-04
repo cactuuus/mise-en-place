@@ -27,7 +27,7 @@ const routes: RouteRecordRaw[] = [
             },
             {
                 path: ':id',
-                name: 'recipe-detail',
+                name: 'discover-recipe',
                 component: () => import('@/pages/RecipePage.vue'),
                 props: true,
                 meta: {title: 'Recipe Detail'}
@@ -36,9 +36,22 @@ const routes: RouteRecordRaw[] = [
     },
     {
         path: '/cookbook',
-        name: 'cookbook',
-        component: () => import('@/pages/CookbookPage.vue'),
-        meta: {title: 'Cookbook', requiresAuth: true}
+        meta: {requiresAuth: true},
+        children: [
+            {
+                path: '',
+                name: 'cookbook',
+                component: () => import('@/pages/CookbookPage.vue'),
+                meta: {title: 'Cookbook'}
+            },
+            {
+                path: ':id',
+                name: 'cookbook-recipe',
+                component: () => import('@/pages/RecipePage.vue'),
+                props: true,
+                meta: {title: 'Recipe Detail'}
+            }
+        ]
     },
     {
         path: '/settings',

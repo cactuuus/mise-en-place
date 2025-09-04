@@ -35,7 +35,7 @@ class RecipeController extends Controller
 
     public function show(Recipe $recipe): JsonResponse
     {
-        if ( ! $recipe->is_public && $recipe->user_id !== auth()->id()) {
+        if ( ! $recipe->is_public && $recipe->user_id !== auth('sanctum')->id()) {
             return response()->json(['message' => 'Recipe not found'], 404);
         }
 

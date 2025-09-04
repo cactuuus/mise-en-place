@@ -12,11 +12,7 @@ import 'primeicons/primeicons.css'
 
 const app = createApp(App)
 const pinia = createPinia()
-
-// Register plugins
-app.use(pinia)
-app.use(router)
-app.use(PrimeVue, {
+const primevueConfig = {
     theme: {
         preset: definePreset(Aura, {
             semantic: {
@@ -37,13 +33,18 @@ app.use(PrimeVue, {
             cssLayer: false
         }
     }
-});
-app.use(ToastService);
+}
 
 // Initialize authentication before mounting
 const initializeApp = async () => {
+    app.use(pinia)
     const authStore = useAuthStore()
     await authStore.initializeAuth()
+
+    app.use(PrimeVue, primevueConfig);
+    app.use(router)
+    app.use(ToastService);
+
     app.mount('#app')
 }
 

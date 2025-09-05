@@ -15,11 +15,10 @@ class RecipeController extends Controller
      */
     public function index(): RecipePreviewCollection
     {
-        $recipes = Recipe::with('media')
-            ->withRatings()
+        $recipes = Recipe::withRatings()
             ->excludeUser(auth('sanctum')->id())
             ->publicOnly()
-            ->with(['user:id,name', 'tags:id,name'])
+            ->with(['user:id,name', 'tags:id,name', 'media'])
             ->latest('recipes.created_at')
             ->simplePaginate(20);
 
@@ -31,10 +30,9 @@ class RecipeController extends Controller
      */
     public function mine(): RecipePreviewCollection
     {
-        $recipes = Recipe::with('media')
-            ->withRatings()
+        $recipes = Recipe::withRatings()
             ->forUser(auth()->id())
-            ->with(['tags:id,name'])
+            ->with(['tags:id,name', 'media'])
             ->latest('recipes.updated_at')
             ->paginate(20);
 
@@ -49,6 +47,11 @@ class RecipeController extends Controller
         if ( ! $recipe->is_public && $recipe->user_id !== auth('sanctum')->id()) {
             return response()->json(['message' => 'Recipe not found'], 404);
         }
+
+        $recipe = $recipe
+            ->newQuery()
+            ->withRatings()
+            ->find($recipe->id);
 
         $recipe->load([
             'media',

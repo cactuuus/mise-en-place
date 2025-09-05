@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Enums\Difficulty;
+use App\Traits\HasCachedMediaUrls;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -16,7 +17,7 @@ use Spatie\Tags\HasTags;
 
 class Recipe extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, HasTags;
+    use HasFactory, InteractsWithMedia, HasTags, HasCachedMediaUrls;
 
     private static array $IMAGE_SIZES = [
         'small'  => 150,
@@ -148,23 +149,6 @@ class Recipe extends Model implements HasMedia
 
     public function getImageUrlsAttribute(): array
     {
-        if ( ! $this->hasMedia('recipe-images')) {
-            // Return null for each size when no media
-            return array_fill_keys(array_keys(self::$IMAGE_SIZES), null);
-        }
-
-        $media = $this->getFirstMedia('recipe-images');
-        $urls  = [];
-
-        // Loop through each image size and generate cached temporary URL
-        foreach (self::$IMAGE_SIZES as $sizeName => $sizeValue) {
-            $urls[$sizeName] = Cache::remember(
-                "recipe_image_{$sizeName}_{$media->id}",
-                now()->addMinutes(30),
-                fn() => $media->getTemporaryUrl(now()->addHour(), $sizeName),
-            );
-        }
-
-        return $urls;
+        return $this->getCachedMediaUrls('recipe-images', self::$IMAGE_SIZES);
     }
 }

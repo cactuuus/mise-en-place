@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\HasCachedMediaUrls;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
@@ -19,7 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasCachedMediaUrls;
 
     private static array $AVATAR_SIZES = [
         'small' => 100,
@@ -129,21 +129,6 @@ class User extends Authenticatable implements FilamentUser, HasMedia
 
     public function getAvatarUrlsAttribute(): array
     {
-        if ( ! $this->hasMedia('avatar')) {
-            return array_fill_keys(array_keys(self::$AVATAR_SIZES), null);
-        }
-
-        $media = $this->getFirstMedia('avatar');
-        $urls  = [];
-
-        foreach (self::$AVATAR_SIZES as $sizeName => $sizeValue) {
-            $urls[$sizeName] = Cache::remember(
-                "user_avatar_{$sizeName}_{$media->id}",
-                now()->addMinutes(30),
-                fn() => $media->getTemporaryUrl(now()->addHour(), $sizeName),
-            );
-        }
-
-        return $urls;
+        return $this->getCachedMediaUrls('avatar', self::$AVATAR_SIZES);
     }
 }

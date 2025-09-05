@@ -147,6 +147,37 @@ class Recipe extends Model implements HasMedia
         return $this->ratings()->where('user_id', $userId)->first()?->rating;
     }
 
+    public function scopeWithRatings($query)
+    {
+        return $query
+            ->leftJoin('recipe_ratings', 'recipes.id', '=', 'recipe_ratings.recipe_id')
+            ->select([
+                'recipes.*',
+                DB::raw('AVG(recipe_ratings.rating) as average_rating'),
+                DB::raw('COUNT(recipe_ratings.rating) as total_ratings'),
+            ])
+            ->groupBy('recipes.id');
+    }
+
+    public function scopePublicOnly($query)
+    {
+        return $query->where('recipes.is_public', true);
+    }
+
+    public function scopeForUser($query, int $userId)
+    {
+        return $query->where('recipes.user_id', $userId);
+    }
+
+    public function scopeExcludeUser($query, ?int $userId)
+    {
+        if ($userId) {
+            $query->where('recipes.user_id', '!=', $userId);
+        }
+
+        return $query;
+    }
+
     public function getImageUrlsAttribute(): array
     {
         return $this->getCachedMediaUrls('recipe-images', self::$IMAGE_SIZES);

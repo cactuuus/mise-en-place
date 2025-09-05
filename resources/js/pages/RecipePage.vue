@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loading" class="max-w-4xl mx-auto">
+    <div v-if="loading" class="max-w-4xl mx-auto space-y-4 p-4">
         <Skeleton class="mb-6" height="300px"/>
         <Skeleton class="mb-4" height="2rem" width="60%"/>
         <Skeleton class="mb-8" height="1rem" width="40%"/>
@@ -15,9 +15,9 @@
         </div>
     </div>
 
-    <div v-else-if="recipe" class="max-w-4xl mx-auto space-y-6  text-sm">
+    <div v-else-if="recipe" class="max-w-4xl mx-auto space-y-4 p-4">
         <!-- Hero Section -->
-        <div class="relative overflow-hidden rounded-lg dark:bg-surface-900">
+        <div class="relative overflow-hidden rounded-lg">
             <SmartImage
                 v-if="recipe.image_urls?.large"
                 :alt="recipe.title"
@@ -89,35 +89,30 @@
         <!-- Main Content -->
 
         <!-- Ingredients -->
-        <Card>
-            <template #title>
-                Ingredients
-            </template>
-            <template #content>
-                <ul v-if="recipe.ingredients && recipe.ingredients.length > 0" class="space-y-2">
-                    <li
-                        v-for="(ingredient, index) in recipe.ingredients"
-                        :key="index"
-                        class="flex items-center gap-2"
+        <Panel header="Ingredients">
+            <ul v-if="recipe.ingredients && recipe.ingredients.length > 0" class="space-y-2">
+                <li
+                    v-for="(ingredient, index) in recipe.ingredients"
+                    :key="index"
+                    class="flex items-center gap-2"
+                >
+                    <Checkbox
+                        v-model="checkedIngredients[index]"
+                        :input-id="index.toString()"
+                        binary
+                        size="small"
+                    />
+                    <label
+                        :class="{ 'line-through text-surface-500': checkedIngredients[index] }"
+                        :for="index.toString()"
+                        class="cursor-pointer flex-1"
                     >
-                        <Checkbox
-                            v-model="checkedIngredients[index]"
-                            :input-id="index.toString()"
-                            binary
-                            size="small"
-                        />
-                        <label
-                            :class="{ 'line-through text-surface-500': checkedIngredients[index] }"
-                            :for="index.toString()"
-                            class="cursor-pointer flex-1"
-                        >
-                            {{ ingredient.ingredient }}
-                        </label>
-                    </li>
-                </ul>
-                <p v-else class="text-surface-500 italic">No ingredients listed</p>
-            </template>
-        </Card>
+                        {{ ingredient.ingredient }}
+                    </label>
+                </li>
+            </ul>
+            <p v-else class="text-surface-500 italic">No ingredients listed</p>
+        </Panel>
 
         <!-- Instructions -->
         <Card>

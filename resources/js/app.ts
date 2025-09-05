@@ -38,12 +38,12 @@ const primevueConfig = {
 // Initialize authentication before mounting
 const initializeApp = async () => {
     app.use(pinia)
-    const authStore = useAuthStore()
-    await authStore.initializeAuth()
-
     app.use(PrimeVue, primevueConfig);
     app.use(router)
     app.use(ToastService);
+
+    const authStore = useAuthStore()
+    await authStore.initializeAuth()
 
     app.mount('#app')
 }

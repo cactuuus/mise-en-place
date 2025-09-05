@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import api from '@/services/api'
 import {useRouter} from 'vue-router'
 import executeApiCall from '@/services/apiService'
@@ -31,6 +31,20 @@ export const useAuthStore = defineStore('auth', () => {
     const authState = ref<AuthState>(AuthState.IDLE)
     const errorMessage = ref<string>('')
     const router = useRouter()
+    const isInitialized = ref<boolean>(false)
+
+    const waitForInitialization = async (): Promise<void> => {
+        if (isInitialized.value) return
+
+        return new Promise((resolve) => {
+            const unwatch = watch(isInitialized, (initialized) => {
+                if (initialized) {
+                    unwatch()
+                    resolve()
+                }
+            }, {immediate: true})
+        })
+    }
 
     const isAuthenticated = computed((): boolean => {
         return !!(token.value && user.value)
@@ -120,6 +134,7 @@ export const useAuthStore = defineStore('auth', () => {
                 }
             })
         }
+        isInitialized.value = true
     }
 
     const clearAuth = async (redirect: boolean = false): Promise<void> => {
@@ -156,6 +171,7 @@ export const useAuthStore = defineStore('auth', () => {
         logout,
         initializeAuth,
         clearAuth,
-        setUser
+        setUser,
+        waitForInitialization
     }
 })

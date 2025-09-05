@@ -68,8 +68,9 @@ const router = createRouter({
 })
 
 // Global navigation guard
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore()
+    await authStore.waitForInitialization()
 
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         // Redirect to home if not authenticated

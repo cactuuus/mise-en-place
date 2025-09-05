@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <div v-else-if="recipe" class="max-w-4xl mx-auto space-y-4 p-4">
+    <div v-else-if="recipe" class="page-container p-4">
         <!-- Hero Section -->
         <div class="relative overflow-hidden rounded-lg">
             <SmartImage
@@ -28,42 +28,53 @@
             />
             <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover"/>
 
-            <div
-                class="absolute bottom-0 left-0 flex justify-between p-1 w-full backdrop-blur-sm dark:bg-black/20"
-                style="mask: linear-gradient(to top, black 95%, transparent 100%);">
+            <!-- Action Button -->
+            <Button
+                class="!absolute !top-2 !right-2"
+                disabled
+                icon="pi pi-bars"
+                raised
+                severity="secondary"
+            />
+        </div>
+
+        <!-- Header Info -->
+        <div class="space-y-2 my-3">
+            <div>
+                <h2 class="text-2xl font-semibold">{{ recipe.title }}</h2>
+                <div class="text-lg flex items-center gap-2">
+                    <SmartImage
+                        :alt="recipe.user.name"
+                        :max-retries="5"
+                        :retry-delay="2000"
+                        :src="recipe.user.avatar_urls?.small || '/images/avatar-placeholder.svg'"
+                        image-class="user-avatar"
+                    />
+                    <span>by {{ recipe.user.name }}</span>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-stretch gap-3">
                 <DifficultyBadge
                     v-if="recipe.difficulty_level"
                     :difficulty="recipe.difficulty_level"
                 />
-                <!-- Action Buttons -->
-                <div class="flex gap-2">
-                    <Button icon="pi pi-heart" size="small"/>
-                    <Button icon="pi pi-share-alt" size="small"/>
+                <div class="flex items-center gap-2 px-2 secondary-bg rounded-md">
+                    <Rating
+                        :cancel="false"
+                        :model-value="recipe.average_rating"
+                        :stars="recipe.average_rating ? 5 : 1"
+                        readonly
+                    />
+                    <span class="secondary-text font-semibold text-sm">
+                        {{ recipe.total_ratings ? `(${recipe.total_ratings} ratings)` : 'not yet rated' }}
+                    </span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Header Info -->
-        <div class="space-y-3">
-            <div>
-                <h1 class="text-2xl font-semibold">{{ recipe.title }}</h1>
-                <span class="text-sm">by {{ recipe.user.name }}</span>
-            </div>
-
-            <!-- Rating -->
-            <div v-if="recipe.average_rating || recipe.total_ratings" class="flex items-center gap-3">
-                <Rating
-                    :cancel="false"
-                    :model-value="recipe.average_rating"
-                    readonly
-                />
-                <span class="text-xs">
-                    ({{ recipe.total_ratings }} reviews)
-                </span>
             </div>
 
             <!-- Recipe Meta -->
-            <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+            <div class="flex flex-wrap gap-x-3 gap-y-1 secondary-text">
                 <div v-if="recipe.serves" class="flex items-center gap-1">
                     <i class="pi pi-users"></i>
                     <span>Serves {{ recipe.serves }}</span>
@@ -80,30 +91,31 @@
                     v-for="tag in recipe.tags"
                     :key="tag.id"
                     :value="getTagLabel(tag.name)"
-                    class="!text-xs"
                     severity="secondary"
                 />
             </div>
         </div>
 
-        <!-- Main Content -->
+        <Divider/>
 
         <!-- Ingredients -->
-        <Panel header="Ingredients">
+        <section>
+            <h3 class="text-xl font-semibold my-3">
+                Ingredients
+            </h3>
             <ul v-if="recipe.ingredients && recipe.ingredients.length > 0" class="space-y-2">
                 <li
                     v-for="(ingredient, index) in recipe.ingredients"
                     :key="index"
-                    class="flex items-center gap-2"
+                    class="flex items-center gap-3"
                 >
                     <Checkbox
                         v-model="checkedIngredients[index]"
                         :input-id="index.toString()"
                         binary
-                        size="small"
                     />
                     <label
-                        :class="{ 'line-through text-surface-500': checkedIngredients[index] }"
+                        :class="{ 'line-through secondary-text': checkedIngredients[index] }"
                         :for="index.toString()"
                         class="cursor-pointer flex-1"
                     >
@@ -111,63 +123,83 @@
                     </label>
                 </li>
             </ul>
-            <p v-else class="text-surface-500 italic">No ingredients listed</p>
-        </Panel>
+            <p v-else class="secondary-text italic">No ingredients listed</p>
+        </section>
 
         <!-- Instructions -->
-        <Card>
-            <template #title>
+        <Divider/>
+
+        <div>
+            <h3 class="text-xl font-semibold my-3">
                 Instructions
-            </template>
-            <template #content>
-                <ol v-if="recipe.instructions && recipe.instructions.length > 0" class="divide-y space-y-2">
-                    <li
-                        v-for="(instruction, index) in recipe.instructions"
-                        :key="index"
-                    >
-                        <h4 class="font-semibold my-1">
-                            Step {{ index + 1 }}
-                        </h4>
-                        <p>{{ instruction.instruction }}</p>
-                    </li>
-                </ol>
-                <p v-else class="text-surface-500 italic">No instructions provided</p>
-            </template>
-        </Card>
+            </h3>
+            <Accordion
+                v-if="recipe.instructions && recipe.instructions.length > 0"
+                :value="Array.from({ length: recipe.instructions.length }, (_, i) => i)"
+                multiple
+            >
+                <AccordionPanel
+                    v-for="(instruction, index) in recipe.instructions"
+                    :key="index"
+                    :class="index !== recipe.instructions.length - 1 ? '!border-dashed' : '!border-none'"
+                    :value="index"
+                >
+                    <AccordionHeader as="H4" class="!p-2">Step {{ index + 1 }}</AccordionHeader>
+                    <AccordionContent as="P">{{ instruction.instruction }}</AccordionContent>
+                </AccordionPanel>
+            </Accordion>
+            <p v-else class="secondary-text italic">No instructions provided</p>
+        </div>
 
         <!-- Notes Section -->
-        <Card v-if="recipe.notes">
-            <template #title>
-                Notes
-            </template>
-            <template #content>
-                <p>{{ recipe.notes }}</p>
-            </template>
-        </Card>
+        <template v-if="recipe.notes">
+            <Divider/>
 
-        <!-- Source -->
-        <div v-if="recipe.source_url || recipe.parent_recipe"
-             class="text-center p-4 bg-surface-50 dark:bg-surface-800 rounded-lg">
-            <p class="text-surface-600 mb-2">
-                {{ sourceText }}
-            </p>
-            <Button
-                icon="pi pi-external-link"
-                label="View original recipe"
-                link
-                @click="viewOriginal"
-            />
-        </div>
+            <section>
+                <h3 class="text-xl font-semibold my-3">
+                    Notes
+                </h3>
+                <p>{{ recipe.notes }}</p>
+            </section>
+        </template>
+
+        <!-- Original recipe -->
+        <template v-if="recipe.source_url || recipe.parent_recipe">
+            <Divider/>
+
+            <section
+                class="text-center p-2 secondary-bg rounded-lg">
+                <p class="secondary-text text-sm">
+                    {{ sourceText }}
+                </p>
+                <Button
+                    icon="pi pi-external-link"
+                    label="View original recipe"
+                    link
+                    size="small"
+                    @click="viewOriginal"
+                />
+            </section>
+        </template>
     </div>
 
     <!-- Error State -->
-    <div v-else class="max-w-4xl mx-auto text-center py-12">
-        <i class="pi pi-exclamation-triangle text-6xl text-surface-400 mb-4"></i>
-        <h2 class="text-2xl font-semibold mb-2">Recipe not found</h2>
-        <p class="text-surface-600 mb-4">The recipe you're looking for doesn't exist or has been removed.</p>
+    <div v-else class="max-w-4xl mx-auto text-center py-20 space-y-6">
+        <SmartImage
+            :max-retries="3"
+            :retry-delay="0"
+            alt="Recipe Not Found"
+            image-class="mx-auto w-48 h-48 aspect-square object-contain !bg-transparent"
+            src="/images/not-found.svg"
+        />
+        <div>
+            <h2 class="text-2xl font-semibold mb-2">Recipe not found!</h2>
+            <p class="secondary-text">The recipe you're looking for doesn't exist or has been removed.</p>
+        </div>
         <Button
-            label="Back to Recipes"
-            @click="$router.push('/recipes')"
+            icon="pi pi-arrow-left"
+            label="Back to Home"
+            @click="$router.push('/')"
         />
     </div>
 </template>
@@ -175,12 +207,16 @@
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
-import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
 import Checkbox from 'primevue/checkbox'
 import Skeleton from 'primevue/skeleton'
+import Divider from 'primevue/divider'
+import Accordion from 'primevue/accordion'
+import AccordionPanel from 'primevue/accordionpanel'
+import AccordionHeader from 'primevue/accordionheader'
+import AccordionContent from 'primevue/accordioncontent'
 import {getTagLabel, getTimeBreakdown, Recipe} from '@/types/recipe'
 import {fetchRecipeById} from '@/services/recipeService'
 import SmartImage from '@/components/SmartImage.vue'

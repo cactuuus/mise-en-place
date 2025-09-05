@@ -1,12 +1,12 @@
 <template>
-    <div class="min-h-screen bg-surface-200 dark:bg-surface-800">
+    <div class="min-h-screen page-container">
         <!-- Header -->
         <AppHeader @showLoginModal="showLoginModal = true"/>
 
         <!-- Main Content -->
-        <div class="container mx-auto px-4 py-8">
+        <main class="relative">
             <RouterView/>
-        </div>
+        </main>
 
         <!-- Toast Container -->
         <Toast class="max-w-[85%]" position="bottom-center"/>

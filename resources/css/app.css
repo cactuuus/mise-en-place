@@ -5,28 +5,45 @@
 /* GLOBAL *************************************************************************************************************/
 
 html {
-    font-size: 14px;
+    font-size: 16px;
+}
+
+body {
+    @apply primary-bg;
+}
+
+.page-container {
+    @apply container mx-auto;
 }
 
 .secondary-text {
     @apply text-surface-500 dark:text-surface-400;
 }
 
+.primary-bg {
+    @apply bg-white dark:bg-surface-900;
+}
+
 .secondary-border {
-    @apply border-surface-200 dark:border-surface-800;
+    @apply border-surface-200 dark:border-surface-700;
 }
 
 .secondary-bg {
     @apply bg-surface-100 dark:bg-surface-800/50;
 }
 
+.user-avatar {
+    @apply w-6 rounded-full object-cover aspect-square;
+    @apply sm:w-8;
+}
+
 /* HEADER *************************************************************************************************************/
 
 Header {
-    @apply sticky top-0 z-50 bg-surface-0 dark:bg-surface-900 border-b-2 secondary-border;
+    @apply sticky top-0 z-50 px-4 primary-bg border-b-2 secondary-border;
 
     #header-content {
-        @apply container mx-auto px-4 py-2 grid grid-cols-2 items-center gap-1;
+        @apply py-2 grid grid-cols-2 items-center gap-1;
         @apply sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
 
         #banner {
@@ -37,7 +54,7 @@ Header {
             @apply flex justify-end;
 
             .user-avatar {
-                @apply w-8 rounded-full object-cover aspect-square cursor-pointer;
+                @apply w-8 cursor-pointer;
                 @apply sm:w-10;
             }
         }

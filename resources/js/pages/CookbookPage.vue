@@ -28,12 +28,11 @@
                 />
 
                 <Button
-                    :disabled="loading"
                     icon="pi pi-plus"
                     label="New"
                     severity="success"
                     size="small"
-                    @click="addRecipe"
+                    @click="router.push('/cookbook/create')"
                 />
             </div>
         </template>
@@ -71,7 +70,8 @@
             <div v-for="(recipe, index) in slotProps.items" :key="index">
                 <div
                     class="flex items-center gap-3 p-3 border-b secondary-border cursor-pointer hover:bg-primary-500/5 transition"
-                    @click="router.push(`/cookbook/${recipe.id}`)">
+                    @click="router.push(`/cookbook/${recipe.id}`)"
+                >
                     <!-- Image Preview -->
                     <DeferredContent>
                         <div class="h-20 w-20 relative overflow-hidden aspect-square rounded-lg">
@@ -129,15 +129,17 @@
                     <!-- Actions -->
                     <div>
                         <Button
-                            icon="pi pi-ellipsis-v"
+                            icon="pi pi-bars"
                             severity="secondary"
                             text
-                        />
+                            @click.stop="(event) => recipeActionsMenuRef.toggle(event, recipe)"/>
                     </div>
                 </div>
             </div>
         </template>
     </DataView>
+
+    <RecipeActionsMenu ref="recipeActionsMenuRef"/>
 </template>
 
 <script lang="ts" setup>
@@ -154,6 +156,7 @@ import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue"
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue"
 import {fetchMyRecipes} from "@/services/recipeService.ts";
+import RecipeActionsMenu from "@/components/RecipeActionsMenu.vue";
 
 const router = useRouter()
 
@@ -161,26 +164,14 @@ const router = useRouter()
 const recipes = ref<RecipePreview[]>([])
 const loading = ref(true)
 const searchValue = ref('')
+const recipeActionsMenuRef = ref()
 
 // Methods
 const loadRecipes = async () => {
     const result = await fetchMyRecipes()
-    await new Promise(resolve => setTimeout(resolve, 1000)); // 2 second delay
     if (result) {
         recipes.value = result.recipes
     }
-}
-
-const addRecipe = () => {
-    router.push('/recipes/create')
-}
-
-const editRecipe = (recipe: RecipePreview) => {
-    router.push(`/recipes/${recipe.id}/edit`)
-}
-
-const viewRecipe = (recipe: RecipePreview) => {
-    router.push(`/discover/${recipe.id}`)
 }
 
 // Lifecycle

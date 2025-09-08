@@ -1,6 +1,6 @@
 import api from './api'
 import executeApiCall from './apiService'
-import {getDifficultyFromValue, Recipe, RecipePreview} from '@/types/recipe'
+import {getDifficultyFromValue, Recipe, RecipePreview, Tag} from '@/types/recipe'
 
 interface RecipesApiResponse {
     data: any[] // Raw API data with numeric difficulty_level
@@ -94,6 +94,44 @@ export const fetchMyRecipes = async (page: number = 1): Promise<RecipesResponse 
     })
 
     return result
+}
+
+export const createRecipe = async (formData: FormData): Promise<Recipe | null> => {
+    let result = null
+
+    await executeApiCall({
+        call: () => api.post('/recipes', formData, {
+            headers: {'Content-Type': 'multipart/form-data'}
+        }),
+        successMessage: 'Recipe created successfully!',
+        errorMessage: 'Failed to create recipe',
+        onSuccess: (response) => {
+            result = {
+                ...response.data,
+                difficulty_level: getDifficultyFromValue(response.data.difficulty_level),
+            }
+        }
+    })
+
+    return result
+}
+
+export const updateRecipe = async (id: number, formData: FormData): Promise<boolean> => {
+    return await executeApiCall({
+        call: () => api.post(`/recipes/${id}`, formData, {
+            headers: {'Content-Type': 'multipart/form-data'}
+        }),
+        successMessage: 'Recipe updated successfully!',
+        errorMessage: 'Failed to update recipe'
+    })
+}
+
+export const deleteRecipe = async (id: number): Promise<boolean> => {
+    return await executeApiCall({
+        call: () => api.delete(`/recipes/${id}`),
+        successMessage: 'Recipe deleted successfully!',
+        errorMessage: 'Failed to delete recipe'
+    })
 }
 
 export const fetchRecipeTags = async (tagsType: string = ''): Promise<Tag[]> => {

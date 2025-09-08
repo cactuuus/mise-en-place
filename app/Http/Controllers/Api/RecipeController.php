@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\TagType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RecipeDetailsResource;
 use App\Http\Resources\RecipePreviewCollection;
 use App\Models\Recipe;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class RecipeController extends Controller
 {
@@ -65,67 +67,106 @@ class RecipeController extends Controller
         return new RecipeDetailsResource($recipe);
     }
 
-//    public function store(Request $request): RecipeDetailsResource
-//    {
-//        $validated = $this->validateRecipeData($request);
-//
-//        $recipe = Recipe::create([
-//            ...$validated,
-//            'user_id' => auth()->id(),
-//        ]);
-//
-//        if (isset($validated['tags'])) {
-//            $recipe->attachTags($validated['tags']);
-//        }
-//
-//        return new RecipeDetailsResource($recipe->load(['user', 'tags']));
-//    }
-//
-//    private function validateRecipeData(Request $request, bool $isRequired = true): array
-//    {
-//        $rules = [
-//            'title'            => ($isRequired ? 'required|' : '').'string|max:255',
-//            'ingredients'      => ($isRequired ? 'required|' : '').'array',
-//            'instructions'     => ($isRequired ? 'required|' : '').'array',
-//            'notes'            => 'nullable|string',
-//            'source_url'       => 'nullable|url',
-//            'is_public'        => 'boolean',
-//            'prep_time'        => 'nullable|integer|min:0',
-//            'cook_time'        => 'nullable|integer|min:0',
-//            'serves'           => 'nullable|integer|min:1',
-//            'difficulty_level' => 'nullable|integer',
-//            'tags'             => 'nullable|array',
-//        ];
-//
-//        return $request->validate($rules);
-//    }
-//
-//    public function update(Request $request, Recipe $recipe): RecipeDetailsResource|JsonResponse
-//    {
-//        if ($recipe->user_id !== auth()->id()) {
-//            return response()->json(['message' => 'Unauthorized'], 403);
-//        }
-//
-//        $validated = $this->validateRecipeData($request, false);
-//        $recipe->update($validated);
-//
-//        if (isset($validated['tags'])) {
-//            $recipe->syncTags($validated['tags']);
-//        }
-//
-//        return new RecipeDetailsResource($recipe->load(['user', 'tags']));
-//    }
-//
-//    public function destroy(Recipe $recipe): JsonResponse
-//    {
-//        if ($recipe->user_id !== auth()->id()) {
-//            return response()->json(['message' => 'Unauthorized'], 403);
-//        }
-//
-//        $recipe->delete();
-//
-//        return response()->json(null, 'Recipe deleted successfully');
-//    }
+    public function store(Request $request): RecipeDetailsResource
+    {
+        $validated = $this->validateRecipeData($request);
+
+        $recipe = Recipe::create([
+            ...$validated,
+            'user_id' => auth()->id(),
+        ]);
+
+        if ($request->hasFile('image')) {
+            $recipe
+                ->addMediaFromRequest('image')
+                ->usingName($recipe->title)
+                ->toMediaCollection('recipe-images');
+        }
+
+        if (isset($validated['tags'])) {
+            $recipe->syncTagsWithType($validated['tags'], TagType::Recipe->value);
+        }
+
+        $recipe->load([
+            'media',
+            'user:id,name',
+            'tags:id,name',
+            'ratings.user:id,name',
+            'parentRecipe:id,title,user_id',
+            'parentRecipe.user:id,name',
+        ]);
+
+        return new RecipeDetailsResource($recipe);
+    }
+
+    private function validateRecipeData(Request $request): array
+    {
+        $rules = [
+            'title'            => 'required|string|max:255',
+            'ingredients'      => 'required|array',
+            'instructions'     => 'required|array',
+            'notes'            => 'nullable|string',
+            'source_url'       => 'nullable|url',
+            'is_public'        => 'required|boolean',
+            'prep_time'        => 'nullable|integer|min:0',
+            'cook_time'        => 'nullable|integer|min:0',
+            'serves'           => 'nullable|integer|min:1',
+            'difficulty_level' => 'nullable|integer',
+            'tags'             => 'nullable|array',
+            'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ];
+
+        return $request->validate($rules);
+    }
+
+    public function update(Request $request, Recipe $recipe): RecipeDetailsResource|JsonResponse
+    {
+        if ($recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $this->validateRecipeData($request);
+        $recipe->update($validated);
+
+        if ($request->hasFile('image')) {
+            $recipe->clearMediaCollection('recipe-images');
+            $recipe
+                ->addMediaFromRequest('image')
+                ->usingName($recipe->title)
+                ->toMediaCollection('recipe-images');
+        }
+
+        if (isset($validated['tags'])) {
+            $recipe->syncTagsWithType($validated['tags'], TagType::Recipe->value);
+        }
+
+        $recipe = $recipe
+            ->newQuery()
+            ->withRatings()
+            ->find($recipe->id);
+
+        $recipe->load([
+            'media',
+            'user:id,name',
+            'tags:id,name',
+            'ratings.user:id,name',
+            'parentRecipe:id,title,user_id',
+            'parentRecipe.user:id,name',
+        ]);
+
+        return new RecipeDetailsResource($recipe->load(['user', 'tags']));
+    }
+
+    public function destroy(Recipe $recipe): JsonResponse
+    {
+        if ($recipe->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $recipe->delete();
+
+        return response()->json(null, 204);
+    }
 //
 //    public function fork(Request $request, Recipe $recipe): RecipeDetailsResource|JsonResponse
 //    {

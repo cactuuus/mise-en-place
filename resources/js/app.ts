@@ -5,6 +5,7 @@ import Aura from '@primevue/themes/aura';
 import {definePreset} from "@primevue/themes";
 import {colors} from './colors';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from "primevue/confirmationservice";
 import router from './router'
 import App from './App.vue'
 import {useAuthStore} from './stores/auth'
@@ -41,6 +42,7 @@ const initializeApp = async () => {
     app.use(PrimeVue, primevueConfig);
     app.use(router)
     app.use(ToastService);
+    app.use(ConfirmationService);
 
     const authStore = useAuthStore()
     await authStore.initializeAuth()

@@ -29,7 +29,7 @@ const routes: RouteRecordRaw[] = [
                 path: ':id',
                 name: 'discover-recipe',
                 component: () => import('@/pages/RecipePage.vue'),
-                props: true,
+                props: (route) => ({id: Number(route.params.id)}),
                 meta: {title: 'Recipe Detail'}
             }
         ]
@@ -48,8 +48,21 @@ const routes: RouteRecordRaw[] = [
                 path: ':id',
                 name: 'cookbook-recipe',
                 component: () => import('@/pages/RecipePage.vue'),
-                props: true,
+                props: (route) => ({id: Number(route.params.id)}),
                 meta: {title: 'Recipe Detail'}
+            },
+            {
+                path: 'create',
+                name: 'create-recipe',
+                component: () => import('@/pages/CreateRecipePage.vue'),
+                meta: {title: 'Create Recipe', requiresAuth: true}
+            },
+            {
+                path: ':id/edit',
+                name: 'edit-recipe',
+                component: () => import('@/pages/EditRecipePage.vue'),
+                props: (route) => ({id: Number(route.params.id)}),
+                meta: {title: 'Edit Recipe', requiresAuth: true}
             }
         ]
     },

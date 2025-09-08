@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-4xl mx-auto space-y-4">
+    <div class="max-w-4xl mx-auto space-y-4 p-4">
         <!-- Profile Information Display -->
         <Panel id="user-settings-panel">
             <template #header>

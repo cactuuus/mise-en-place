@@ -37,6 +37,18 @@ body {
     @apply sm:w-8;
 }
 
+.p-fileupload-basic {
+    @apply min-w-0 w-full max-w-full;
+
+    .p-fileupload-basic-content {
+        @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
+
+        > span {
+            @apply text-sm truncate block w-full secondary-text;
+        }
+    }
+}
+
 /* HEADER *************************************************************************************************************/
 
 Header {
@@ -145,19 +157,6 @@ Header {
     }
 }
 
-#avatar-modal {
-    .p-fileupload-basic {
-        @apply min-w-0 w-full max-w-full;
-
-        .p-fileupload-basic-content {
-            @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
-
-            > span {
-                @apply text-xs truncate block w-full;
-            }
-        }
-    }
-}
 
 /* RECIPES ************************************************************************************************************/
 
@@ -215,4 +214,28 @@ Header {
 
 #danger-zone-panel .p-fieldset-content {
     @apply flex-wrap;
+}
+
+/* RECIPE EDITOR ******************************************************************************************************/
+
+#difficulty_level {
+    @apply transition-all duration-200;
+
+    /* styling ineer buttons to reflect the 'severity' of the options (easy, medium, hard) */
+
+    .p-togglebutton {
+        @apply font-bold;
+    }
+
+    .p-togglebutton:nth-child(1).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-500/15;
+    }
+
+    .p-togglebutton:nth-child(2).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-orange-600 bg-orange-100 dark:text-orange-300 dark:bg-orange-500/15;
+    }
+
+    .p-togglebutton:nth-child(3).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-500/15;
+    }
 }

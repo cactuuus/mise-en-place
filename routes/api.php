@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RecipeController;
+use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recipe management
     Route::post('/recipes', [RecipeController::class, 'store']);
-    Route::put('/recipes/{recipe}', [RecipeController::class, 'update']);
+    Route::post('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
     Route::post('/recipes/{recipe}/fork', [RecipeController::class, 'fork']);
     Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate']);

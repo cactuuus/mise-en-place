@@ -4,7 +4,7 @@
         <AppHeader @showLoginModal="showLoginModal = true"/>
 
         <!-- Main Content -->
-        <main class="relative">
+        <main class="relative page-container max-w-4xl">
             <RouterView/>
         </main>
 

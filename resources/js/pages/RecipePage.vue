@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loading" class="max-w-4xl mx-auto space-y-4 p-4">
+    <div v-if="loading" class="space-y-4 p-4">
         <Skeleton class="mb-6" height="300px"/>
         <Skeleton class="mb-4" height="2rem" width="60%"/>
         <Skeleton class="mb-8" height="1rem" width="40%"/>
@@ -31,10 +31,10 @@
             <!-- Action Button -->
             <Button
                 class="!absolute !top-2 !right-2"
-                disabled
                 icon="pi pi-bars"
                 raised
                 severity="secondary"
+                @click.stop="recipeActionsMenuRef.toggle($event, recipe)"
             />
         </div>
 
@@ -119,7 +119,7 @@
                         :for="index.toString()"
                         class="cursor-pointer flex-1"
                     >
-                        {{ ingredient.ingredient }}
+                        {{ ingredient }}
                     </label>
                 </li>
             </ul>
@@ -145,7 +145,7 @@
                     :value="index"
                 >
                     <AccordionHeader as="H4" class="!p-2">Step {{ index + 1 }}</AccordionHeader>
-                    <AccordionContent as="P">{{ instruction.instruction }}</AccordionContent>
+                    <AccordionContent as="P">{{ instruction }}</AccordionContent>
                 </AccordionPanel>
             </Accordion>
             <p v-else class="secondary-text italic">No instructions provided</p>
@@ -198,15 +198,17 @@
         </div>
         <Button
             icon="pi pi-arrow-left"
-            label="Back to Home"
-            @click="$router.push('/')"
+            label="Go Back"
+            @click="$router.back()"
         />
     </div>
+
+    <RecipeActionsMenu ref="recipeActionsMenuRef"/>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref, watch} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
+import {useRouter} from 'vue-router'
 import Button from 'primevue/button'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
@@ -222,29 +224,27 @@ import {fetchRecipeById} from '@/services/recipeService'
 import SmartImage from '@/components/SmartImage.vue'
 import DifficultyBadge from '@/components/DifficultyBadge.vue'
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
+import RecipeActionsMenu from "@/components/RecipeActionsMenu.vue";
 
-const route = useRoute()
 const router = useRouter()
+
+const props = defineProps<{
+    id: number
+}>()
 
 const recipe = ref<Recipe | null>(null)
 const loading = ref(true)
 const checkedIngredients = ref<boolean[]>([])
+const recipeActionsMenuRef = ref()
 
 watch(() => recipe.value?.ingredients, (ingredients) => {
     if (ingredients) {
         checkedIngredients.value = new Array(ingredients.length).fill(false)
     }
-    console.log(recipe.value)
 }, {immediate: true})
 
 const loadRecipe = async () => {
-    const recipeId = parseInt(route.params.id as string)
-    if (isNaN(recipeId)) {
-        router.push('/recipes')
-        return
-    }
-
-    recipe.value = await fetchRecipeById(recipeId)
+    recipe.value = await fetchRecipeById(props.id)
     loading.value = false
 }
 

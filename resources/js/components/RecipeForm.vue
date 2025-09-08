@@ -190,7 +190,6 @@
 
             <!-- Ingredients -->
             <Panel header="Ingredients" toggleable>
-                <pre>{{ ingredientFields ?? 'nothing' }}</pre>
                 <div class="space-y-3">
                     <div
                         v-for="(ingredient, index) in ingredientFields"

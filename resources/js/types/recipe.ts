@@ -50,8 +50,8 @@ export interface RecipePreview {
 
 // Complete recipe
 export interface Recipe extends RecipePreview {
-    ingredients: [{ [key: string]: string }]
-    instructions: [{ [key: string]: string }]
+    ingredients: string[]
+    instructions: string[]
     notes?: string
     source_url?: string
     forked_from_recipe_id?: number

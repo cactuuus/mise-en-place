@@ -45,4 +45,7 @@ Route::get('/users/{user}/recipes', [UserController::class, 'recipes']);
 Route::get('/users/{user}/followers', [UserController::class, 'followers']);
 Route::get('/users/{user}/following', [UserController::class, 'following']);
 
+// Tags
+Route::get('/tags', [TagController::class, 'index']);
+
 

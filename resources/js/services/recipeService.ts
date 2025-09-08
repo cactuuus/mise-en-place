@@ -95,3 +95,17 @@ export const fetchMyRecipes = async (page: number = 1): Promise<RecipesResponse 
 
     return result
 }
+
+export const fetchRecipeTags = async (tagsType: string = ''): Promise<Tag[]> => {
+    let tags: Tag[] = []
+
+    await executeApiCall({
+        call: () => api.get(`/tags${tagsType ? `?type=${tagsType}` : ''}`),
+        errorMessage: 'Failed to load tags',
+        onSuccess: (response) => {
+            tags = response.data
+        }
+    })
+
+    return tags
+}

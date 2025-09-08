@@ -23,15 +23,17 @@ export const DIFFICULTY_LEVELS = {
 
 export type DifficultyLevel = typeof DIFFICULTY_LEVELS[keyof typeof DIFFICULTY_LEVELS]
 
+export interface Tag {
+    id: number
+    name: { [key: string]: string } // Localized names
+}
+
 // Base recipe for previews/cards
 export interface RecipePreview {
     id: number
     title: string
     user: UserPreview
-    tags?: Array<{
-        id: number
-        name: string | { [key: string]: string }
-    }>
+    tags?: Tag[]
     prep_time?: number
     cook_time?: number
     total_time?: number
@@ -81,11 +83,7 @@ export function getTimeBreakdown(recipe: Recipe | RecipePreview): string {
 }
 
 // Helper function to extract the label from a tag name which may be localized
-export const getTagLabel = (tagName: string | { [key: string]: string }): string => {
-    if (typeof tagName === 'string') {
-        return tagName
-    }
-
+export const getTagLabel = (tagName: { [key: string]: string }): string => {
     // Extract from JSON object - prefer English, fallback to first available
-    return tagName.en || tagName.eng || Object.values(tagName)[0]
+    return tagName.en || Object.values(tagName)[0]
 }

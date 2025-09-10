@@ -119,9 +119,9 @@
                                 <i class="pi pi-clock"></i>
                                 <span>{{ recipe.total_time || '-' }}m</span>
                             </div>
-                            <div class="flex items-center gap-1">
-                                <i class="pi pi-users"></i>
-                                <span>{{ recipe.serves || '-' }}</span>
+                            <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
+                                <i class="pi pi-bolt"></i>
+                                <span>{{ recipe.recipe_yield }}</span>
                             </div>
                         </div>
                     </div>

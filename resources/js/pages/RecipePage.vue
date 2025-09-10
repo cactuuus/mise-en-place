@@ -74,14 +74,14 @@
             </div>
 
             <!-- Recipe Meta -->
-            <div class="flex flex-wrap gap-x-3 gap-y-1 secondary-text">
-                <div v-if="recipe.serves" class="flex items-center gap-1">
-                    <i class="pi pi-users"></i>
-                    <span>Serves {{ recipe.serves }}</span>
-                </div>
+            <div class="flex flex-wrap gap-x-4 gap-y-1 secondary-text">
                 <div v-if="recipe.total_time" class="flex items-center gap-1">
                     <i class="pi pi-clock"></i>
                     <span>{{ getTimeBreakdown(recipe) }}</span>
+                </div>
+                <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
+                    <i class="pi pi-bolt"></i>
+                    <span>{{ recipe.recipe_yield }}</span>
                 </div>
             </div>
 

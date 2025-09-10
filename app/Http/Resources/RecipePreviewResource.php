@@ -17,7 +17,7 @@ class RecipePreviewResource extends JsonResource
             'prep_time'        => $this->prep_time,
             'cook_time'        => $this->cook_time,
             'total_time'       => $this->total_time,
-            'serves'           => $this->serves,
+            'recipe_yield'     => $this->recipe_yield,
             'difficulty_level' => $this->difficulty_level,
             'source_url'       => $this->source_url,
             'is_public'        => $this->is_public,

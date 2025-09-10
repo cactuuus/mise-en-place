@@ -45,9 +45,9 @@
                             <i class="pi pi-clock text-xs"></i>
                             <span>{{ recipe.total_time || '-' }}m</span>
                         </div>
-                        <div class="flex items-center gap-1">
-                            <i class="pi pi-users text-xs"></i>
-                            <span>{{ recipe.serves || '-' }}</span>
+                        <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
+                            <i class="pi pi-bolt text-xs"></i>
+                            <span>{{ recipe.recipe_yield }}</span>
                         </div>
                     </div>
                     <DifficultyBadge

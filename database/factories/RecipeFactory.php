@@ -30,7 +30,7 @@ class RecipeFactory extends Factory
             'forked_from_recipe_id' => null, // We'll handle forks separately
             'prep_time'             => $this->faker->numberBetween(5, 60),
             'cook_time'             => $this->faker->numberBetween(10, 180),
-            'serves'                => $this->faker->numberBetween(1, 8),
+            'recipe_yield'          => $this->getRandomYield(),
             'difficulty_level'      => $this->faker->randomElement(Difficulty::cases()),
         ];
     }
@@ -231,6 +231,28 @@ class RecipeFactory extends Factory
         ];
 
         return $this->faker->randomElement($recipes);
+    }
+
+    private function getRandomYield(): string
+    {
+        $yields = [
+            '1 serving',
+            '2 servings',
+            '4 servings',
+            '6 servings',
+            '8 servings',
+            '10 servings',
+            '12 servings',
+            '1 loaf',
+            '1 cake',
+            '1 pie',
+            '24 cookies',
+            '1 dozen cookies',
+            '2 large pizzas',
+            '1 liter',
+        ];
+
+        return $this->faker->randomElement($yields);
     }
 
     public function configure(): static

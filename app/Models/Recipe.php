@@ -38,7 +38,7 @@ class Recipe extends Model implements HasMedia
         'prep_time',
         'cook_time',
         'total_time',
-        'serves',
+        'recipe_yield',
         'difficulty_level',
     ];
 
@@ -49,7 +49,6 @@ class Recipe extends Model implements HasMedia
         'prep_time'        => 'integer',
         'cook_time'        => 'integer',
         'total_time'       => 'integer',
-        'serves'           => 'integer',
         'difficulty_level' => Difficulty::class,
     ];
 

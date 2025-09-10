@@ -37,7 +37,7 @@ export interface RecipePreview {
     prep_time?: number
     cook_time?: number
     total_time?: number
-    serves?: number
+    recipe_yield?: string
     difficulty_level?: DifficultyLevel
     created_at: string
     is_public: boolean

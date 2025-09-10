@@ -92,23 +92,19 @@
                         <div>
                             <InputGroup>
                                 <InputGroupAddon>
-                                    <i class="pi pi-users"></i>
+                                    <i class="pi pi-bolt"></i>
                                 </InputGroupAddon>
                                 <FloatLabel variant="on">
-                                    <InputNumber
-                                        id="serves"
-                                        :min="1"
+                                    <InputText
+                                        id="recipe_yield"
                                         class="w-full"
-                                        name="serves"
+                                        name="recipe_yield"
                                     />
-                                    <label for="serves">Serves</label>
+                                    <label for="recipe_yield">Yield</label>
                                 </FloatLabel>
-                                <InputGroupAddon>
-                                    <span class="min-w-14 text-center">people</span>
-                                </InputGroupAddon>
                             </InputGroup>
-                            <Message v-if="$form.serves?.invalid" severity="error" size="small" variant="simple">
-                                {{ $form.serves.error?.message }}
+                            <Message v-if="$form.recipe_yield?.invalid" severity="error" size="small" variant="simple">
+                                {{ $form.recipe_yield.error?.message }}
                             </Message>
                         </div>
 
@@ -384,7 +380,7 @@ const recipeSchema = z.object({
     is_public: z.boolean().default(false),
     prep_time: z.number().min(0, 'Prep time cannot be negative').optional(),
     cook_time: z.number().min(0, 'Cook time cannot be negative').optional(),
-    serves: z.number().min(1, 'Must serve at least 1 person').optional(),
+    recipe_yield: z.string().max(50, 'Invalid input, max 50 characters').optional(),
     difficulty_level: z.number().min(1).max(3, 'Invalid difficulty level')
 })
 
@@ -404,8 +400,8 @@ const initialValues = computed(() => ({
     is_public: props.initialData?.is_public || true,
     prep_time: props.initialData?.prep_time || undefined,
     cook_time: props.initialData?.cook_time || undefined,
-    serves: props.initialData?.serves || undefined,
     tags: getInitialTagLabels() || [],
+    recipe_yield: props.initialData?.recipe_yield || undefined,
     difficulty_level: props.initialData?.difficulty_level?.value || DIFFICULTY_LEVELS.EASY.value,
     // ingredients: [],
     // instructions: []

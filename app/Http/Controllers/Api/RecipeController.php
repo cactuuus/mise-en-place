@@ -110,7 +110,7 @@ class RecipeController extends Controller
             'is_public'        => 'required|boolean',
             'prep_time'        => 'nullable|integer|min:0',
             'cook_time'        => 'nullable|integer|min:0',
-            'serves'           => 'nullable|integer|min:1',
+            'recipe_yield'     => 'nullable|string|max:50',
             'difficulty_level' => 'nullable|integer',
             'tags'             => 'nullable|array',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',

@@ -161,11 +161,6 @@
                         </p>
 
                         <!-- Tags -->
-                        <div class="col-span-full flex items-center gap-2">
-                            <i class="pi pi-tags"></i>
-                            <span>Tags</span>
-                            <Divider/>
-                        </div>
                         <div class="col-span-full">
                             <div class="flex items-center gap-2">
                                 <i class="pi pi-tags"></i>
@@ -427,25 +422,13 @@ const initialValues = computed(() => ({
     cook_time: props.initialData?.cook_time || undefined,
     recipe_yield: props.initialData?.recipe_yield || undefined,
     difficulty_level: props.initialData?.difficulty_level?.value || DIFFICULTY_LEVELS.EASY.value,
-    // ingredients: [],
-    // instructions: []
     // Tags
     recipe_cuisine: props.initialData?.tags?.recipe_cuisine || [],
     recipe_category: props.initialData?.tags?.recipe_category || [],
     recipe_diet: props.initialData?.tags?.recipe_diet || [],
     recipe_keyword: props.initialData?.tags?.recipe_keyword || [],
+    // ingredients, instructions, and image are handled separately
 }))
-
-const getInitialTagLabels = (): string[] | null => {
-    if (!props.initialData?.tags) {
-        return null
-    }
-    return props.initialData?.tags.map(
-        (tag: { id: number, name: { [p: string]: string } }) => {
-            return getTagLabel(tag.name)
-        }
-    )
-}
 
 // Dynamic field management
 const ingredientFields = ref<{ id: number, value: string }[]>([])
@@ -567,6 +550,7 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
         formData.append('notes', event.states.notes?.value || '')
         formData.append('source_url', event.states.source_url?.value || '')
         formData.append('is_public', event.states.is_public.value ? '1' : '0')
+        formData.append('difficulty_level', event.states.difficulty_level.value.toString())
         formData.append('tags',
             JSON.stringify({
                 recipe_diet: event.states.recipe_diet?.value || [],
@@ -585,8 +569,6 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
         if (event.states.serves?.value) {
             formData.append('recipe_yield', event.states.serves.value.toString())
         }
-
-        formData.append('difficulty_level', event.states.difficulty_level.value.toString())
 
         // Add ingredients and instructions
         const ingredients = ingredientFields.value.map(f => f.value).filter(v => v.trim())

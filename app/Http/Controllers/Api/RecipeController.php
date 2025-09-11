@@ -20,7 +20,7 @@ class RecipeController extends Controller
         $recipes = Recipe::withRatings()
             ->excludeUser(auth('sanctum')->id())
             ->publicOnly()
-            ->with(['user:id,name', 'tags:id,name', 'media'])
+            ->with(['user:id,name', 'tags:name,type', 'media'])
             ->latest('recipes.created_at')
             ->simplePaginate(20);
 
@@ -34,7 +34,7 @@ class RecipeController extends Controller
     {
         $recipes = Recipe::withRatings()
             ->forUser(auth()->id())
-            ->with(['tags:id,name', 'media'])
+            ->with(['tags:name,type', 'media'])
             ->latest('recipes.updated_at')
             ->paginate(20);
 
@@ -58,7 +58,7 @@ class RecipeController extends Controller
         $recipe->load([
             'media',
             'user:id,name',
-            'tags:id,name',
+            'tags:name,type',
             'ratings.user:id,name',
             'parentRecipe:id,title,user_id',
             'parentRecipe.user:id,name',
@@ -84,13 +84,13 @@ class RecipeController extends Controller
         }
 
         if (isset($validated['tags'])) {
-            $recipe->syncTagsWithType($validated['tags'], TagType::Recipe->value);
+            $recipe->syncRecipeTags($validated['tags']);
         }
 
         $recipe->load([
             'media',
             'user:id,name',
-            'tags:id,name',
+            'tags:name,type',
             'ratings.user:id,name',
             'parentRecipe:id,title,user_id',
             'parentRecipe.user:id,name',
@@ -101,6 +101,12 @@ class RecipeController extends Controller
 
     private function validateRecipeData(Request $request): array
     {
+        if ($request->has('tags') && is_string($request->input('tags'))) {
+            $tags = json_decode($request->input('tags'), true);
+            $request->merge(['tags' => $tags]);
+        }
+
+        Log::debug('Parsed tags:', $request->input('tags', []));
         $rules = [
             'title'            => 'required|string|max:255',
             'ingredients'      => 'required|array',
@@ -112,7 +118,9 @@ class RecipeController extends Controller
             'cook_time'        => 'nullable|integer|min:0',
             'recipe_yield'     => 'nullable|string|max:50',
             'difficulty_level' => 'nullable|integer',
-            'tags'             => 'nullable|array',
+            'tags'             => ['nullable', 'array'],
+            'tags.*'           => ['nullable', 'array'],
+            'tags.*.*'         => ['nullable', 'string'],
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ];
 
@@ -137,7 +145,7 @@ class RecipeController extends Controller
         }
 
         if (isset($validated['tags'])) {
-            $recipe->syncTagsWithType($validated['tags'], TagType::Recipe->value);
+            $recipe->syncRecipeTags($validated['tags']);
         }
 
         $recipe = $recipe

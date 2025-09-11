@@ -181,4 +181,16 @@ class Recipe extends Model implements HasMedia
     {
         return $this->getCachedMediaUrls('recipe-images', self::$IMAGE_SIZES);
     }
+
+    /**
+     * Syncs the recipe's tags based on a structured array.
+     *
+     * @param  array  $tags  An associative array where keys are tag types and values are arrays of tag names.
+     */
+    public function syncRecipeTags(array $tags): void
+    {
+        foreach ($tags as $tagType => $tagNames) {
+            $this->syncTagsWithType($tagNames, $tagType);
+        }
+    }
 }

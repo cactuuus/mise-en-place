@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\TagHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RecipePreviewResource extends JsonResource
@@ -13,7 +14,16 @@ class RecipePreviewResource extends JsonResource
             'id'               => $this->id,
             'title'            => $this->title,
             'user'             => $this->whenLoaded('user'),
-            'tags'             => $this->whenLoaded('tags'),
+            'tags'             => $this->whenLoaded('tags', function () {
+                $grouped = TagHelper::groupTagsByType($this->tags);
+
+                return [
+                    'recipe_cuisine'  => $grouped['recipe_cuisine'] ?? [],
+                    'recipe_category' => $grouped['recipe_category'] ?? [],
+                    'recipe_diet'     => $grouped['recipe_diet'] ?? [],
+                    'recipe_keyword'  => $grouped['recipe_keyword'] ?? [],
+                ];
+            }),
             'prep_time'        => $this->prep_time,
             'cook_time'        => $this->cook_time,
             'total_time'       => $this->total_time,

@@ -86,12 +86,14 @@
             </div>
 
             <!-- Tags -->
-            <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-2">
+            <div v-if="displayTags.length > 0" class="flex flex-wrap gap-1 items-baseline">
                 <Tag
-                    v-for="tag in recipe.tags"
-                    :key="tag.id"
-                    :value="getTagLabel(tag.name)"
-                    severity="secondary"
+                    v-for="(tag, index) in displayTags"
+                    :key="index"
+                    :icon="tag.icon"
+                    :severity="tag.severity"
+                    :value="tag.text"
+                    class="!text-xs"
                 />
             </div>
         </div>
@@ -219,12 +221,13 @@ import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
 import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
-import {getTagLabel, getTimeBreakdown, Recipe} from '@/types/recipe'
+import {getTimeBreakdown, Recipe} from '@/types/recipe'
 import {fetchRecipeById} from '@/services/recipeService'
 import SmartImage from '@/components/SmartImage.vue'
 import DifficultyBadge from '@/components/DifficultyBadge.vue'
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 import RecipeActionsMenu from "@/components/RecipeActionsMenu.vue";
+import {FlattenedTag, flattenRecipeTags} from "@/utils/tagUtils.ts";
 
 const router = useRouter()
 
@@ -236,6 +239,7 @@ const recipe = ref<Recipe | null>(null)
 const loading = ref(true)
 const checkedIngredients = ref<boolean[]>([])
 const recipeActionsMenuRef = ref()
+const displayTags = ref<FlattenedTag[]>([]);
 
 watch(() => recipe.value?.ingredients, (ingredients) => {
     if (ingredients) {
@@ -245,6 +249,9 @@ watch(() => recipe.value?.ingredients, (ingredients) => {
 
 const loadRecipe = async () => {
     recipe.value = await fetchRecipeById(props.id)
+    if (recipe.value) {
+        displayTags.value = flattenRecipeTags(recipe.value.tags)
+    }
     loading.value = false
 }
 

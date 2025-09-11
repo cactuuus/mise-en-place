@@ -1,6 +1,6 @@
 import api from './api'
 import executeApiCall from './apiService'
-import {getDifficultyFromValue, Recipe, RecipePreview, Tag} from '@/types/recipe'
+import {getDifficultyFromValue, Recipe, RecipePreview, RecipeTags} from '@/types/recipe'
 
 interface RecipesApiResponse {
     data: any[] // Raw API data with numeric difficulty_level
@@ -134,11 +134,18 @@ export const deleteRecipe = async (id: number): Promise<boolean> => {
     })
 }
 
-export const fetchRecipeTags = async (tagsType: string = ''): Promise<Tag[]> => {
-    let tags: Tag[] = []
+export const fetchRecipeTags = async (): Promise<RecipeTags> => {
+    let tags: RecipeTags = {
+        recipe_cuisine: [],
+        recipe_category: [],
+        recipe_diet: [],
+        recipe_keyword: []
+    }
 
     await executeApiCall({
-        call: () => api.get(`/tags${tagsType ? `?type=${tagsType}` : ''}`),
+        call: () => api.get<RecipeTags>('/tags', {
+            params: {types: Object.keys(tags).join(',')}
+        }),
         errorMessage: 'Failed to load tags',
         onSuccess: (response) => {
             tags = response.data

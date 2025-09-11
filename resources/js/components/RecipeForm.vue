@@ -167,19 +167,44 @@
                             <Divider/>
                         </div>
                         <div class="col-span-full">
-                            <AutoComplete
-                                v-model="selectedTags"
-                                :loading="loadingTags"
-                                :suggestions="filteredSuggestions"
-                                auto-option-focus
-                                fluid
-                                multiple
-                                name="tags"
-                                placeholder="Type to search or add tags..."
-                                @complete="searchTags"
-                            />
+                            <div class="flex items-center gap-2">
+                                <i class="pi pi-tags"></i>
+                                <span>Tags</span>
+                                <Divider/>
+                            </div>
+                            <p class="secondary-text text-sm col-span-full">
+                                Select existing tags or create
+                                new ones by typing and pressing enter.
+                            </p>
                         </div>
-
+                        <TagSelector
+                            :available-tags="availableTags?.recipe_diet"
+                            class="col-span-full"
+                            icon="pi pi-heart"
+                            label="Diet"
+                            name="recipe_diet"
+                        />
+                        <TagSelector
+                            :available-tags="availableTags?.recipe_cuisine"
+                            class="col-span-full"
+                            icon="pi pi-globe"
+                            label="Cuisine type"
+                            name="recipe_cuisine"
+                        />
+                        <TagSelector
+                            :available-tags="availableTags?.recipe_category"
+                            class="col-span-full"
+                            icon="pi pi-list"
+                            label="Category"
+                            name="recipe_category"
+                        />
+                        <TagSelector
+                            :available-tags="availableTags?.recipe_keyword"
+                            class="col-span-full"
+                            icon="pi pi-tag"
+                            label="Additional Keywords"
+                            name="recipe_keyword"
+                        />
                     </div>
                 </Panel>
             </div>
@@ -348,10 +373,10 @@ import InputGroup from 'primevue/inputgroup'
 import InputGroupAddon from 'primevue/inputgroupaddon'
 import Divider from 'primevue/divider'
 import SelectButton from 'primevue/selectbutton'
-import AutoComplete from 'primevue/autocomplete'
-import {DIFFICULTY_LEVELS, getTagLabel, type Recipe} from '@/types/recipe'
+import {DIFFICULTY_LEVELS, type Recipe, RecipeTags} from '@/types/recipe'
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 import {fetchRecipeTags} from "@/services/recipeService.ts";
+import TagSelector from "@/components/TagSelector.vue";
 
 const MAX_FILESIZE = 5242880 // 5MB
 
@@ -400,11 +425,15 @@ const initialValues = computed(() => ({
     is_public: props.initialData?.is_public || true,
     prep_time: props.initialData?.prep_time || undefined,
     cook_time: props.initialData?.cook_time || undefined,
-    tags: getInitialTagLabels() || [],
     recipe_yield: props.initialData?.recipe_yield || undefined,
     difficulty_level: props.initialData?.difficulty_level?.value || DIFFICULTY_LEVELS.EASY.value,
     // ingredients: [],
     // instructions: []
+    // Tags
+    recipe_cuisine: props.initialData?.tags?.recipe_cuisine || [],
+    recipe_category: props.initialData?.tags?.recipe_category || [],
+    recipe_diet: props.initialData?.tags?.recipe_diet || [],
+    recipe_keyword: props.initialData?.tags?.recipe_keyword || [],
 }))
 
 const getInitialTagLabels = (): string[] | null => {
@@ -430,28 +459,12 @@ const imagePreviewUrl = ref<string | null>(null)
 const fileUploadRef = ref()
 
 // Tags handling
-const selectedTags = ref<string[]>([])
-const filteredSuggestions = ref<string[]>([])
-const availableTags = ref<string[]>([])
+const availableTags = ref<RecipeTags>()
 const loadingTags = ref(true)
 
 const initializeTags = async () => {
-    const tags = await fetchRecipeTags('recipe')
-    availableTags.value = tags.map(tag => getTagLabel(tag.name))
+    availableTags.value = await fetchRecipeTags()
     loadingTags.value = false
-}
-
-const searchTags = (event: { query: string }) => {
-    const query = event.query.toLowerCase().trim()
-
-    if (!query) {
-        filteredSuggestions.value = availableTags.value
-        return
-    }
-    // Filter existing tags that match + always include the current query
-    const matches = availableTags.value.filter(tag => tag.toLowerCase().includes(query))
-
-    filteredSuggestions.value = [...new Set([...matches, query])]
 }
 
 const calculateTotalTime = (prepTime: number | undefined, cookTime: number | undefined): number => {
@@ -471,6 +484,7 @@ const initializeIngredients = () => {
         nextIngredientId.value = 2
     }
 }
+
 const addIngredient = () => {
     ingredientFields.value.push({id: nextIngredientId.value++, value: ''})
 }
@@ -553,6 +567,14 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
         formData.append('notes', event.states.notes?.value || '')
         formData.append('source_url', event.states.source_url?.value || '')
         formData.append('is_public', event.states.is_public.value ? '1' : '0')
+        formData.append('tags',
+            JSON.stringify({
+                recipe_diet: event.states.recipe_diet?.value || [],
+                recipe_cuisine: event.states.recipe_cuisine?.value || [],
+                recipe_category: event.states.recipe_category?.value || [],
+                recipe_keyword: event.states.recipe_keyword?.value || []
+            })
+        )
 
         if (event.states.prep_time?.value) {
             formData.append('prep_time', event.states.prep_time.value.toString())
@@ -578,12 +600,6 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
             formData.append(`instructions[${index}]`, instruction)
         })
 
-        // Add tags
-        if (selectedTags.value.length > 0) {
-            selectedTags.value.forEach((tag, index) => {
-                formData.append(`tags[${index}]`, tag)
-            })
-        }
         // Add image if selected
         if (selectedImage.value) {
             formData.append('image', selectedImage.value)

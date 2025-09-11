@@ -61,16 +61,17 @@
 
         <template #footer>
             <!-- Tags -->
-            <div v-if="recipe.tags && recipe.tags.length > 0" class="flex flex-wrap gap-1 items-baseline">
+            <div v-if="displayTags.length > 0" class="flex flex-wrap gap-1 items-baseline">
                 <Tag
-                    v-for="tag in recipe.tags.slice(0, MAX_TAGS)"
-                    :key="tag.id"
-                    :value="getTagLabel(tag.name)"
+                    v-for="(tag, index) in displayTags.slice(0, MAX_TAGS)"
+                    :key="index"
+                    :icon="tag.icon"
+                    :severity="tag.severity"
+                    :value="tag.text"
                     class="!text-xs"
-                    severity="secondary"
                 />
-                <span v-if="recipe.tags.length > MAX_TAGS" class="text-xs">
-                        +{{ recipe.tags.length - MAX_TAGS }} more
+                <span v-if="displayTags.length > MAX_TAGS" class="text-xs">
+                        +{{ displayTags.length - MAX_TAGS }} more
                     </span>
             </div>
         </template>
@@ -82,13 +83,17 @@ import Card from 'primevue/card'
 import Rating from 'primevue/rating'
 import Tag from 'primevue/tag'
 import DeferredContent from 'primevue/deferredcontent'
-import {getTagLabel, RecipePreview} from '@/types/recipe'
+import {RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue";
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
+import {computed} from "vue";
+import {flattenRecipeTags} from "@/utils/tagUtils.ts";
 
 const MAX_TAGS = 5
-defineProps<{
+const props = defineProps<{
     recipe: RecipePreview
 }>()
+
+const displayTags = computed(() => flattenRecipeTags(props.recipe.tags));
 </script>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\TagHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,8 +12,16 @@ class TagController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $type = $request->query('type');
+        $types = $request->query('types');
 
-        return response()->json(Tag::withType($type)->get(['id', 'name']));
+        $query = Tag::query();
+        if ($types && is_string($types)) {
+            $types = explode(',', $types);
+            $query->whereIn('type', $types);
+        }
+
+        $tags = $query->get();
+
+        return response()->json(TagHelper::groupTagsByType($tags, $types));
     }
 }

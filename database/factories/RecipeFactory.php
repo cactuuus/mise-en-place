@@ -268,6 +268,19 @@ class RecipeFactory extends Factory
         });
     }
 
+    private function attachRandomTags($recipe): void
+    {
+        $allTags = \Spatie\Tags\Tag::all();
+
+        if ($allTags->isEmpty()) {
+            return;
+        }
+
+        // Attach 1-6 random tags
+        $randomTags = $allTags->random($this->faker->numberBetween(1, min(6, $allTags->count())));
+        $recipe->attachTags($randomTags);
+    }
+
     private function attachRandomImage($recipe): void
     {
         $seedImagesPath = storage_path('app/public/seed-images');

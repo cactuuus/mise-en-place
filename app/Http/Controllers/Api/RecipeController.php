@@ -156,7 +156,7 @@ class RecipeController extends Controller
         $recipe->load([
             'media',
             'user:id,name',
-            'tags:id,name',
+            'tags:name,type',
             'ratings.user:id,name',
             'parentRecipe:id,title,user_id',
             'parentRecipe.user:id,name',

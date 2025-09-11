@@ -583,7 +583,7 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
             formData.append('cook_time', event.states.cook_time.value.toString())
         }
         if (event.states.serves?.value) {
-            formData.append('serves', event.states.serves.value.toString())
+            formData.append('recipe_yield', event.states.serves.value.toString())
         }
 
         formData.append('difficulty_level', event.states.difficulty_level.value.toString())

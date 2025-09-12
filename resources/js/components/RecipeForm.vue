@@ -230,59 +230,23 @@
                     </div>
                 </div>
 
-                <Button
-                    class="mt-4"
-                    icon="pi pi-plus"
-                    label="Add Ingredient"
-                    outlined
-                    size="small"
-                    @click="addIngredient"
-                />
+                <div class="mt-2 flex justify-end">
+                    <Button
+                        icon="pi pi-plus"
+                        label="Add Ingredient"
+                        size="small"
+                        text
+                        @click="addIngredient"
+                    />
+                </div>
             </Panel>
 
             <!-- Instructions -->
             <Panel header="Instructions" toggleable>
-                <div class="space-y-3">
-                    <div
-                        v-for="(instruction, index) in instructionFields"
-                        :key="instruction.id"
-                        class="relative"
-                    >
-                        <FloatLabel variant="on">
-                            <Textarea
-                                :id="`Step ${index + 1}`"
-                                :model-value="instruction.value"
-                                auto-resize
-                                fluid
-                                rows="2"
-                                @input="updateInstruction(index, ($event.target as HTMLInputElement)?.value)"
-                            />
-                            <label :for="`Step ${index + 1}`">Step {{ index + 1 }}</label>
-                        </FloatLabel>
-
-                        <Button
-                            v-if="instructionFields.length > 1"
-                            class="!absolute top-1 right-1"
-                            icon="pi pi-trash"
-                            severity="danger"
-                            size="small"
-                            text
-                            @click="removeInstruction(index)"
-                        />
-                    </div>
-
-                    <Button
-                        icon="pi pi-plus"
-                        label="Add Step"
-                        outlined
-                        size="small"
-                        @click="addInstruction"
-                    />
-
-                    <Message v-if="$form.instructions?.invalid" severity="error" size="small" variant="simple">
-                        {{ $form.instructions.error?.message }}
-                    </Message>
-                </div>
+                <RecipeInstructionEditor
+                    ref="instructionsField"
+                    v-model="instructionFields"
+                />
             </Panel>
 
             <!-- Additional Information -->
@@ -343,6 +307,7 @@
                     :label="mode === 'create' ? 'Create Recipe' : 'Update Recipe'"
                     :loading="loading"
                     icon="pi pi-save"
+                    severity="success"
                     type="submit"
                 />
             </div>
@@ -368,10 +333,11 @@ import InputGroup from 'primevue/inputgroup'
 import InputGroupAddon from 'primevue/inputgroupaddon'
 import Divider from 'primevue/divider'
 import SelectButton from 'primevue/selectbutton'
-import {DIFFICULTY_LEVELS, type Recipe, RecipeTags} from '@/types/recipe'
+import {DIFFICULTY_LEVELS, type Recipe, RecipeInstruction, RecipeTags} from '@/types/recipe'
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 import {fetchRecipeTags} from "@/services/recipeService.ts";
 import TagSelector from "@/components/TagSelector.vue";
+import RecipeInstructionEditor from "@/components/RecipeInstructionEditor.vue";
 
 const MAX_FILESIZE = 5242880 // 5MB
 
@@ -394,7 +360,6 @@ const emit = defineEmits<Emits>()
 const recipeSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
     ingredients: z.array(z.string().min(1, 'Ingredient cannot be empty')).min(1, 'At least one ingredient is required'),
-    instructions: z.array(z.string().min(1, 'Instruction cannot be empty')).min(1, 'At least one instruction is required'),
     notes: z.string().optional(),
     source_url: z.string().url('Invalid URL').optional().or(z.literal('')),
     is_public: z.boolean().default(false),
@@ -430,11 +395,13 @@ const initialValues = computed(() => ({
     // ingredients, instructions, and image are handled separately
 }))
 
-// Dynamic field management
+// Ingredients management
 const ingredientFields = ref<{ id: number, value: string }[]>([])
 const nextIngredientId = ref(1)
-const instructionFields = ref<{ id: number, value: string }[]>([])
-const nextInstructionId = ref(1)
+
+// Instructions management
+const instructionsField = ref()
+const instructionFields = ref<RecipeInstruction[]>(props.initialData?.instructions || [])
 
 // Image handling
 const selectedImage = ref<File | null>(null)
@@ -482,31 +449,7 @@ const updateIngredient = (index: number, value: string) => {
     ingredientFields.value[index].value = value
 }
 
-// Instruction management
-const initializeInstructions = () => {
-    if (props.initialData?.instructions?.length) {
-        instructionFields.value = props.initialData.instructions.map((instruction, index) => ({
-            id: index + 1,
-            value: instruction
-        }))
-        nextInstructionId.value = instructionFields.value.length + 1
-    } else {
-        instructionFields.value = [{id: 1, value: ''}]
-        nextInstructionId.value = 2
     }
-}
-const addInstruction = () => {
-    instructionFields.value.push({id: nextInstructionId.value++, value: ''})
-}
-
-const removeInstruction = (index: number) => {
-    if (instructionFields.value.length > 1) {
-        instructionFields.value.splice(index, 1)
-    }
-}
-
-const updateInstruction = (index: number, value: string) => {
-    instructionFields.value[index].value = value
 }
 
 // Image handling
@@ -538,7 +481,14 @@ const handleImageRemove = () => {
 
 // Form submission
 const handleSubmit = async (event: { valid: boolean; states: Record<string, any> }) => {
-    if (!event.valid) return
+    // Trigger instruction validation
+    instructionsField.value?.onSubmit()
+
+    // Check both form and instruction validity
+    if (!instructionsField.value?.valid || !event.valid) {
+        console.warn('Form is invalid, cannot submit')
+        return
+    }
 
     loading.value = true
 
@@ -570,17 +520,15 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
             formData.append('recipe_yield', event.states.serves.value.toString())
         }
 
-        // Add ingredients and instructions
+        // Add ingredients
         const ingredients = ingredientFields.value.map(f => f.value).filter(v => v.trim())
-        const instructions = instructionFields.value.map(f => f.value).filter(v => v.trim())
-
         ingredients.forEach((ingredient, index) => {
             formData.append(`ingredients[${index}]`, ingredient)
         })
 
-        instructions.forEach((instruction, index) => {
-            formData.append(`instructions[${index}]`, instruction)
-        })
+        // Add instructions
+        const validInstructions = instructionFields.value.filter(inst => inst.text.trim())
+        formData.append('instructions', JSON.stringify(validInstructions))
 
         // Add image if selected
         if (selectedImage.value) {
@@ -595,7 +543,7 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
 
 onMounted(() => {
     initializeIngredients()
-    initializeInstructions()
+
     initializeTags()
 })
 </script>

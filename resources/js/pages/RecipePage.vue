@@ -131,26 +131,56 @@
         <!-- Instructions -->
         <Divider/>
 
-        <div>
-            <h3 class="text-xl font-semibold my-3">
-                Instructions
-            </h3>
-            <Accordion
-                v-if="recipe.instructions && recipe.instructions.length > 0"
-                :value="Array.from({ length: recipe.instructions.length }, (_, i) => i)"
-                multiple
+        <h3 class="text-xl font-semibold my-3">
+            Instructions
+        </h3>
+        <div v-if="recipe.instructions.length > 0" class="space-y-4">
+            <div
+                v-for="(instruction, index) in recipe.instructions"
+                :key="`instruction-${index}`"
             >
-                <AccordionPanel
-                    v-for="(instruction, index) in recipe.instructions"
-                    :key="index"
-                    :class="index !== recipe.instructions.length - 1 ? '!border-dashed' : '!border-none'"
-                    :value="index"
-                >
-                    <AccordionHeader as="H4" class="!p-2">Step {{ index + 1 }}</AccordionHeader>
-                    <AccordionContent as="P">{{ instruction }}</AccordionContent>
-                </AccordionPanel>
-            </Accordion>
-            <p v-else class="secondary-text italic">No instructions provided</p>
+                <!-- Section Header -->
+                <div v-if="instruction.type === 'section'"
+                     class="p-1 mb-3 secondary-bg rounded-sm">
+                    <h4 class="font-semibold flex items-center gap-2 primary-theme-text">
+                        <i class="pi pi-bookmark-fill !text-xs"></i>
+                        {{ instruction.position }} # {{ instruction.name }}
+                    </h4>
+                </div>
+
+                <!-- Section Steps -->
+                <div v-if="instruction.type === 'section'" class="space-y-4 pl-1">
+                    <div
+                        v-for="step in instruction.steps"
+                        :key="`step-${step.position}`"
+                        class="flex items-baseline gap-2"
+                    >
+                        <div
+                            class="shrink-0 primary-theme-text font-medium text-sm">
+                            {{ instruction.position }}.{{ step.position }}
+                        </div>
+                        <p>
+                        <span v-if="step.name" class="font-medium primary-theme-text">
+                            {{ step.name }} ~
+                        </span>
+                            {{ step.text }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Standalone Step -->
+                <div v-else class="flex items-baseline pl-1 gap-2">
+                    <div class="shrink-0 primary-theme-text font-medium text-sm">
+                        {{ instruction.position }}
+                    </div>
+                    <p>
+                        <span v-if="instruction.name" class="font-medium primary-theme-text">
+                            {{ instruction.name }} ~
+                        </span>
+                        {{ instruction.text }}
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Notes Section -->
@@ -217,10 +247,6 @@ import Tag from 'primevue/tag'
 import Checkbox from 'primevue/checkbox'
 import Skeleton from 'primevue/skeleton'
 import Divider from 'primevue/divider'
-import Accordion from 'primevue/accordion'
-import AccordionPanel from 'primevue/accordionpanel'
-import AccordionHeader from 'primevue/accordionheader'
-import AccordionContent from 'primevue/accordioncontent'
 import {getTimeBreakdown, Recipe} from '@/types/recipe'
 import {fetchRecipeById} from '@/services/recipeService'
 import SmartImage from '@/components/SmartImage.vue'
@@ -272,6 +298,40 @@ const viewOriginal = () => {
         // Open external URL
         window.open(recipe.value?.source_url, '_blank', 'noopener,noreferrer')
     }
+}
+
+const flattenedInstructions = computed(() => {
+    if (!recipe.value?.instructions) return []
+
+    const flattened: any[] = []
+    let globalStepCounter = 1
+
+    recipe.value.instructions.forEach(instruction => {
+        if (instruction.type === 'section') {
+            // Add section with globally numbered steps
+            const sectionWithGlobalSteps = {
+                ...instruction,
+                steps: instruction.steps.map(step => ({
+                    ...step,
+                    globalPosition: globalStepCounter++
+                }))
+            }
+            flattened.push(sectionWithGlobalSteps)
+        } else {
+            // Add standalone step with global position
+            flattened.push({
+                ...instruction,
+                globalPosition: globalStepCounter++
+            })
+        }
+    })
+
+    return flattened
+})
+
+const getAccordionPanelClass = (item: any, index: number) => {
+    const baseClass = index !== flattenedInstructions.value.length - 1 ? '!border-dashed' : '!border-none'
+    return item.type === 'section' ? `${baseClass} section-panel` : baseClass
 }
 
 onMounted(() => {

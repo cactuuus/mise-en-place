@@ -38,6 +38,7 @@ class RecipeFactory extends Factory
     private function getRandomRecipeData(): array
     {
         $recipes = [
+            // Recipe with just steps (some with names, some without)
             [
                 'title'        => 'Classic Chocolate Chip Cookies',
                 'ingredients'  => [
@@ -52,17 +53,33 @@ class RecipeFactory extends Factory
                     '2 cups chocolate chips',
                 ],
                 'instructions' => [
-                    'Preheat oven to 375°F (190°C).',
-                    'Mix flour, baking soda, and salt in a bowl.',
-                    'Beat butter, sugars, and vanilla in large bowl until creamy.',
-                    'Add eggs one at a time, beating well after each addition.',
-                    'Gradually blend in flour mixture.',
-                    'Stir in chocolate chips.',
-                    'Drop rounded tablespoons of dough onto ungreased baking sheets.',
-                    'Bake 9-11 minutes or until golden brown.',
-                    'Cool on baking sheets for 2 minutes; remove to wire rack.',
+                    ['type' => 'step', 'position' => 1, 'text' => 'Preheat oven to 375°F (190°C).'],
+                    [
+                        'type' => 'step', 'position' => 2, 'name' => 'Mix dry ingredients',
+                        'text' => 'Mix flour, baking soda, and salt in a bowl.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 3,
+                        'text' => 'Beat butter, sugars, and vanilla in large bowl until creamy.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 4, 'name' => 'Add eggs',
+                        'text' => 'Add eggs one at a time, beating well after each addition.',
+                    ],
+                    ['type' => 'step', 'position' => 5, 'text' => 'Gradually blend in flour mixture.'],
+                    ['type' => 'step', 'position' => 6, 'text' => 'Stir in chocolate chips.'],
+                    [
+                        'type' => 'step', 'position' => 7, 'name' => 'Shape and bake',
+                        'text' => 'Drop rounded tablespoons of dough onto ungreased baking sheets. Bake 9-11 minutes or until golden brown.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 8,
+                        'text' => 'Cool on baking sheets for 2 minutes; remove to wire rack.',
+                    ],
                 ],
             ],
+
+            // Recipe with sections containing steps
             [
                 'title'        => 'Homemade Pizza Margherita',
                 'ingredients'  => [
@@ -76,17 +93,46 @@ class RecipeFactory extends Factory
                     'black pepper to taste',
                 ],
                 'instructions' => [
-                    'Preheat oven to 475°F (245°C).',
-                    'Roll out pizza dough on floured surface.',
-                    'Transfer to pizza stone or baking sheet.',
-                    'Brush with olive oil.',
-                    'Mix crushed tomatoes with minced garlic, salt, and pepper.',
-                    'Spread tomato mixture evenly over dough.',
-                    'Tear mozzarella into pieces and distribute over pizza.',
-                    'Bake for 12-15 minutes until crust is golden.',
-                    'Top with fresh basil leaves before serving.',
+                    [
+                        'type'     => 'section',
+                        'position' => 1,
+                        'name'     => 'Prepare the base',
+                        'steps'    => [
+                            ['type' => 'step', 'position' => 1, 'text' => 'Preheat oven to 475°F (245°C).'],
+                            [
+                                'type' => 'step', 'position' => 2, 'name' => 'Roll dough',
+                                'text' => 'Roll out pizza dough on floured surface and transfer to pizza stone or baking sheet.',
+                            ],
+                            ['type' => 'step', 'position' => 3, 'text' => 'Brush with olive oil.'],
+                        ],
+                    ],
+                    [
+                        'type'     => 'section',
+                        'position' => 2,
+                        'name'     => 'Add toppings and bake',
+                        'steps'    => [
+                            [
+                                'type' => 'step', 'position' => 1, 'name' => 'Make sauce',
+                                'text' => 'Mix crushed tomatoes with minced garlic, salt, and pepper. Spread evenly over dough.',
+                            ],
+                            [
+                                'type' => 'step', 'position' => 2,
+                                'text' => 'Tear mozzarella into pieces and distribute over pizza.',
+                            ],
+                            [
+                                'type' => 'step', 'position' => 3,
+                                'text' => 'Bake for 12-15 minutes until crust is golden.',
+                            ],
+                            [
+                                'type' => 'step', 'position' => 4, 'name' => 'Finish',
+                                'text' => 'Top with fresh basil leaves before serving.',
+                            ],
+                        ],
+                    ],
                 ],
             ],
+
+            // Recipe with mix of global steps and sections
             [
                 'title'        => 'Chicken Stir Fry',
                 'ingredients'  => [
@@ -101,18 +147,53 @@ class RecipeFactory extends Factory
                     '1 tsp sesame oil',
                 ],
                 'instructions' => [
-                    'Marinate chicken in 1 tbsp soy sauce for 15 minutes.',
-                    'Heat oil in large wok or skillet over high heat.',
-                    'Add chicken and cook until no longer pink.',
-                    'Remove chicken and set aside.',
-                    'Add vegetables to wok and stir-fry for 3-4 minutes.',
-                    'Add garlic and ginger, cook for 30 seconds.',
-                    'Return chicken to wok.',
-                    'Mix remaining soy sauce with cornstarch and add to wok.',
-                    'Stir-fry until sauce thickens, about 1 minute.',
-                    'Drizzle with sesame oil before serving.',
+                    [
+                        'type' => 'step', 'position' => 1, 'name' => 'Prep beef',
+                        'text' => 'Season beef cubes with salt and pepper, then coat with flour.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 2,
+                        'text' => 'Heat oil in large pot over medium-high heat. Brown beef on all sides.',
+                    ],
+                    [
+                        'type'     => 'section',
+                        'position' => 3,
+                        'name'     => 'Build the stew',
+                        'steps'    => [
+                            [
+                                'type' => 'step', 'position' => 1,
+                                'text' => 'Add diced onion to pot and cook until softened.',
+                            ],
+                            [
+                                'type' => 'step', 'position' => 2, 'name' => 'Add liquid',
+                                'text' => 'Pour in beef broth and add bay leaves. Bring to a boil.',
+                            ],
+                            [
+                                'type' => 'step', 'position' => 3,
+                                'text' => 'Reduce heat to low, cover and simmer for 1 hour.',
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'     => 'section',
+                        'position' => 4,
+                        'name'     => 'Add vegetables',
+                        'steps'    => [
+                            ['type' => 'step', 'position' => 1, 'text' => 'Add carrots and potatoes to the pot.'],
+                            [
+                                'type' => 'step', 'position' => 2,
+                                'text' => 'Continue simmering for 30-45 minutes until vegetables are tender.',
+                            ],
+                        ],
+                    ],
+                    [
+                        'type' => 'step', 'position' => 5,
+                        'text' => 'Remove bay leaves, season with salt and pepper, and serve hot.',
+                    ],
                 ],
             ],
+
+            // Simple steps-only recipe
             [
                 'title'        => 'Classic Caesar Salad',
                 'ingredients'  => [
@@ -127,105 +208,22 @@ class RecipeFactory extends Factory
                     'black pepper to taste',
                 ],
                 'instructions' => [
-                    'Wash and chop romaine lettuce into bite-sized pieces.',
-                    'In a large bowl, whisk together mayonnaise, lemon juice, worcestershire sauce, garlic, and anchovy paste.',
-                    'Add lettuce to bowl and toss with dressing.',
-                    'Top with parmesan cheese and croutons.',
-                    'Season with black pepper and serve immediately.',
-                ],
-            ],
-            [
-                'title'        => 'Beef Tacos',
-                'ingredients'  => [
-                    '1 lb ground beef',
-                    '1 packet taco seasoning',
-                    '¾ cup water',
-                    '8 corn tortillas',
-                    '1 cup shredded lettuce',
-                    '2 medium tomatoes, diced',
-                    '1 cup shredded cheddar cheese',
-                    '½ cup sour cream',
-                    '½ cup salsa',
-                ],
-                'instructions' => [
-                    'Brown ground beef in large skillet over medium-high heat.',
-                    'Drain excess fat.',
-                    'Add taco seasoning and water, simmer for 10 minutes.',
-                    'Warm tortillas in microwave or dry skillet.',
-                    'Fill tortillas with beef mixture.',
-                    'Top with lettuce, tomatoes, cheese, sour cream, and salsa.',
-                    'Serve immediately.',
-                ],
-            ],
-            [
-                'title'        => 'Banana Bread',
-                'ingredients'  => [
-                    '3 large ripe bananas',
-                    '⅓ cup melted butter',
-                    '¾ cup sugar',
-                    '1 beaten egg',
-                    '1 tsp vanilla extract',
-                    '1 tsp baking soda',
-                    'pinch of salt',
-                    '1½ cups all-purpose flour',
-                ],
-                'instructions' => [
-                    'Preheat oven to 350°F (175°C).',
-                    'Mash bananas in a large bowl.',
-                    'Mix in melted butter.',
-                    'Add sugar, egg, and vanilla extract.',
-                    'Sprinkle baking soda and salt over mixture and mix.',
-                    'Add flour and mix until just combined.',
-                    'Pour into greased 4×8 inch loaf pan.',
-                    'Bake for 60-65 minutes until toothpick comes out clean.',
-                    'Cool in pan for 10 minutes, then turn out onto wire rack.',
-                ],
-            ],
-            [
-                'title'        => 'Spaghetti Carbonara',
-                'ingredients'  => [
-                    '1 lb spaghetti',
-                    '6 oz pancetta or guanciale, diced',
-                    '4 large eggs',
-                    '1 cup freshly grated Pecorino Romano cheese',
-                    '2 cloves garlic, minced',
-                    'freshly cracked black pepper',
-                    'salt for pasta water',
-                ],
-                'instructions' => [
-                    'Bring a large pot of salted water to boil. Cook spaghetti according to package directions.',
-                    'While pasta cooks, sauté pancetta in large skillet until crispy.',
-                    'In a bowl, whisk together eggs, cheese, and black pepper.',
-                    'Reserve 1 cup pasta cooking water before draining.',
-                    'Add drained hot pasta to skillet with pancetta.',
-                    'Remove from heat and quickly toss with egg mixture.',
-                    'Add pasta water gradually until creamy consistency is reached.',
-                    'Serve immediately with extra cheese and pepper.',
-                ],
-            ],
-            [
-                'title'        => 'Thai Green Curry',
-                'ingredients'  => [
-                    '1 lb chicken thigh, sliced',
-                    '2 tbsp green curry paste',
-                    '1 can (14oz) coconut milk',
-                    '1 tbsp fish sauce',
-                    '1 tbsp brown sugar',
-                    '1 eggplant, cubed',
-                    '1 red bell pepper, sliced',
-                    '¼ cup Thai basil leaves',
-                    '2 kaffir lime leaves',
-                    'jasmine rice for serving',
-                ],
-                'instructions' => [
-                    'Heat 2 tbsp of thick coconut milk in a wok over medium heat.',
-                    'Add curry paste and fry for 2 minutes until fragrant.',
-                    'Add chicken and cook until no longer pink.',
-                    'Add remaining coconut milk, fish sauce, and sugar.',
-                    'Bring to a simmer and add eggplant and bell pepper.',
-                    'Cook for 10-15 minutes until vegetables are tender.',
-                    'Stir in Thai basil and lime leaves.',
-                    'Serve hot over jasmine rice.',
+                    [
+                        'type' => 'step', 'position' => 1, 'name' => 'Prep lettuce',
+                        'text' => 'Wash and chop romaine lettuce into bite-sized pieces.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 2,
+                        'text' => 'In a large bowl, whisk together mayonnaise, lemon juice, worcestershire sauce, garlic, and anchovy paste.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 3, 'name' => 'Combine',
+                        'text' => 'Add lettuce to bowl and toss with dressing.',
+                    ],
+                    [
+                        'type' => 'step', 'position' => 4,
+                        'text' => 'Top with parmesan cheese and croutons. Season with black pepper and serve immediately.',
+                    ],
                 ],
             ],
         ];

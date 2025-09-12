@@ -30,6 +30,22 @@ export interface RecipeTags {
     recipe_keyword: string[]
 }
 
+export interface RecipeStep {
+    type: 'step'
+    position: number
+    text: string
+    name?: string
+}
+
+export interface RecipeSection {
+    type: 'section'
+    position: number
+    name: string
+    steps: RecipeStep[]
+}
+
+export type RecipeInstruction = RecipeStep | RecipeSection
+
 // Base recipe for previews/cards
 export interface RecipePreview {
     id: number
@@ -55,7 +71,7 @@ export interface RecipePreview {
 // Complete recipe
 export interface Recipe extends RecipePreview {
     ingredients: string[]
-    instructions: string[]
+    instructions: RecipeInstruction[]
     notes?: string
     source_url?: string
     forked_from_recipe_id?: number

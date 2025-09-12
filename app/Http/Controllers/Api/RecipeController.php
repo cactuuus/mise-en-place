@@ -106,22 +106,39 @@ class RecipeController extends Controller
             $request->merge(['tags' => $tags]);
         }
 
-        Log::debug('Parsed tags:', $request->input('tags', []));
+        if ($request->has('instructions') && is_string($request->input('instructions'))) {
+            $instructions = json_decode($request->input('instructions'), true);
+            $request->merge(['instructions' => $instructions]);
+        }
+
         $rules = [
             'title'            => 'required|string|max:255',
             'ingredients'      => 'required|array',
             'instructions'     => 'required|array',
             'notes'            => 'nullable|string',
-            'source_url'       => 'nullable|url',
-            'is_public'        => 'required|boolean',
-            'prep_time'        => 'nullable|integer|min:0',
-            'cook_time'        => 'nullable|integer|min:0',
-            'recipe_yield'     => 'nullable|string|max:50',
-            'difficulty_level' => 'nullable|integer',
-            'tags'             => ['nullable', 'array'],
-            'tags.*'           => ['nullable', 'array'],
-            'tags.*.*'         => ['nullable', 'string'],
-            'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'title'                           => 'required|string|max:255',
+            'ingredients'                     => 'required|array',
+            'instructions'                    => 'required|array',
+            'instructions.*.type'             => 'required|string|in:step,section',
+            'instructions.*.position'         => 'required|integer|min:1',
+            'instructions.*.text'             => 'required_if:instructions.*.type,step|string',
+            'instructions.*.name'             => 'nullable|string',
+            'instructions.*.steps'            => 'required_if:instructions.*.type,section|array',
+            'instructions.*.steps.*.type'     => 'required|string|in:step',
+            'instructions.*.steps.*.position' => 'required|integer|min:1',
+            'instructions.*.steps.*.text'     => 'required|string',
+            'instructions.*.steps.*.name'     => 'nullable|string',
+            'notes'                           => 'nullable|string',
+            'source_url'                      => 'nullable|url',
+            'is_public'                       => 'required|boolean',
+            'prep_time'                       => 'nullable|integer|min:0',
+            'cook_time'                       => 'nullable|integer|min:0',
+            'recipe_yield'                    => 'nullable|string|max:50',
+            'difficulty_level'                => 'nullable|integer',
+            'tags'                            => ['nullable', 'array'],
+            'tags.*'                          => ['nullable', 'array'],
+            'tags.*.*'                        => ['nullable', 'string'],
+            'image'                           => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ];
 
         return $request->validate($rules);

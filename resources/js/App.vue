@@ -1,4 +1,6 @@
 <template>
+    <meta content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" name="viewport">
+
     <div class="min-h-screen page-container">
         <!-- Header -->
         <AppHeader @showLoginModal="showLoginModal = true"/>

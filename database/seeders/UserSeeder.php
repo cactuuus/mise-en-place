@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $NUMBER_OF_USERS = 5;
+        $NUMBER_OF_USERS = 10;
 
         // Create the test user first
         \App\Models\User::factory()->create([

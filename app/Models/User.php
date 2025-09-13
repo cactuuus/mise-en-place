@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\HasCachedMediaUrls;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,10 +11,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasCachedMediaUrls;
+
+    private static array $AVATAR_SIZES = [
+        'small' => 100,
+        'large' => 500,
+    ];
 
     protected $fillable = [
         'name',
@@ -30,6 +41,24 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
     ];
+
+    protected $appends = [
+        'avatar_urls',
+    ];
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        foreach (self::$AVATAR_SIZES as $name => $size) {
+            $this
+                ->addMediaConversion($name)
+                ->fit(Fit::Max, $size, $size)
+                ->format('webp')
+                ->optimize()
+                ->quality(90)
+                ->performOnCollections('avatar')
+                ->queued();
+        }
+    }
 
     public function ratings(): HasMany
     {
@@ -96,5 +125,10 @@ class User extends Authenticatable implements FilamentUser
     {
         // for now we only have a single panel, accessible for all users
         return true;
+    }
+
+    public function getAvatarUrlsAttribute(): array
+    {
+        return $this->getCachedMediaUrls('avatar', self::$AVATAR_SIZES);
     }
 }

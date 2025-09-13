@@ -34,7 +34,7 @@ abstract class BaseRecipeResource extends Resource
                             ->visibility('private')
                             ->defaultImageUrl(asset('images/recipe-placeholder.svg'))
                             ->collection('recipe-images')
-                            ->conversion('lg')
+                            ->conversion('large')
                             ->columnSpan(1),
 
                         Infolists\Components\Group::make()
@@ -191,7 +191,7 @@ abstract class BaseRecipeResource extends Resource
                 ->defaultImageUrl(asset('images/recipe-placeholder.svg'))
                 ->tooltip('Recipe photo')
                 ->collection('recipe-images')
-                ->conversion('sm'),
+                ->conversion('small'),
 
             Tables\Columns\TextColumn::make('title')
                 ->label(false)

@@ -14,6 +14,7 @@
         "filament/spatie-laravel-tags-plugin": "^3.3",
         "icetalker/filament-table-repeater": "^1.4",
         "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.2",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
         "mokhosh/filament-rating": "^1.4",

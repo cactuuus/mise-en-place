@@ -1,0 +1,43 @@
+<template>
+    <meta content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" name="viewport">
+
+    <div class="min-h-screen page-container">
+        <!-- Header -->
+        <AppHeader @showLoginModal="showLoginModal = true"/>
+
+        <!-- Main Content -->
+        <main class="relative page-container max-w-4xl">
+            <RouterView/>
+        </main>
+
+        <!-- Toast Container -->
+        <Toast class="max-w-[85%]" position="bottom-center"/>
+
+        <!-- Login Modal -->
+        <Dialog
+            v-model:visible="showLoginModal"
+            :closable="false"
+            :draggable="false"
+            class="base-modal headless-modal"
+            close-on-escape
+            dismissable-mask
+            modal
+            responsive
+        >
+            <LoginModal @close="showLoginModal = false"/>
+        </Dialog>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import {ref} from 'vue'
+import Toast from 'primevue/toast'
+import Dialog from 'primevue/dialog'
+import LoginModal from '@/components/LoginModal.vue'
+import {initializeToast} from "@/services/toastService.ts"
+import AppHeader from "@/components/AppHeader.vue";
+
+initializeToast()
+const showLoginModal = ref(false)
+
+</script>

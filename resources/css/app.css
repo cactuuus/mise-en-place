@@ -1,3 +1,255 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+/* GLOBAL *************************************************************************************************************/
+
+html {
+    font-size: 16px;
+}
+
+body {
+    @apply primary-bg;
+}
+
+.page-container {
+    @apply container mx-auto;
+}
+
+.secondary-text {
+    @apply text-surface-500 dark:text-surface-400;
+}
+
+.primary-theme-text {
+    @apply text-primary-700 dark:text-primary-400;
+}
+
+.primary-bg {
+    @apply bg-white dark:bg-surface-900;
+}
+
+.contrast-bg {
+    @apply bg-surface-0 dark:bg-surface-950;
+}
+
+.secondary-border {
+    @apply border-surface-200 dark:border-surface-700;
+}
+
+.secondary-bg {
+    @apply bg-surface-100 dark:bg-surface-800/50;
+}
+
+.user-avatar {
+    @apply w-6 rounded-full object-cover aspect-square;
+    @apply sm:w-8;
+}
+
+.p-fileupload-basic {
+    @apply min-w-0 w-full max-w-full;
+
+    .p-fileupload-basic-content {
+        @apply flex flex-col max-w-full items-stretch min-w-0 w-full;
+
+        > span {
+            @apply text-sm truncate block w-full secondary-text;
+        }
+    }
+}
+
+.p-panel {
+    .p-panel-header, .p-panel-content, .p-panel-footer {
+        @apply px-2 sm:px-4;
+    }
+}
+
+/* HEADER *************************************************************************************************************/
+
+Header {
+    @apply sticky top-0 z-50 px-4 primary-bg border-b-2 secondary-border;
+
+    #header-content {
+        @apply py-2 grid grid-cols-2 items-center gap-1;
+        @apply sm:grid-cols-[auto_1fr_auto] sm:gap-x-6;
+
+        #banner {
+            @apply text-2xl font-bold;
+        }
+
+        #user-section {
+            @apply flex justify-end;
+
+            .user-avatar {
+                @apply w-8 cursor-pointer;
+                @apply sm:w-10;
+            }
+        }
+
+        #main-nav {
+            @apply flex justify-start items-center w-full mt-1 gap-2 col-span-2 row-start-2;
+            @apply sm:col-span-1 sm:row-start-1 sm:col-start-2 sm:mt-0 sm:items-end sm:text-base;
+
+            .nav-link {
+                @apply inline-flex items-center gap-1 font-medium rounded-md secondary-text;
+                @apply sm:px-2 sm:pt-1 sm:gap-2 sm:mt-1;
+
+                &.enabled {
+                    @apply sm:hover:mt-0 sm:hover:pb-1 sm:hover:bg-primary-100 sm:dark:hover:bg-primary-900/50 sm:hover:-translate-y-0.5 transition-all duration-200;
+
+                    &.active, &:hover {
+                        @apply primary-theme-text;
+                    }
+                }
+
+                &.disabled {
+                    @apply opacity-50 cursor-not-allowed hover:bg-transparent;
+                }
+            }
+
+            .separator {
+                @apply w-px h-5 bg-surface-500 dark:bg-surface-400 mx-1 sm:hidden;
+            }
+        }
+    }
+}
+
+#user-menu {
+    .p-popover-content {
+        @apply p-2 flex flex-col gap-1;
+    }
+
+    .p-button {
+        @apply justify-start gap-3;
+    }
+}
+
+/* MODALS *************************************************************************************************************/
+
+.headless-modal {
+    .p-dialog-header {
+        @apply p-0;
+    }
+
+    .p-dialog-content {
+        @apply py-0 px-3;
+    }
+}
+
+.base-modal {
+    @apply w-full max-w-sm mx-3;
+
+    .button-container {
+        @apply flex gap-3 mt-6 mb-1;
+
+        .p-button {
+            @apply grow;
+        }
+    }
+}
+
+#login-panel {
+    @apply px-0 py-2 w-full text-center;
+
+    .panel-heading {
+        @apply text-2xl font-bold mt-4 mb-6;
+
+        .sub-heading {
+            @apply text-sm font-normal secondary-text;
+        }
+    }
+
+    .form-content {
+        @apply flex flex-col gap-4;
+    }
+
+    .p-tabpanel {
+        @apply w-full max-w-xs mx-auto px-2;
+    }
+
+    .footer-text {
+        @apply pt-3 pb-2;
+    }
+}
+
+
+/* RECIPES ************************************************************************************************************/
+
+.recipe-card {
+    @apply max-w-sm cursor-pointer overflow-hidden w-full;
+
+    .image-preview {
+        @apply w-full object-cover mx-auto h-36 bg-surface-100 dark:bg-surface-800/50;
+    }
+
+    .p-card-body {
+        @apply pt-2 pb-3;
+    }
+
+    .p-card-caption {
+        @apply block;
+    }
+
+    .p-card-title {
+        @apply truncate;
+    }
+
+    .p-card-subtitle {
+        @apply truncate text-sm;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+/* USER SETTINGS ******************************************************************************************************/
+
+#user-settings-panel, #danger-zone-panel {
+    .panel-header {
+        @apply flex items-center gap-2 font-semibold;
+    }
+
+    .p-fieldset {
+        @apply w-full min-w-0 max-w-full;
+    }
+
+    .p-fieldset-content {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .p-button {
+        @apply shrink-0 min-w-20;
+    }
+}
+
+#user-settings-panel .p-fieldset-content > p {
+    @apply truncate;
+}
+
+#danger-zone-panel .p-fieldset-content {
+    @apply flex-wrap;
+}
+
+/* RECIPE EDITOR ******************************************************************************************************/
+
+#difficulty_level {
+    @apply transition-all duration-200;
+
+    /* styling ineer buttons to reflect the 'severity' of the options (easy, medium, hard) */
+
+    .p-togglebutton {
+        @apply font-bold;
+    }
+
+    .p-togglebutton:nth-child(1).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-500/15;
+    }
+
+    .p-togglebutton:nth-child(2).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-orange-600 bg-orange-100 dark:text-orange-300 dark:bg-orange-500/15;
+    }
+
+    .p-togglebutton:nth-child(3).p-togglebutton-checked > .p-togglebutton-content {
+        @apply text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-500/15;
+    }
+}

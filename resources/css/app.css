@@ -28,6 +28,10 @@ body {
     @apply bg-white dark:bg-surface-900;
 }
 
+.contrast-bg {
+    @apply bg-surface-0 dark:bg-surface-950;
+}
+
 .secondary-border {
     @apply border-surface-200 dark:border-surface-700;
 }
@@ -50,6 +54,12 @@ body {
         > span {
             @apply text-sm truncate block w-full secondary-text;
         }
+    }
+}
+
+.p-panel {
+    .p-panel-header, .p-panel-content, .p-panel-footer {
+        @apply px-2 sm:px-4;
     }
 }
 

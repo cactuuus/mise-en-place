@@ -112,10 +112,6 @@ class RecipeController extends Controller
         }
 
         $rules = [
-            'title'            => 'required|string|max:255',
-            'ingredients'      => 'required|array',
-            'instructions'     => 'required|array',
-            'notes'            => 'nullable|string',
             'title'                           => 'required|string|max:255',
             'ingredients'                     => 'required|array',
             'instructions'                    => 'required|array',

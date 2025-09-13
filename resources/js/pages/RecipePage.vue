@@ -1,5 +1,5 @@
 <template>
-    <div v-if="loading" class="space-y-4 p-4">
+    <div v-if="loading" class="space-y-4 p-2 sm:p-4">
         <Skeleton class="mb-6" height="300px"/>
         <Skeleton class="mb-4" height="2rem" width="60%"/>
         <Skeleton class="mb-8" height="1rem" width="40%"/>
@@ -15,7 +15,7 @@
         </div>
     </div>
 
-    <div v-else-if="recipe" class="page-container p-4">
+    <div v-else-if="recipe" class="page-container p-2 sm:p-4">
         <!-- Hero Section -->
         <div class="relative overflow-hidden rounded-lg">
             <SmartImage
@@ -143,8 +143,8 @@
                 <div v-if="instruction.type === 'section'"
                      class="p-1 mb-3 secondary-bg rounded-sm">
                     <h4 class="font-semibold flex items-center gap-2 primary-theme-text">
-                        <i class="pi pi-bookmark-fill !text-xs"></i>
-                        {{ instruction.position }} # {{ instruction.name }}
+                        [{{ instruction.position }}]
+                        <span># {{ instruction.name }}</span>
                     </h4>
                 </div>
 
@@ -157,7 +157,7 @@
                     >
                         <div
                             class="shrink-0 primary-theme-text font-medium text-sm">
-                            {{ instruction.position }}.{{ step.position }}
+                            [{{ instruction.position }}.{{ step.position }}]
                         </div>
                         <p>
                         <span v-if="step.name" class="font-medium primary-theme-text">
@@ -171,7 +171,7 @@
                 <!-- Standalone Step -->
                 <div v-else class="flex items-baseline pl-1 gap-2">
                     <div class="shrink-0 primary-theme-text font-medium text-sm">
-                        {{ instruction.position }}
+                        [{{ instruction.position }}]
                     </div>
                     <p>
                         <span v-if="instruction.name" class="font-medium primary-theme-text">

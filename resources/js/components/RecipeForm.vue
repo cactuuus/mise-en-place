@@ -527,8 +527,7 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
         })
 
         // Add instructions
-        const validInstructions = instructionFields.value.filter(inst => inst.text.trim())
-        formData.append('instructions', JSON.stringify(validInstructions))
+        formData.append('instructions', JSON.stringify(instructionFields.value))
 
         // Add image if selected
         if (selectedImage.value) {

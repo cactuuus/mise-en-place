@@ -449,9 +449,6 @@ const updateIngredient = (index: number, value: string) => {
     ingredientFields.value[index].value = value
 }
 
-    }
-}
-
 // Image handling
 const imageUrl = computed(() => {
     return imagePreviewUrl.value ?? props.initialData?.image_urls?.medium;

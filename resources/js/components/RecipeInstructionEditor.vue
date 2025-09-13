@@ -1,104 +1,160 @@
 <template>
     <div class="space-y-4">
-        <Message v-if="modelValue.length === 0" severity="secondary">
+        <Message v-if="localInstructions.length === 0" severity="secondary" size="small">
             No instructions present
         </Message>
 
-        <div
-            v-for="(instruction, index) in modelValue"
-            v-else
-            :key="`instruction-${index}`"
+        <!-- Draggable container for all instructions -->
+        <Draggable
+            :component-data="{ class: 'space-y-4' }"
+            :group="{ name: 'instructions', pull: true, put: true }"
+            :list="localInstructions"
+            item-key="id"
+            v-bind="draggableOptions"
         >
-            <div
-                v-if="instruction.type === 'section'"
-                class="border rounded secondary-border space-y-4 pb-4"
-            >
-                <!-- Section Header -->
-                <div
-                    class="flex items-start p-3 border-b secondary-border secondary-bg justify-between rounded-sm w-full">
-                    <p class="truncate font-semibold">
-                        [{{ instruction.position }}] # {{ instruction.name }}
-                    </p>
-
-                    <div class="flex gap-2">
-                        <Button
-                            class="!p-0"
-                            icon="pi pi-pencil"
-                            severity="warn"
-                            size="small"
-                            text
-                            @click="openSectionModal('edit', index, instruction.name)"
-                        />
-                        <Button
-                            class="!p-0"
-                            icon="pi pi-trash"
-                            severity="danger"
-                            size="small"
-                            text
-                            @click="removeInstruction(index)"
-                        />
-                    </div>
-                </div>
-
-                <!-- Section Steps -->
-                <div class="space-y-4 px-1">
-
+            <template #item="{ element: instruction, index }">
+                <div :key="instruction.id">
+                    <!-- Section -->
                     <div
-                        v-for="(step, stepIndex) in instruction.steps"
-                        :key="`step-${stepIndex}`"
-                        class="p-3 space-y-2 border secondary-border cursor-pointer hover:border-primary-700 dark:hover:border-primary-400 rounded transition-colors contrast-bg"
-                        @click="openStepModal('edit', index, stepIndex, step.name, step.text)"
+                        v-if="instruction.type === 'section'"
+                        class="border rounded secondary-border pb-4"
                     >
-                        <div class="flex items-start gap-2 justify-between w-full">
-                            <p class="truncate font-medium">
-                                [{{ instruction.position }}.{{ step.position }}] {{ step.name }}
-                            </p>
+                        <!-- Section Header with drag handle -->
+                        <div
+                            class="flex items-center p-3 gap-2 border-b secondary-border secondary-bg justify-between rounded-sm w-full">
                             <Button
-                                class="!p-0"
-                                icon="pi pi-trash"
-                                severity="danger"
+                                class="drag-handle cursor-move"
+                                icon="pi pi-bars"
+                                severity="secondary"
+                                text
+                            />
+
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                <p class="truncate font-semibold">
+                                    [{{ instruction.position }}] # {{ instruction.name }}
+                                </p>
+                            </div>
+
+                            <div class="flex gap-2 shrink-0">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    severity="warn"
+                                    text
+                                    @click="openSectionModal('edit', index, instruction.name)"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    text
+                                    @click="removeInstruction(index)"
+                                />
+                            </div>
+                        </div>
+
+
+                        <!-- Section Steps - Nested Draggable -->
+                        <div class="px-1">
+                            <Draggable
+                                :component-data="{ class: 'space-y-4 py-4' }"
+                                :group="{ name: 'steps', pull: true, put: true }"
+                                :list="instruction.steps"
+                                item-key="id"
+                                v-bind="draggableOptions"
+                            >
+                                <template v-if="instruction.steps.length === 0" #header>
+                                    <Message class="mx-2" severity="secondary" size="small">
+                                        This section is empty
+                                    </Message>
+                                </template>
+                                <template #item="{ element: step, index: stepIndex }">
+                                    <div :key="step.id">
+                                        <div
+                                            class="p-3 space-y-2 border secondary-border cursor-pointer hover:border-primary-700 dark:hover:border-primary-400 rounded transition-colors contrast-bg"
+                                        >
+                                            <div class="flex items-centre gap-2 justify-between w-full">
+                                                <Button
+                                                    class="drag-handle cursor-move"
+                                                    icon="pi pi-bars"
+                                                    severity="secondary"
+                                                    text
+                                                    @click.stop
+                                                />
+                                                <div class="flex items-center gap-2 flex-1 min-w-0">
+                                                    <p class="truncate font-medium">
+                                                        [{{ instruction.position }}.{{ step.position }}] {{ step.name }}
+                                                    </p>
+                                                </div>
+                                                <div class="flex gap-2 shrink-0">
+                                                    <Button
+                                                        icon="pi pi-pencil"
+                                                        severity="warn"
+                                                        text
+                                                        @click.stop="openStepModal('edit', index, stepIndex, step.name, step.text)"
+                                                    />
+                                                    <Button
+                                                        icon="pi pi-trash"
+                                                        severity="danger"
+                                                        text
+                                                        @click.stop="removeStepFromSection(index, stepIndex)"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <p class="text-sm secondary-text">{{ step.text || '[no description]' }}</p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </Draggable>
+                        </div>
+
+                        <div class="flex justify-end px-1">
+                            <Button
+                                icon="pi pi-plus"
+                                label="Add Step Inside Section"
                                 size="small"
                                 text
-                                @click.stop="removeStepFromSection(index, stepIndex)"
+                                @click="openStepModal('create', index)"
                             />
                         </div>
-                        <p class="text-sm secondary-text">{{ step.text || '[no description]' }}</p>
+                    </div>
+
+                    <!-- Standalone Step -->
+                    <div
+                        v-else
+                        class="p-3 space-y-2 border secondary-border cursor-pointer hover:border-primary-700 dark:hover:border-primary-400 rounded transition-colors contrast-bg"
+                    >
+                        <div class="flex items-center gap-2 justify-between w-full">
+                            <Button
+                                class="drag-handle cursor-move"
+                                icon="pi pi-bars"
+                                severity="secondary"
+                                text
+                                @click.stop
+                            />
+                            <div class="flex items-center gap-2 flex-1 min-w-0">
+                                <p class="truncate font-medium">
+                                    [{{ instruction.position }}] {{ instruction.name }}
+                                </p>
+                            </div>
+                            <div class="flex gap-2 shrink-0">
+                                <Button
+                                    icon="pi pi-pencil"
+                                    severity="warn"
+                                    text
+                                    @click.stop="openStepModal('edit', index, undefined, instruction.name, instruction.text)"
+                                />
+                                <Button
+                                    icon="pi pi-trash"
+                                    severity="danger"
+                                    text
+                                    @click.stop="removeInstruction(index)"
+                                />
+                            </div>
+                        </div>
+                        <p class="text-sm secondary-text">{{ instruction.text || '[no description]' }}</p>
                     </div>
                 </div>
-
-                <div class="flex justify-end px-1">
-                    <Button
-                        icon="pi pi-plus"
-                        label="Add Step to Section"
-                        size="small"
-                        text
-                        @click="openStepModal('create', index)"
-                    />
-                </div>
-            </div>
-
-            <!-- Standalone Step -->
-            <div
-                v-else
-                class="p-3 space-y-2 border secondary-border cursor-pointer hover:border-primary-700 dark:hover:border-primary-400 rounded transition-colors contrast-bg"
-                @click="openStepModal('edit', index, undefined, instruction.name, instruction.text)"
-            >
-                <div class="flex items-start gap-2 justify-between w-full">
-                    <p class="truncate font-medium">
-                        [{{ instruction.position }}] {{ instruction.name }}
-                    </p>
-                    <Button
-                        class="!p-0"
-                        icon="pi pi-trash"
-                        severity="danger"
-                        size="small"
-                        text
-                        @click.stop="removeInstruction(index)"
-                    />
-                </div>
-                <p class="text-sm secondary-text">{{ instruction.text || '[no description]' }}</p>
-            </div>
-        </div>
+            </template>
+        </Draggable>
 
         <div class="flex items-stretch justify-end pt-2">
             <Button
@@ -111,7 +167,7 @@
             <Divider class="!mx-1" layout="vertical"/>
             <Button
                 icon="pi pi-plus"
-                label="Add Global Step"
+                label="Add Step"
                 size="small"
                 text
                 @click="openStepModal('create')"
@@ -141,7 +197,8 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, readonly, ref, watch} from 'vue'
+import {computed, readonly, ref} from 'vue'
+import Draggable from 'vuedraggable'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import Divider from 'primevue/divider'
@@ -149,28 +206,114 @@ import RecipeSectionModal from "@/components/RecipeSectionModal.vue"
 import RecipeStepModal from "@/components/RecipeStepModal.vue"
 import type {RecipeInstruction, RecipeSection, RecipeStep} from '@/types/recipe'
 
-interface Props {
-    modelValue: RecipeInstruction[]
-}
+type DraggableRecipeStep = RecipeStep & { id?: string }
+type DraggableRecipeSection = Omit<RecipeSection, 'steps'> & { id?: string, steps: DraggableRecipeStep[] }
+type DraggableRecipeInstruction = (DraggableRecipeStep | DraggableRecipeSection) & { id?: string }
 
-const props = defineProps<Props>()
+const props = defineProps({
+    modelValue: {
+        type: Array as () => RecipeInstruction[],
+        default: () => []
+    }
+})
 
 const emit = defineEmits<{
     'update:modelValue': [value: RecipeInstruction[]]
 }>()
 
-// Modal state
+
+const draggableOptions = {
+    bubbleScroll: true,
+    forceFallback: true,
+    ghostClass: 'ghost',
+    scroll: true,
+    scrollSensitivity: 100,
+    scrollSpeed: 10,
+    handle: '.drag-handle',
+    tag: 'div',
+    delay: 200,
+    delayOnTouchOnly: true,
+    onStart: () => {
+        if (navigator.vibrate) navigator.vibrate(50)
+    },
+    onChange: () => localInstructions.value = localInstructions.value // Trigger reactivity on change,
+}
+
+// Modal state & data
 const showSectionModal = ref(false)
 const showStepModal = ref(false)
 const sectionModalMode = ref<'create' | 'edit'>('create')
 const stepModalMode = ref<'create' | 'edit'>('create')
-
-// Modal data
 const editingSectionName = ref<string>()
 const editingStepName = ref<string>()
 const editingStepText = ref<string>()
 const editingInstructionIndex = ref<number>()
 const editingStepIndex = ref<number>()
+
+// Computed property for local instructions with drag IDs
+const localInstructions = computed<DraggableRecipeInstruction[]>({
+    get: () => addDraggableIds(props.modelValue),
+    set: (value) => emit('update:modelValue', repositionInstructions(removeDraggableIds(value)))
+})
+
+// Internal validation state
+const error = ref<string | null>(null)
+const hasBlurred = ref(false)
+const hasAttemptedSubmit = ref(false)
+const valid = computed(() => !error.value)
+const shouldShowError = computed(() => error.value && (hasBlurred.value || hasAttemptedSubmit.value))
+
+// Add/remove IDs for draggable functionality
+const addDraggableIds = (instructions: DraggableRecipeInstruction[]): DraggableRecipeInstruction[] => {
+    const flattened = flattenInstructions(instructions)
+    return flattened.map((instruction, index) => ({
+        ...instruction,
+        id: `inst-${index}`,
+        ...(instruction.type === 'section' && {
+            steps: instruction.steps.map((step, stepIndex) => ({
+                ...step,
+                id: `step-${index}-${stepIndex}`
+            }))
+        })
+    }))
+}
+
+const removeDraggableIds = (instructions: DraggableRecipeInstruction[]): DraggableRecipeInstruction[] => {
+    const flattened = flattenInstructions(instructions)
+    return flattened.map(({id, ...instruction}) => ({
+        ...instruction,
+        ...(instruction.type === 'section' && {
+            steps: instruction.steps.map(({id, ...step}) => step)
+        })
+    }))
+}
+
+// Flatten nested sections for easier manipulation
+const flattenSection = (section: DraggableRecipeSection): DraggableRecipeInstruction => {
+    return {
+        ...section,
+        steps: section.steps.flatMap((child) => {
+            if (child.type === "step") {
+                return [child]
+            }
+            if (child.type === "section") {
+                // @ts-expect-error We know this will be steps only after flattening
+                return flattenSection(child).steps
+            }
+            return []
+        }),
+    }
+}
+
+// Flatten instructions to avoid nested sections (sections with sections), leaving at most one level of nesting (sections with steps)
+const flattenInstructions = (instructions: DraggableRecipeInstruction[]): DraggableRecipeInstruction[] => {
+    return instructions.map((instruction) => {
+        if (instruction.type === "section") {
+            return flattenSection(instruction)
+        }
+        return instruction
+    })
+}
 
 // Modal handlers
 const openSectionModal = (mode: 'create' | 'edit', instructionIndex?: number, name?: string) => {
@@ -197,13 +340,14 @@ const handleSectionSubmit = (data: { name: string }) => {
             name: data.name,
             steps: []
         }
-        const updated = [...props.modelValue, newSection]
-        emit('update:modelValue', repositionInstructions(updated))
-    } else if (sectionModalMode.value === 'edit' && editingInstructionIndex.value !== undefined) {
-        const updated = [...props.modelValue]
-        const section = updated[editingInstructionIndex.value] as RecipeSection
-        updated[editingInstructionIndex.value] = {...section, name: data.name}
-        emit('update:modelValue', updated)
+        localInstructions.value = [...localInstructions.value, {...newSection, id: 'temp'}]
+    } else if (editingInstructionIndex.value !== undefined) {
+        const updated = [...localInstructions.value]
+        const section = updated[editingInstructionIndex.value]
+        if (section.type === 'section') {
+            section.name = data.name
+        }
+        localInstructions.value = updated
     }
 }
 
@@ -211,53 +355,51 @@ const handleStepSubmit = (data: { name?: string, text: string }) => {
     if (stepModalMode.value === 'create') {
         if (editingInstructionIndex.value !== undefined) {
             // Adding to section
-            const updated = [...props.modelValue]
-            const section = updated[editingInstructionIndex.value] as RecipeSection
-            const newStep: RecipeStep = {
-                type: 'step',
-                position: section.steps.length + 1,
-                text: data.text,
-                name: data.name
+            const updated = [...localInstructions.value]
+            const section = updated[editingInstructionIndex.value]
+            if (section.type === 'section') {
+                const newStep: RecipeStep = {
+                    type: 'step',
+                    position: section.steps.length + 1,
+                    text: data.text,
+                    name: data.name,
+                }
+                section.steps = [...section.steps, newStep]
             }
-            section.steps.push(newStep)
-            emit('update:modelValue', repositionInstructions(updated))
+            localInstructions.value = updated
         } else {
             // Adding global step
             const newStep: RecipeStep = {
                 type: 'step',
-                position: props.modelValue.length + 1,
+                position: localInstructions.value.length + 1,
                 text: data.text,
-                name: data.name
+                name: data.name,
             }
-            const updated = [...props.modelValue, newStep]
-            emit('update:modelValue', repositionInstructions(updated))
+            localInstructions.value = [...localInstructions.value, newStep]
         }
     } else if (stepModalMode.value === 'edit' && editingInstructionIndex.value !== undefined) {
-        const updated = [...props.modelValue]
+        const updated = [...localInstructions.value]
 
         if (editingStepIndex.value !== undefined) {
             // Editing step in section
-            const section = updated[editingInstructionIndex.value] as RecipeSection
-            const step = section.steps[editingStepIndex.value]
-            section.steps[editingStepIndex.value] = {...step, text: data.text, name: data.name}
+            const section = updated[editingInstructionIndex.value]
+            if (section.type === 'section') {
+                const step = section.steps[editingStepIndex.value]
+                step.text = data.text
+                step.name = data.name
+            }
         } else {
             // Editing global step
-            const step = updated[editingInstructionIndex.value] as RecipeStep
-            updated[editingInstructionIndex.value] = {...step, text: data.text, name: data.name}
+            const step = updated[editingInstructionIndex.value]
+            if (step.type === 'step') {
+                step.text = data.text
+                step.name = data.name
+            }
         }
 
-        emit('update:modelValue', updated)
+        localInstructions.value = updated
     }
 }
-
-// Internal validation state
-const error = ref<string | null>(null)
-const hasBlurred = ref(false)
-const hasAttemptedSubmit = ref(false)
-
-// Computed properties for the field interface
-const valid = computed(() => !error.value)
-const shouldShowError = computed(() => error.value && (hasBlurred.value || hasAttemptedSubmit.value))
 
 const validate = () => {
     // Check for at least one instruction
@@ -304,13 +446,6 @@ const onSubmit = () => {
     validate()
 }
 
-// Auto-validate on changes if needed
-watch(() => props.modelValue, () => {
-    if (hasBlurred.value || hasAttemptedSubmit.value) {
-        validate()
-    }
-}, {deep: true})
-
 // Helper to reposition instructions after a change
 const repositionInstructions = (instructions: RecipeInstruction[]) => {
     let position = 1
@@ -319,7 +454,6 @@ const repositionInstructions = (instructions: RecipeInstruction[]) => {
             return {...instruction, position: position++}
         } else if (instruction.type === 'section') {
             const repositionedSteps = instruction.steps.map((step, i) => ({...step, position: i + 1}))
-            // Since a section itself takes up a position, we don't increment it by the number of steps inside.
             return {...instruction, position: position++, steps: repositionedSteps}
         }
         return instruction
@@ -327,15 +461,14 @@ const repositionInstructions = (instructions: RecipeInstruction[]) => {
 }
 
 const removeInstruction = (index: number) => {
-    const updated = props.modelValue.filter((_, i) => i !== index)
-    emit('update:modelValue', repositionInstructions(updated))
+    localInstructions.value = localInstructions.value.filter((_, i) => i !== index)
 }
 
 const removeStepFromSection = (sectionIndex: number, stepIndex: number) => {
-    const updated = [...props.modelValue]
+    const updated = [...localInstructions.value]
     const section = updated[sectionIndex] as RecipeSection
     section.steps = section.steps.filter((_, i) => i !== stepIndex)
-    emit('update:modelValue', repositionInstructions(updated))
+    localInstructions.value = updated
 }
 
 // Expose the field interface
@@ -346,3 +479,15 @@ defineExpose({
     validate
 })
 </script>
+
+<style scoped>
+.ghost {
+    @apply border-t-4 border-primary-700 dark:border-primary-400 h-0 p-0 overflow-hidden;
+}
+
+.drag-handle:active,
+.drag-handle:active,
+.chosen {
+    cursor: grabbing !important;
+}
+</style>

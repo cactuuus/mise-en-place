@@ -1,6 +1,7 @@
 <template>
-    <!-- Loading State -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch">
+    <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 place-items-center items-stretch p-2 sm:p-4">
+        <!-- Loading State -->
         <Card
             v-for="i in 10"
             v-if="loading && recipes.length === 0"

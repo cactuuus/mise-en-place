@@ -1,5 +1,5 @@
 <template>
-    <div class="space-y-4 p-4">
+    <div class="space-y-4 p-2 sm:p-4">
         <div v-if="loading" class="text-center">
             <p>Loading recipe...</p>
         </div>

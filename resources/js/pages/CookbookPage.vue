@@ -117,7 +117,7 @@
                         <div class="flex items-center justify-start gap-4 secondary-text text-sm mt-1">
                             <div class="flex items-center gap-1">
                                 <i class="pi pi-clock"></i>
-                                <span>{{ recipe.total_time || '-' }}m</span>
+                                <span>{{ getTimeBreakdown(recipe) }}</span>
                             </div>
                             <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
                                 <i class="pi pi-bolt"></i>
@@ -151,7 +151,7 @@ import Tag from 'primevue/tag'
 import DeferredContent from "primevue/deferredcontent"
 import Skeleton from "primevue/skeleton"
 import InputText from 'primevue/inputtext'
-import {RecipePreview} from '@/types/recipe'
+import {getTimeBreakdown, RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue"
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue"

@@ -76,11 +76,11 @@
 
             <!-- Recipe Meta -->
             <div class="flex flex-wrap gap-x-4 gap-y-1 secondary-text">
-                <div v-if="recipe.total_time" class="flex items-center gap-1">
+                <div v-if="recipe.total_time" class="flex items-center gap-2">
                     <i class="pi pi-clock"></i>
                     <span>{{ getTimeBreakdown(recipe) }}</span>
                 </div>
-                <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
+                <div v-if="recipe.recipe_yield" class="flex items-center gap-2">
                     <i class="pi pi-bolt"></i>
                     <span>{{ recipe.recipe_yield }}</span>
                 </div>
@@ -94,7 +94,6 @@
                     :icon="tag.icon"
                     :severity="tag.severity"
                     :value="tag.text"
-                    class="!text-xs"
                 />
             </div>
         </div>
@@ -227,7 +226,10 @@
         />
         <div>
             <h2 class="text-2xl font-semibold mb-2">Recipe not found!</h2>
-            <p class="secondary-text">The recipe you're looking for doesn't exist or has been removed.</p>
+            <p class="secondary-text">
+                The recipe you're looking for can't be loaded, the image might have been deleted,
+                on an error might have occurred.
+            </p>
         </div>
         <Button
             icon="pi pi-arrow-left"
@@ -303,38 +305,6 @@ const viewOriginal = () => {
     }
 }
 
-const flattenedInstructions = computed(() => {
-    if (!recipe.value?.instructions) return []
-
-    const flattened: any[] = []
-    let globalStepCounter = 1
-
-    recipe.value.instructions.forEach(instruction => {
-        if (instruction.type === 'section') {
-            // Add section with globally numbered steps
-            const sectionWithGlobalSteps = {
-                ...instruction,
-                steps: instruction.steps.map(step => ({
-                    ...step,
-                    globalPosition: globalStepCounter++
-                }))
-            }
-            flattened.push(sectionWithGlobalSteps)
-        } else {
-            // Add standalone step with global position
-            flattened.push({
-                ...instruction,
-                globalPosition: globalStepCounter++
-            })
-        }
-    })
-
-    return flattened
-})
-
-const getAccordionPanelClass = (item: any, index: number) => {
-    const baseClass = index !== flattenedInstructions.value.length - 1 ? '!border-dashed' : '!border-none'
-    return item.type === 'section' ? `${baseClass} section-panel` : baseClass
 // Move to cookbook after recipe deletion
 const onRecipeDeleted = () => {
     router.push('/cookbook')

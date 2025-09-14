@@ -28,8 +28,9 @@
             />
             <PlaceholderRecipeImage v-else class="w-full h-48 md:h-64 object-cover"/>
 
-            <!-- Action Button -->
+            <!-- Action Button - Only show if the viewer is the owner -->
             <Button
+                v-if="recipe.user.id === authStore?.user?.id"
                 class="!absolute !top-2 !right-2"
                 icon="pi pi-bars"
                 raised
@@ -254,8 +255,10 @@ import DifficultyBadge from '@/components/DifficultyBadge.vue'
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
 import RecipeActionsMenu from "@/components/RecipeActionsMenu.vue";
 import {FlattenedTag, flattenRecipeTags} from "@/utils/tagUtils.ts";
+import {useAuthStore} from "@/stores/auth.ts";
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const props = defineProps<{
     id: number

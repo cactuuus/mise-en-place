@@ -235,7 +235,7 @@
         />
     </div>
 
-    <RecipeActionsMenu ref="recipeActionsMenuRef"/>
+    <RecipeActionsMenu ref="recipeActionsMenuRef" @deleted="onRecipeDeleted"/>
 </template>
 
 <script lang="ts" setup>
@@ -332,6 +332,9 @@ const flattenedInstructions = computed(() => {
 const getAccordionPanelClass = (item: any, index: number) => {
     const baseClass = index !== flattenedInstructions.value.length - 1 ? '!border-dashed' : '!border-none'
     return item.type === 'section' ? `${baseClass} section-panel` : baseClass
+// Move to cookbook after recipe deletion
+const onRecipeDeleted = () => {
+    router.push('/cookbook')
 }
 
 onMounted(() => {

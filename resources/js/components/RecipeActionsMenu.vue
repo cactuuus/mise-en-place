@@ -31,6 +31,10 @@ import {useRouter} from "vue-router";
 import ConfirmDialog from "primevue/confirmdialog";
 import {useConfirm} from "primevue/useconfirm";
 
+const emit = defineEmits<{
+    deleted: [recipeId: number]
+}>()
+
 const router = useRouter()
 const confirm = useConfirm()
 const actionMenuRef = ref()
@@ -68,7 +72,7 @@ const deleteActiveRecipe = () => {
         acceptIcon: 'pi pi-trash',
         accept: async () => {
             const success = await deleteRecipe(recipeToDelete.id)
-            if (success) await router.push('/cookbook')
+            if (success) emit('deleted', recipeToDelete.id)
         }
     })
 }

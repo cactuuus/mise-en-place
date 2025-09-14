@@ -139,7 +139,7 @@
         </template>
     </DataView>
 
-    <RecipeActionsMenu ref="recipeActionsMenuRef"/>
+    <RecipeActionsMenu ref="recipeActionsMenuRef" @deleted="onRecipeDeleted"/>
 </template>
 
 <script lang="ts" setup>
@@ -172,6 +172,11 @@ const loadRecipes = async () => {
     if (result) {
         recipes.value = result.recipes
     }
+}
+
+// Update the list to remove the deleted recipe
+const onRecipeDeleted = (recipeId: number) => {
+    recipes.value = recipes.value.filter(r => r.id !== recipeId)
 }
 
 // Lifecycle

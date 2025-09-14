@@ -14,11 +14,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Recipe management
     Route::post('/recipes', [RecipeController::class, 'store']);
+    Route::post('/recipes/import', [RecipeController::class, 'import']);
+    Route::get('/recipes/mine', [RecipeController::class, 'mine']);
     Route::post('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
     Route::post('/recipes/{recipe}/fork', [RecipeController::class, 'fork']);
     Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate']);
-    Route::get('/recipes/mine', [RecipeController::class, 'mine']);
 
     // User social features
     Route::post('/users/{user}/follow', [UserController::class, 'follow']);

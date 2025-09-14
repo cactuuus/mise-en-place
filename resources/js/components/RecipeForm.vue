@@ -316,7 +316,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue'
+import {computed, nextTick, onMounted, ref} from 'vue'
 import {Form} from '@primevue/forms'
 import {zodResolver} from '@primevue/forms/resolvers/zod'
 import {z} from 'zod'
@@ -334,16 +334,23 @@ import InputGroupAddon from 'primevue/inputgroupaddon'
 import Divider from 'primevue/divider'
 import SelectButton from 'primevue/selectbutton'
 import {DIFFICULTY_LEVELS, type Recipe, RecipeInstruction, RecipeTags} from '@/types/recipe'
-import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue";
-import {fetchRecipeTags} from "@/services/recipeService.ts";
-import TagSelector from "@/components/TagSelector.vue";
-import RecipeInstructionEditor from "@/components/RecipeInstructionEditor.vue";
+import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue"
+import {fetchRecipeTags} from "@/services/recipeService.ts"
+import {showError} from "@/services/toastService.ts"
+import TagSelector from "@/components/TagSelector.vue"
+import RecipeInstructionEditor from "@/components/RecipeInstructionEditor.vue"
 
 const MAX_FILESIZE = 5242880 // 5MB
 
+// Interface for initial data prop, can have any subset of Recipe fields, with the addition of imported_image_url
+interface InitialRecipeData extends Partial<Recipe> {
+    imported_image_data?: string
+    imported_image_mime?: string
+}
+
 interface Props {
     mode?: 'create' | 'edit'
-    initialData?: Partial<Recipe>
+    initialData?: InitialRecipeData
 }
 
 interface Emits {
@@ -361,7 +368,7 @@ const recipeSchema = z.object({
     title: z.string().min(1, 'Title is required').max(255, 'Title too long'),
     ingredients: z.array(z.string().min(1, 'Ingredient cannot be empty')).min(1, 'At least one ingredient is required'),
     notes: z.string().optional(),
-    source_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+    source_url: z.url('Invalid URL').optional().or(z.literal('')),
     is_public: z.boolean().default(false),
     prep_time: z.number().min(0, 'Prep time cannot be negative').optional(),
     cook_time: z.number().min(0, 'Cook time cannot be negative').optional(),
@@ -450,9 +457,62 @@ const updateIngredient = (index: number, value: string) => {
 }
 
 // Image handling
+const generateTimestampId = (): string => {
+    const timestamp = Date.now()
+    const random = Math.random().toString(36).substring(2, 8)
+    return `${timestamp}_${random}`
+}
+
+const getExtensionFromMime = (mimeType: string): string => {
+    const extensions = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/gif': 'gif',
+        'image/webp': 'webp'
+    }
+    return extensions[mimeType as keyof typeof extensions] || 'jpg'
+}
+
+const initializeImage = async () => {
+    // Clear the component first
+    fileUploadRef.value?.clear()
+    await nextTick()
+
+    if (props.initialData?.imported_image_data && props.initialData?.imported_image_mime) {
+        try {
+            const bytes = Uint8Array.from(atob(props.initialData.imported_image_data), c => c.charCodeAt(0))
+            const blob = new Blob([bytes], {type: props.initialData.imported_image_mime})
+            const filename = `imported_${generateTimestampId()}.${getExtensionFromMime(blob.type)}`
+            const file = new File([blob], filename, {type: blob.type})
+
+            // Try to access the underlying input element and simulate file selection
+            if (fileUploadRef.value?.$el) {
+                const inputElement = fileUploadRef.value?.$el?.querySelector?.('input[type="file"]') ||
+                    fileUploadRef.value?.$refs?.fileInput
+                if (inputElement) {
+                    const dataTransfer = new DataTransfer()
+                    dataTransfer.items.add(file)
+                    inputElement.files = dataTransfer.files
+
+                    // Trigger the change event to notify PrimeVue
+                    const changeEvent = new Event('change', {bubbles: true})
+                    inputElement.dispatchEvent(changeEvent)
+                    return
+                }
+            }
+
+            // Fallback: Handle manually if the above doesn't work
+            selectedImage.value = file
+            imagePreviewUrl.value = URL.createObjectURL(file)
+        } catch (error) {
+            console.error('Failed to process imported image:', error)
+        }
+    }
+}
+
 const imageUrl = computed(() => {
-    return imagePreviewUrl.value ?? props.initialData?.image_urls?.medium;
-});
+    return imagePreviewUrl.value ?? props.initialData?.image_urls?.medium
+})
 
 const handleImageSelect = (event: { files: File[] }) => {
     const file = event.files[0]
@@ -477,13 +537,11 @@ const handleImageRemove = () => {
 }
 
 // Form submission
-const handleSubmit = async (event: { valid: boolean; states: Record<string, any> }) => {
-    // Trigger instruction validation
+const handleSubmit = async (event: { valid: boolean, states: Record<string, any> }) => {
+    // Validate form
     instructionsField.value?.onSubmit()
-
-    // Check both form and instruction validity
     if (!instructionsField.value?.valid || !event.valid) {
-        console.warn('Form is invalid, cannot submit')
+        showError('Please fix the errors in the form before submitting.')
         return
     }
 
@@ -532,12 +590,16 @@ const handleSubmit = async (event: { valid: boolean; states: Record<string, any>
         }
 
         emit('submit', formData)
+    } catch (error) {
+        showError('An error occurred during form submission. Please try again.')
     } finally {
         loading.value = false
     }
 }
 
 onMounted(() => {
+    // initialises custom fields, technically present in the form
+    initializeImage()
     initializeIngredients()
 
     initializeTags()

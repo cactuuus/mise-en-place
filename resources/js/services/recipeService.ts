@@ -154,3 +154,18 @@ export const fetchRecipeTags = async (): Promise<RecipeTags> => {
 
     return tags
 }
+
+export const importRecipe = async (url: string): Promise<any | null> => {
+    let result: any | null = null
+
+    await executeApiCall({
+        call: () => api.post('/recipes/import', {url}),
+        successMessage: 'Recipe imported successfully! Please review and adjust as needed.',
+        errorMessage: 'Failed to import recipe, the URL may be unsupported.',
+        onSuccess: (response) => {
+            result = response.data
+        }
+    })
+
+    return result
+}

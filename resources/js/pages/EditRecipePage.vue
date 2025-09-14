@@ -13,8 +13,27 @@
             />
         </template>
 
-        <div v-else class="text-center">
-            <p class="text-red-600">Error loading recipe. Please try again later.</p>
+        <!-- Error State -->
+        <div v-else class="max-w-4xl mx-auto text-center py-20 space-y-6">
+            <SmartImage
+                :max-retries="3"
+                :retry-delay="0"
+                alt="Recipe Not Found"
+                image-class="mx-auto w-48 h-48 aspect-square object-contain !bg-transparent"
+                src="/images/not-found.svg"
+            />
+            <div>
+                <h2 class="text-2xl font-semibold mb-2">Recipe not found!</h2>
+                <p class="secondary-text">
+                    The recipe you're looking for can't be loaded, the image might have been deleted,
+                    on an error might have occurred.
+                </p>
+            </div>
+            <Button
+                icon="pi pi-arrow-left"
+                label="Go Back"
+                @click="$router.back()"
+            />
         </div>
     </div>
 </template>
@@ -25,6 +44,8 @@ import {useRoute, useRouter} from 'vue-router'
 import RecipeForm from '@/components/RecipeForm.vue'
 import {fetchRecipeById, updateRecipe} from '@/services/recipeService'
 import type {Recipe} from '@/types/recipe'
+import SmartImage from "@/components/SmartImage.vue";
+import Button from "primevue/button";
 
 const router = useRouter()
 const route = useRoute()

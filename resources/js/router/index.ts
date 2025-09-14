@@ -1,15 +1,6 @@
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
 
-// This is TypeScript's way of extending existing types
-// Extend custom properties we want to add to routes
-declare module 'vue-router' {
-    interface RouteMeta {
-        title?: string
-        requiresAuth?: boolean
-    }
-}
-
 // Type-safe route definitions
 const routes: RouteRecordRaw[] = [
     {

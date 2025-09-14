@@ -117,7 +117,7 @@
                         <div class="flex items-center justify-start gap-4 secondary-text text-sm mt-1">
                             <div class="flex items-center gap-1">
                                 <i class="pi pi-clock"></i>
-                                <span>{{ recipe.total_time || '-' }}m</span>
+                                <span>{{ getTimeBreakdown(recipe) }}</span>
                             </div>
                             <div v-if="recipe.recipe_yield" class="flex items-center gap-1">
                                 <i class="pi pi-bolt"></i>
@@ -139,7 +139,7 @@
         </template>
     </DataView>
 
-    <RecipeActionsMenu ref="recipeActionsMenuRef"/>
+    <RecipeActionsMenu ref="recipeActionsMenuRef" @deleted="onRecipeDeleted"/>
 </template>
 
 <script lang="ts" setup>
@@ -151,7 +151,7 @@ import Tag from 'primevue/tag'
 import DeferredContent from "primevue/deferredcontent"
 import Skeleton from "primevue/skeleton"
 import InputText from 'primevue/inputtext'
-import {RecipePreview} from '@/types/recipe'
+import {getTimeBreakdown, RecipePreview} from '@/types/recipe'
 import DifficultyBadge from "@/components/DifficultyBadge.vue"
 import SmartImage from "@/components/SmartImage.vue"
 import PlaceholderRecipeImage from "@/components/PlaceholderRecipeImage.vue"
@@ -172,6 +172,11 @@ const loadRecipes = async () => {
     if (result) {
         recipes.value = result.recipes
     }
+}
+
+// Update the list to remove the deleted recipe
+const onRecipeDeleted = (recipeId: number) => {
+    recipes.value = recipes.value.filter(r => r.id !== recipeId)
 }
 
 // Lifecycle

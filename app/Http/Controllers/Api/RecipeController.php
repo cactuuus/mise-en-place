@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\TagType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RecipeDetailsResource;
 use App\Http\Resources\RecipePreviewCollection;
 use App\Models\Recipe;
+use App\Services\RecipeImportService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -187,6 +187,14 @@ class RecipeController extends Controller
         $recipe->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function import(Request $request): JsonResponse
+    {
+        $validated  = $request->validate(['url' => 'required|url']);
+        $recipeData = RecipeImportService::importFromUrl($validated['url']);
+
+        return response()->json($recipeData);
     }
 //
 //    public function fork(Request $request, Recipe $recipe): RecipeDetailsResource|JsonResponse

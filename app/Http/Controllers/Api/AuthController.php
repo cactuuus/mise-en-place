@@ -19,20 +19,10 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if ( ! User::create($credentials)) {
-            throw ValidationException::withMessages(['There was an error creating the account']);
-        }
-        if ( ! Auth::attempt($credentials)) {
-            throw ValidationException::withMessages(['There was an error logging in after registration. Please try to log in manually.']);
-        }
-
+        $user = User::create($credentials);
+        Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return response()->json(Auth::user());
-    }
-
-    public function user(): JsonResponse
-    {
         return response()->json(Auth::user());
     }
 
@@ -43,12 +33,17 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if ( ! Auth::attempt($credentials)) {
+        if ( ! Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages(['The provided credentials are incorrect.']);
         }
 
         $request->session()->regenerate();
 
+        return response()->json(Auth::user());
+    }
+
+    public function user(): JsonResponse
+    {
         return response()->json(Auth::user());
     }
 

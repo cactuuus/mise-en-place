@@ -10,7 +10,8 @@ interface RegisterData {
     name: string
     email: string,
     password: string,
-    password_confirmation: string
+    password_confirmation: string,
+    remember: boolean
 }
 
 enum AuthState {
@@ -62,12 +63,12 @@ export const useAuthStore = defineStore('auth', () => {
         })
     }
 
-    const login = async (email: string, password: string): Promise<boolean> => {
+    const login = async (email: string, password: string, remember: boolean): Promise<boolean> => {
         errorMessage.value = ''
         authState.value = AuthState.LOADING
 
         return await executeApiCall({
-            call: () => api.post<AuthenticatedUser>('/login', {email, password}),
+            call: () => api.post<AuthenticatedUser>('/login', {email, password, remember}),
             successMessage: 'Login successful!',
             errorMessage: 'Login failed.',
             onSuccess: (response) => {

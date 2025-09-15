@@ -6,11 +6,6 @@ import executeApiCall from '@/services/apiService'
 import {showSuccess} from "@/services/toastService.ts";
 import {AuthenticatedUser} from "@/types/user.ts";
 
-interface LoginResponse {
-    user: AuthenticatedUser
-    token: string
-}
-
 interface RegisterData {
     name: string
     email: string,
@@ -27,12 +22,14 @@ enum AuthState {
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<AuthenticatedUser | null>(null)
-    const token = ref<string | null>(localStorage.getItem('auth_token'))
     const authState = ref<AuthState>(AuthState.IDLE)
     const errorMessage = ref<string>('')
     const router = useRouter()
     const isInitialized = ref<boolean>(false)
+    const isAuthenticated = computed((): boolean => !!user.value)
+    const isLoading = computed((): boolean => authState.value === AuthState.LOADING)
 
+    // Promise that resolves when the auth store is initialized
     const waitForInitialization = async (): Promise<void> => {
         if (isInitialized.value) return
 
@@ -46,27 +43,16 @@ export const useAuthStore = defineStore('auth', () => {
         })
     }
 
-    const isAuthenticated = computed((): boolean => {
-        return !!(token.value && user.value)
-    })
-
-    const isLoading = computed((): boolean => {
-        return authState.value === AuthState.LOADING
-    })
-
     const register = async (userData: RegisterData): Promise<boolean> => {
         errorMessage.value = ''
         authState.value = AuthState.LOADING
 
         return await executeApiCall({
-            call: () => api.post<LoginResponse>('/register', userData),
+            call: () => api.post<AuthenticatedUser>('/register', userData),
             successMessage: `Welcome to Mise En Place, ${userData.name}!`,
             errorMessage: 'Registration failed.',
             onSuccess: (response) => {
-                const authData = response.data
-                token.value = authData.token
-                user.value = authData.user
-                localStorage.setItem('auth_token', token.value)
+                setUser(response.data)
                 authState.value = AuthState.AUTHENTICATED
             },
             onError: (error) => {
@@ -81,14 +67,11 @@ export const useAuthStore = defineStore('auth', () => {
         authState.value = AuthState.LOADING
 
         return await executeApiCall({
-            call: () => api.post<LoginResponse>('/login', {email, password}),
+            call: () => api.post<AuthenticatedUser>('/login', {email, password}),
             successMessage: 'Login successful!',
             errorMessage: 'Login failed.',
             onSuccess: (response) => {
-                const authData = response.data
-                token.value = authData.token
-                user.value = authData.user
-                localStorage.setItem('auth_token', token.value)
+                setUser(response.data)
                 authState.value = AuthState.AUTHENTICATED
             },
             onError: (error) => {
@@ -101,15 +84,9 @@ export const useAuthStore = defineStore('auth', () => {
     const logout = async (): Promise<void> => {
         authState.value = AuthState.LOADING
 
-        // Call logout endpoint if we have a token (don't show error toast if it fails)
-        if (token.value) {
-            await executeApiCall({
-                call: () => api.post('/logout'),
-                onError: (error) => {
-                    console.error('Logout API error:', error)
-                }
-            })
-        }
+        await executeApiCall({
+            call: () => api.post('/logout'),
+        })
         // Clear all authentication state regardless of API response
         await clearAuth(true)
         showSuccess('You have been logged out')
@@ -117,30 +94,37 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Function to initialize authentication state when the app starts
     const initializeAuth = async (): Promise<void> => {
-        // If we have a stored token, try to fetch current user data
-        if (token.value) {
-            authState.value = AuthState.LOADING
+        authState.value = AuthState.LOADING
 
-            const success = await executeApiCall({
+        // First, get the CSRF cookie
+        const fetchedCRSF = await executeApiCall({
+            call: () => api.get('/sanctum/csrf-cookie'),
+            onError: (error) => {
+                console.error('Failed to initialize CSRF cookie:', error)
+            }
+        })
+
+        if (fetchedCRSF) {
+            await executeApiCall({
                 call: () => api.get<AuthenticatedUser>('/user'),
                 onSuccess: (response) => {
-                    user.value = response.data
+                    setUser(response.data)
                     authState.value = AuthState.AUTHENTICATED
+                    console.debug('User session restored')
                 },
-                onError: (error) => {
+                onError: () => {
                     // Token is probably expired or invalid
-                    console.error('Failed to fetch user - token likely expired:', error)
+                    console.warn('No active user session found - likely expired')
                     clearAuth()
                 }
             })
         }
+
         isInitialized.value = true
     }
 
     const clearAuth = async (redirect: boolean = false): Promise<void> => {
         user.value = null
-        token.value = null
-        localStorage.removeItem('auth_token')
         authState.value = AuthState.IDLE
         errorMessage.value = ''
 
@@ -157,7 +141,6 @@ export const useAuthStore = defineStore('auth', () => {
     return {
         // State that components can read
         user,
-        token,
         authState,
         errorMessage,
 

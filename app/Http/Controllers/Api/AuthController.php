@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AuthenticatedUserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request): JsonResponse
+    public function register(Request $request): AuthenticatedUserResource
     {
         $credentials = $request->validate([
             'name'     => 'required|string|max:255',
@@ -23,10 +24,10 @@ class AuthController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return response()->json(Auth::user());
+        return new AuthenticatedUserResource(Auth::user());
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(Request $request): AuthenticatedUserResource
     {
         $credentials = $request->validate([
             'email'    => 'required|email',
@@ -39,12 +40,12 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return response()->json(Auth::user());
+        return new AuthenticatedUserResource(Auth::user());
     }
 
-    public function user(): JsonResponse
+    public function user(): AuthenticatedUserResource
     {
-        return response()->json(Auth::user());
+        return new AuthenticatedUserResource(Auth::user());
     }
 
     public function logout(Request $request): JsonResponse

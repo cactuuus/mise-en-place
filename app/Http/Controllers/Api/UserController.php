@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AuthenticatedUserResource;
+use App\Http\Resources\RecipePreviewCollection;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -13,7 +16,7 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json([
-            'user'            => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
+            'user'            => $user->only(['id', 'name', 'avatar_urls']),
             'followers_count' => $user->followersCount(),
             'following_count' => $user->followingCount(),
             'recipes_count'   => $user->publicRecipes()->count(),
@@ -21,22 +24,22 @@ class UserController extends Controller
         ]);
     }
 
-    public function recipes(User $user): JsonResponse
+    public function recipes(User $user): RecipePreviewCollection
     {
         $recipes = $user
             ->publicRecipes()
-            ->with(['tags'])
+            ->with(['tags:name,type', 'media'])
             ->latest()
             ->paginate(20);
 
-        return response()->json($recipes);
+        return new RecipePreviewCollection($recipes);
     }
 
     public function followers(User $user): JsonResponse
     {
         $followers = $user
             ->followers()
-            ->select(['users.id', 'users.name', 'users.email'])
+            ->select(['users.id', 'users.name'])
             ->paginate(20);
 
         return response()->json($followers);
@@ -46,7 +49,7 @@ class UserController extends Controller
     {
         $following = $user
             ->following()
-            ->select(['users.id', 'users.name', 'users.email'])
+            ->select(['users.id', 'users.name'])
             ->paginate(20);
 
         return response()->json($following);
@@ -80,9 +83,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function uploadAvatar(Request $request): JsonResponse
+    public function uploadAvatar(Request $request): AuthenticatedUserResource
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $request->validate([
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
         ]);
@@ -93,28 +96,22 @@ class UserController extends Controller
             ->usingName('avatar')
             ->toMediaCollection('avatar');
 
-        return response()->json([
-            'message' => 'Avatar uploaded successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
-        ]);
+        return new AuthenticatedUserResource($user);
     }
 
-    public function deleteAvatar(): JsonResponse
+    public function deleteAvatar(): AuthenticatedUserResource
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $user->clearMediaCollection('avatar');
 
-        return response()->json([
-            'message' => 'Avatar removed successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
-        ]);
+        return new AuthenticatedUserResource($user);
     }
 
     public function updatePassword(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
-        $request->validate([
+        $password = $request->validate([
             'current_password' => 'required',
             'new_password'     => 'required|string|min:8|confirmed',
         ]);
@@ -148,9 +145,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateName(Request $request): JsonResponse
+    public function updateName(Request $request): AuthenticatedUserResource
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -158,9 +155,6 @@ class UserController extends Controller
 
         $user->update(['name' => $request->name]);
 
-        return response()->json([
-            'message' => 'Name updated successfully',
-            'user'    => $user->only(['id', 'name', 'email', 'created_at', 'avatar_urls']),
-        ]);
+        return new AuthenticatedUserResource($user);
     }
 }

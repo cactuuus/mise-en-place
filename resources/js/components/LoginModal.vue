@@ -43,6 +43,19 @@
                             {{ $form.password.error.message }}
                         </Message>
 
+                        <div class="remember-container">
+                            <Checkbox
+                                :disabled="authStore.isLoading"
+                                binary
+                                input-id="login-remember"
+                                name="remember_me"
+                                size="small"
+                            />
+                            <label class="remember-label" for="login-remember">
+                                Remember Me
+                            </label>
+                        </div>
+
                         <Message v-if="authStore.errorMessage" severity="error">
                             {{ authStore.errorMessage }}
                         </Message>
@@ -145,11 +158,25 @@
                                  size="small" variant="simple">
                             {{ $form.password_confirmation.error.message }}
                         </Message>
+
+                        <div class="remember-container">
+                            <label class="remember-label" for="register-remember">
+                                Remember Me
+                            </label>
+                            <Checkbox
+                                :disabled="authStore.isLoading"
+                                binary
+                                input-id="register-remember"
+                                name="remember_me"
+                                size="small"
+                            />
+                        </div>
+
+                        <Message v-if="authStore.errorMessage" severity="error">
+                            {{ authStore.errorMessage }}
+                        </Message>
                     </div>
 
-                    <Message v-if="authStore.errorMessage" severity="error">
-                        {{ authStore.errorMessage }}
-                    </Message>
 
                     <div class="button-container">
                         <Button
@@ -190,6 +217,7 @@ import Password from 'primevue/password'
 import Button from 'primevue/button'
 import FloatLabel from 'primevue/floatlabel'
 import Message from 'primevue/message'
+import Checkbox from "primevue/checkbox";
 import {Form} from '@primevue/forms'
 import {z} from 'zod'
 import {zodResolver} from '@primevue/forms/resolvers/zod'
@@ -235,7 +263,7 @@ const handleLogin = async (event: { valid: boolean; states: Record<string, any> 
     }, {} as Record<string, any>)
 
     try {
-        const success = await authStore.login(values.email, values.password)
+        const success = await authStore.login(values.email, values.password, values.remember_me)
         if (success) {
             emit('close')
         }
@@ -258,7 +286,8 @@ const handleRegister = async (event: { valid: boolean; states: Record<string, an
             name: values.name.trim(),
             email: values.email.trim(),
             password: values.password,
-            password_confirmation: values.password_confirmation
+            password_confirmation: values.password_confirmation,
+            remember: values.remember_me,
         })
 
         if (success) {

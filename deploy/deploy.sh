@@ -101,18 +101,16 @@ print_remote "Current commit: \$CURRENT_COMMIT"
 
 # Build Docker image
 print_remote "Building image: mise-$ENVIRONMENT:$IMAGE_TAG"
-docker build -t mise-$ENVIRONMENT:$IMAGE_TAG -f deploy/Dockerfile --build-arg INSTALL_DEV_DEPS=$INSTALL_DEV .
+docker build -t mise-$ENVIRONMENT:$IMAGE_TAG -f deploy/Dockerfile .
 
-# Generate docker-compose.yml with environment substitution
-print_remote "Generating docker-compose.yml..."
-export APP_IMAGE_NAME="mise-$ENVIRONMENT"
-export IMAGE_TAG="$IMAGE_TAG"
-export APP_CONTAINER_NAME="$ENVIRONMENT-mise-app"
-export WORKER_CONTAINER_NAME="$ENVIRONMENT-mise-worker"
-export TRAEFIK_ROUTER_NAME="$ENVIRONMENT-mise"
-export APP_DOMAIN="$DOMAIN"
-
-envsubst < deploy/docker-compose.yml > docker-compose.yml
+# Update docker-compose.server.yml with environment-specific values
+print_remote "Configuring docker-compose.server.yml..."
+sed -i.bak \
+  -e "s/mise-ENVIRONMENT/mise-$ENVIRONMENT/g" \
+  -e "s/ENVIRONMENT-mise/$ENVIRONMENT-mise/g" \
+  -e "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" \
+  -e "s/:latest/:$IMAGE_TAG/g" \
+  docker-compose.server.yml
 
 # Install dependencies
 print_remote "Installing composer dependencies..."
@@ -142,18 +140,18 @@ docker run --rm --env-file .env -v \$PWD:/var/www/html -w /var/www/html mise-$EN
 
 # Deploy containers
 print_remote "Starting containers..."
-docker-compose down
-docker-compose up -d
+docker-compose -f docker-compose.server.yml down
+docker-compose -f docker-compose.server.yml up -d
 
 # Health check
 print_remote "Health check..."
 sleep 10
-if docker-compose ps | grep -q "Up"; then
+if docker-compose -f docker-compose.server.yml ps | grep -q "Up"; then
     print_remote "✅ Deployment successful!"
-    docker-compose ps
+    docker-compose -f docker-compose.server.yml ps
 else
     print_remote "❌ Container startup failed"
-    docker-compose logs
+    docker-compose -f docker-compose.server.yml logs
     exit 1
 fi
 

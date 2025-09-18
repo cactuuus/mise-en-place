@@ -1,0 +1,49 @@
+services:
+  app:
+    image: ${APP_IMAGE_NAME}:${IMAGE_TAG}
+    container_name: ${APP_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_MAX_EXECUTION_TIME=300
+      - PHP_UPLOAD_MAX_FILESIZE=100M
+      - PHP_POST_MAX_SIZE=100M
+      - PHP_OPCACHE_ENABLE=1
+      - PHP_OPCACHE_MEMORY_CONSUMPTION=128
+      - PHP_OPCACHE_MAX_ACCELERATED_FILES=4000
+    volumes:
+      - .:/var/www/html
+      - app_storage:/var/www/html/storage
+    networks:
+      - web_proxy
+      - shared_db_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.rule=Host(\`${APP_DOMAIN}\`)"
+      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.tls.certresolver=lets-encrypt"
+
+  worker:
+    image: ${APP_IMAGE_NAME}:${IMAGE_TAG}
+    container_name: ${WORKER_CONTAINER_NAME}
+    restart: unless-stopped
+    command: php artisan queue:work --verbose --tries=3 --timeout=90
+    env_file: .env
+    environment:
+      - PHP_MEMORY_LIMIT=256M
+      - PHP_MAX_EXECUTION_TIME=300
+    volumes:
+      - .:/var/www/html
+      - app_storage:/var/www/html/storage
+    networks:
+      - shared_db_network
+
+networks:
+  web_proxy:
+    external: true
+  shared_db_network:
+    external: true
+
+volumes:
+  app_storage:

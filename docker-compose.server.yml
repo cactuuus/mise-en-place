@@ -1,7 +1,7 @@
 services:
   app:
-    image: ${APP_IMAGE_NAME}:${IMAGE_TAG}
-    container_name: ${APP_CONTAINER_NAME}
+    image: mise-${APP_ENV}-app:latest
+    container_name: mise-${APP_ENV}-fpm
     restart: unless-stopped
     env_file: .env
     environment:
@@ -20,13 +20,13 @@ services:
       - shared_db_network
     labels:
       - "traefik.enable=true"
-      - 'traefik.http.routers.${TRAEFIK_ROUTER_NAME}.rule=Host(`${APP_DOMAIN}`)'
-      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.tls.certresolver=lets-encrypt"
+      - 'traefik.http.routers.mise-${APP_ENV}-router.rule=Host(`${APP_DOMAIN}`)'
+      - "traefik.http.routers.mise-${APP_ENV}-router.entrypoints=websecure"
+      - "traefik.http.routers.mise-${APP_ENV}-router.tls.certresolver=lets-encrypt"
 
   worker:
-    image: ${APP_IMAGE_NAME}:${IMAGE_TAG}
-    container_name: ${WORKER_CONTAINER_NAME}
+    image: mise-${APP_ENV}-app:latest
+    container_name: mise-${APP_ENV}-worker
     restart: unless-stopped
     command: php artisan queue:work --verbose --tries=3 --timeout=90
     env_file: .env

@@ -27,8 +27,8 @@ RUN apk del .build-deps
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Create user
-RUN addgroup -g 1000 www-data && adduser -u 1000 -G www-data -s /bin/sh -D www-data
+# Create user (www-data group already exists)
+RUN adduser -u 1000 -G www-data -s /bin/sh -D www-data
 
 WORKDIR /var/www/html
 USER www-data

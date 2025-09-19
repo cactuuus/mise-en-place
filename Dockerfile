@@ -15,6 +15,13 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
         pdo_mysql mysqli mbstring exif pcntl bcmath gd zip intl opcache
 
+# Install PECL extensions
+RUN pecl install redis imagick memcached \
+    && docker-php-ext-enable redis imagick memcached
+
+# Remove build dependencies
+RUN apk del .build-deps
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -35,12 +42,14 @@ RUN apk add --no-cache \
     libpng libjpeg-turbo libwebp freetype \
     oniguruma libxml2 libzip \
     imagemagick libmemcached icu-data-full \
-    zlib
+    zlib \
+    redis \
+    imagick \
+    memcached
 
-# Install PHP extensions (from sources, without build-deps)
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        pdo_mysql mysqli mbstring exif pcntl bcmath gd zip intl opcache
+# Copy PHP extensions from the builder stage
+COPY --from=builder /usr/local/lib/php/extensions/no-debug-non-zts-20230831/ /usr/local/lib/php/extensions/no-debug-non-zts-20230831/
+COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 # Copy Composer and the application code from the builder stage
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

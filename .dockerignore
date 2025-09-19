@@ -1,0 +1,12 @@
+.env
+.git
+.gitignore
+.editorconfig
+/vendor
+/node_modules
+/public/hot
+/storage/*.log
+/tests
+/phpunit.xml
+/deploy
+/laradock

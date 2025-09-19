@@ -20,7 +20,7 @@ services:
       - shared_db_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.rule=Host(\`${APP_DOMAIN}\`)"
+      - 'traefik.http.routers.${TRAEFIK_ROUTER_NAME}.rule=Host(`${APP_DOMAIN}`)'
       - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.entrypoints=websecure"
       - "traefik.http.routers.${TRAEFIK_ROUTER_NAME}.tls.certresolver=lets-encrypt"
 

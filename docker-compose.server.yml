@@ -1,6 +1,7 @@
 services:
   app:
     image: mise-${APP_ENV}-app:latest
+    build: .
     container_name: mise-${APP_ENV}-fpm
     restart: unless-stopped
     env_file: .env
@@ -25,6 +26,7 @@ services:
 
   worker:
     image: mise-${APP_ENV}-app:latest
+    build: .
     container_name: mise-${APP_ENV}-worker
     restart: unless-stopped
     command: php artisan queue:work --verbose --tries=3 --timeout=90

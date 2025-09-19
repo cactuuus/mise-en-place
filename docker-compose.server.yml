@@ -13,7 +13,6 @@ services:
       - PHP_OPCACHE_MEMORY_CONSUMPTION=128
       - PHP_OPCACHE_MAX_ACCELERATED_FILES=4000
     volumes:
-      - .:/var/www/html
       - app_storage:/var/www/html/storage
     networks:
       - web_proxy
@@ -34,7 +33,6 @@ services:
       - PHP_MEMORY_LIMIT=256M
       - PHP_MAX_EXECUTION_TIME=300
     volumes:
-      - .:/var/www/html
       - app_storage:/var/www/html/storage
     networks:
       - shared_db_network

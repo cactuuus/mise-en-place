@@ -7,6 +7,7 @@ RUN apk add --no-cache \
     libpng-dev libjpeg-turbo-dev libwebp-dev freetype-dev \
     oniguruma-dev libxml2-dev libzip-dev \
     imagemagick-dev libmemcached-dev icu-dev \
+    zlib-dev \
     $PHPIZE_DEPS
 
 # Install PHP extensions
@@ -33,7 +34,8 @@ FROM php:8.3-fpm-alpine
 RUN apk add --no-cache \
     libpng libjpeg-turbo libwebp freetype \
     oniguruma libxml2 libzip \
-    imagemagick libmemcached icu-data-full
+    imagemagick libmemcached icu-data-full \
+    zlib
 
 # Install PHP extensions (from sources, without build-deps)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \

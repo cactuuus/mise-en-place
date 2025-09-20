@@ -2,8 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
-use DutchCodingCompany\FilamentSocialite\Provider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,7 +27,6 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration()
             ->spa()
             ->topNavigation()
             ->colors([
@@ -55,16 +52,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->plugins([
-                FilamentSocialitePlugin::make()
-                    ->registration()
-                    ->providers([
-                        Provider::make('google')
-                            ->label('Google')
-                            ->icon('tabler-brand-google-filled')
-                            ->color('primary'),
-                    ]),
             ]);
     }
 }

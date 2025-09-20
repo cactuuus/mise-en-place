@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\Roles;
 use App\Traits\HasCachedMediaUrls;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -16,10 +17,11 @@ use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasMedia
 {
-    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasCachedMediaUrls;
+    use HasFactory, Notifiable, HasApiTokens, InteractsWithMedia, HasCachedMediaUrls, HasRoles;
 
     private static array $AVATAR_SIZES = [
         'small' => 100,
@@ -121,14 +123,18 @@ class User extends Authenticatable implements FilamentUser, HasMedia
         return $this->followers()->count();
     }
 
-    public function canAccessPanel(Panel $panel): bool
-    {
-        // for now we only have a single panel, accessible for all users
-        return true;
-    }
-
     public function getAvatarUrlsAttribute(): array
     {
         return $this->getCachedMediaUrls('avatar', self::$AVATAR_SIZES);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole(Roles::Admin);
     }
 }

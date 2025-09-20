@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,12 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create roles first
+        $this->call(RoleSeeder::class);
+
         // Create all users first (including test user)
         $this->call(UserSeeder::class);
-        
+
         // Create tags before recipes so we can attach them
         $this->call(TagSeeder::class);
-        
+
         // Then create recipes, ratings, and follows for those users
         $this->call(RecipeSeeder::class);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Agents;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 use NeuronAI\Agent;
 use NeuronAI\Chat\Messages\UserMessage;
@@ -35,7 +36,7 @@ class RecipeExtractorAgent extends Agent
         $data = json_decode($cleanResponse, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Failed to parse recipe data from AI response');
+            throw new Exception('Failed to parse recipe data from AI response');
         }
 
         Log::info("AI successfully processed recipe", [

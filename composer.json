@@ -19,6 +19,7 @@
         "mokhosh/filament-rating": "^2.0",
         "secondnetwork/blade-tabler-icons": "^3.34",
         "spatie/laravel-medialibrary": "^11.13",
+        "spatie/laravel-permission": "^6.21",
         "spatie/laravel-tags": "^4.10"
     },
     "require-dev": {

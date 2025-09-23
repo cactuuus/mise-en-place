@@ -1,7 +1,6 @@
 services:
   app:
-    image: mise-${APP_ENV}-app:latest
-    build: ..
+    image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
     container_name: mise-${APP_ENV}-fpm
     restart: unless-stopped
     user: www-data
@@ -31,8 +30,7 @@ services:
       - "traefik.http.routers.mise-${APP_ENV}-router.entrypoints=websecure"
 
   worker:
-    image: mise-${APP_ENV}-app:latest
-    build: ..
+    image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
     container_name: mise-${APP_ENV}-worker
     restart: unless-stopped
     user: www-data

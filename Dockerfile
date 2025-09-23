@@ -1,5 +1,6 @@
 FROM jkaninda/laravel-php-fpm:8.4-alpine
 
+ARG APP_ENV=staging
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install missing extensions including GD with image libraries
@@ -20,8 +21,12 @@ RUN apk add --no-cache --virtual .build-deps \
 COPY . /var/www/html
 WORKDIR /var/www/html
 
-# Install dependencies and build assets
-RUN composer install --optimize-autoloader --no-interaction --prefer-dist \
+# Install dependencies based on environment
+RUN if [ "$APP_ENV" = "staging" ]; then \
+      composer install --optimize-autoloader --no-interaction --prefer-dist; \
+    else \
+      composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist; \
+    fi \
     && if [ -f "package.json" ]; then npm ci && npm run build && npm cache clean --force; fi \
     && rm -rf node_modules package*.json vite.config.js resources/js resources/css
 

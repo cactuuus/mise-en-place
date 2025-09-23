@@ -1,41 +1,48 @@
 services:
   app:
     image: mise-${APP_ENV}-app:latest
-    build: .
+    build: ..
     container_name: mise-${APP_ENV}-fpm
     restart: unless-stopped
+    user: www-data
     env_file: .env
-    environment:
-      - PHP_MEMORY_LIMIT=256M
-      - PHP_MAX_EXECUTION_TIME=300
-      - PHP_UPLOAD_MAX_FILESIZE=100M
-      - PHP_POST_MAX_SIZE=100M
-      - PHP_OPCACHE_ENABLE=1
-      - PHP_OPCACHE_MEMORY_CONSUMPTION=128
-      - PHP_OPCACHE_MAX_ACCELERATED_FILES=4000
     volumes:
       - app_storage:/var/www/html/storage
+      - app_public:/var/www/html/public
     networks:
       - web_proxy
       - shared_db_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: mise-${APP_ENV}-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - app_storage:/var/www/html/storage
+      - app_public:/var/www/html/public
+    networks:
+      - web_proxy
     labels:
       - "traefik.enable=true"
-      - 'traefik.http.routers.mise-${APP_ENV}-router.rule=Host(`${APP_DOMAIN}`)'
+      - "traefik.http.routers.mise-${APP_ENV}-router.rule=Host(`new-${APP_DOMAIN}`)"
       - "traefik.http.routers.mise-${APP_ENV}-router.entrypoints=websecure"
-      - "traefik.http.routers.mise-${APP_ENV}-router.tls.certresolver=lets-encrypt"
 
   worker:
     image: mise-${APP_ENV}-app:latest
-    build: .
+    build: ..
     container_name: mise-${APP_ENV}-worker
     restart: unless-stopped
+    user: www-data
+    depends_on:
+      - app
     command: php artisan queue:work --verbose --tries=3 --timeout=90
     env_file: .env
-    environment:
-      - PHP_MEMORY_LIMIT=256M
-      - PHP_MAX_EXECUTION_TIME=300
     volumes:
       - app_storage:/var/www/html/storage
+      - app_public:/var/www/html/public
     networks:
       - shared_db_network
 
@@ -47,3 +54,4 @@ networks:
 
 volumes:
   app_storage:
+  app_public:

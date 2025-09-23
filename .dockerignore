@@ -13,7 +13,13 @@ README.md
 /node_modules
 /public/hot
 /server
-/storage
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/debugbar
+/storage/media-library
+/storage/app/temp/*
 /tests
 /vendor
 

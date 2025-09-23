@@ -3,8 +3,6 @@ source ../server/print_utils.sh
 source config.env
 set -e
 
-print_status "Building image locally..."
-
 APP_ENV=${1}
 IMAGE_NAME=mise-$APP_ENV
 IMAGE_TAG=$(git rev-parse --short HEAD)

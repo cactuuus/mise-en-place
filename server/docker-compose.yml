@@ -1,0 +1,65 @@
+services:
+    app:
+        image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
+        container_name: mise-${APP_ENV}-fpm
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+        user: www-data
+        env_file: .env
+        volumes:
+            - app_storage:/var/www/html/storage
+            - app_public:/var/www/html/public
+        networks:
+            - web_proxy
+            - shared_db_network
+
+    nginx:
+        image: nginx:alpine
+        container_name: mise-${APP_ENV}-nginx
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 32M
+        environment:
+            - FPM_HOST=mise-${APP_ENV}-fpm
+        depends_on:
+            - app
+        volumes:
+            - ./nginx.template.conf:/etc/nginx/templates/default.conf.template:ro
+            - app_storage:/var/www/html/storage
+            - app_public:/var/www/html/public
+        networks:
+            - web_proxy
+
+    worker:
+        image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
+        container_name: mise-${APP_ENV}-worker
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+        user: www-data
+        depends_on:
+            - app
+        command: php artisan queue:work --verbose --tries=3 --timeout=90
+        env_file: .env
+        volumes:
+            - app_storage:/var/www/html/storage
+            - app_public:/var/www/html/public
+        networks:
+            - shared_db_network
+
+networks:
+    web_proxy:
+        external: true
+    shared_db_network:
+        external: true
+
+volumes:
+    app_storage:
+    app_public:

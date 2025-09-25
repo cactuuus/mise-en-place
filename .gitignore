@@ -1,8 +1,9 @@
 *.log
 .DS_Store
 .env
-.env.backup
-.env.production
+/deploy/config.env
+/server/.env.staging
+/server/.env.production
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,4 +23,3 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-/laradock/

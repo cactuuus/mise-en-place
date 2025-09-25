@@ -20,11 +20,11 @@ fi
 
 # Check if folder exists on remote
 if ssh ${SERVER_USER}@${SERVER_HOST} "[ -d ${APP_PATH} ]"; then
-    print_warning "WARNING: ${APP_PATH} already exists on ${SERVER_HOST}"
+    print_warning "🚨 ${APP_PATH} already exists on ${SERVER_HOST} 🚨"
     read -p "Do you want to continue and overwrite files? (y/n): " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Aborted."
+        print_error "Aborted"
         exit 0
     fi
 fi

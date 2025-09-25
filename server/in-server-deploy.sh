@@ -22,4 +22,4 @@ docker compose exec app php artisan optimize
 print_info "Cleaning up old images"
 docker image prune -f
 
-print_status "Deployment successfull"
+print_status "Deployment successful"

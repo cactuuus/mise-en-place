@@ -3,6 +3,10 @@ services:
         image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
         container_name: mise-${APP_ENV}-fpm
         restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
         user: www-data
         env_file: .env
         volumes:
@@ -16,6 +20,10 @@ services:
         image: nginx:alpine
         container_name: mise-${APP_ENV}-nginx
         restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 32M
         environment:
             - FPM_HOST=mise-${APP_ENV}-fpm
         depends_on:
@@ -31,6 +39,10 @@ services:
         image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest
         container_name: mise-${APP_ENV}-worker
         restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
         user: www-data
         depends_on:
             - app

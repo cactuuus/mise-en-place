@@ -26,10 +26,6 @@ services:
             - app_public:/var/www/html/public
         networks:
             - web_proxy
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.mise-${APP_ENV}-router.rule=Host(`${APP_DOMAIN}`)"
-            - "traefik.http.routers.mise-${APP_ENV}-router.entrypoints=websecure"
 
     worker:
         image: ghcr.io/${GITHUB_USERNAME}/mise-${APP_ENV}:latest

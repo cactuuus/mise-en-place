@@ -1,6 +1,5 @@
-FROM jkaninda/laravel-php-fpm:8.4-alpine
+FROM jkaninda/laravel-php-fpm:8.4-alpine AS base
 
-ARG APP_ENV=staging
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install missing extensions including GD with image libraries
@@ -17,19 +16,47 @@ RUN apk add --no-cache --virtual .build-deps \
     && apk del .build-deps \
     && apk add --no-cache icu libzip jpeg libpng libwebp freetype npm
 
-# Copy Laravel project files
-COPY . /var/www/html
 WORKDIR /var/www/html
 
-# Install dependencies based on environment
-RUN if [ "$APP_ENV" = "staging" ]; then \
-      composer install --optimize-autoloader --no-interaction --prefer-dist; \
-    else \
-      composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist; \
-    fi \
-    && if [ -f "package.json" ]; then npm ci && npm run build && npm cache clean --force; fi \
-    && rm -rf node_modules package*.json vite.config.js resources/js resources/css
+# Staging dependencies stage
+FROM base AS staging-deps
+COPY composer.json composer.lock ./
+RUN composer install --no-scripts --optimize-autoloader --no-interaction --prefer-dist
 
+# Production dependencies stage
+FROM base AS production-deps
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist
+
+# Asset building stage
+FROM node:22-alpine AS assets
+WORKDIR /var/www/html
+COPY package*.json ./
+RUN npm ci
+COPY resources/ resources/
+COPY vite.config.js ./
+RUN npm run build && npm cache clean --force
+
+# Final staging image
+FROM base AS staging
+WORKDIR /var/www/html
+COPY --from=staging-deps /var/www/html/vendor /var/www/html/vendor
+COPY --from=assets /var/www/html/public/build ./public/build
+COPY . .
+RUN composer run-script post-autoload-dump \
+    && rm -rf node_modules package*.json vite.config.js resources/js resources/css
+USER www-data
+EXPOSE 9000
+CMD ["php-fpm"]
+
+# Final production image
+FROM base AS production
+WORKDIR /var/www/html
+COPY --from=production-deps /var/www/html/vendor /var/www/html/vendor
+COPY --from=assets /var/www/html/public/build ./public/build
+COPY . .
+RUN composer run-script post-autoload-dump \
+    && rm -rf node_modules package*.json vite.config.js resources/js resources/css
 USER www-data
 EXPOSE 9000
 CMD ["php-fpm"]

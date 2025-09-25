@@ -4,6 +4,7 @@ source config.env
 set -e
 
 APP_ENV=${1}
+CACHE_OPTION=${2:-""}
 IMAGE_NAME=mise-$APP_ENV
 IMAGE_TAG=$(git rev-parse --short HEAD)
 
@@ -28,8 +29,8 @@ else
     DOMAIN="$STAGING_DOMAIN"
 fi
 
-print_info "Building $APP_ENV image locally..."
-docker build --build-arg APP_ENV=$APP_ENV -t ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ../
+print_info "Building $APP_ENV image locally $CACHE_OPTION..."
+docker build --target $APP_ENV $CACHE_OPTION -t ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ../
 docker tag ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG} ghcr.io/${GITHUB_USERNAME}/${IMAGE_NAME}:latest
 
 print_info "Pushing to GitHub Container Registry..."

@@ -18,6 +18,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "mokhosh/filament-rating": "^2.0",
         "secondnetwork/blade-tabler-icons": "^3.34",
+        "spatie/laravel-backup": "^9.3",
         "spatie/laravel-medialibrary": "^11.13",
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-tags": "^4.10"

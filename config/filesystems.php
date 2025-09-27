@@ -68,7 +68,6 @@ return [
             'bucket'                  => env('R2_BUCKET'),
             'endpoint'                => env('R2_ENDPOINT'),
             'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
-            'root'                    => env('APP_ENV', ''),
             'throw'                   => false,
             'report'                  => false,
         ],

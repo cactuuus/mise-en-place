@@ -90,7 +90,6 @@ class UserController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
         ]);
 
-        $user->clearMediaCollection('avatar');
         $user
             ->addMediaFromRequest('avatar')
             ->usingName('avatar')

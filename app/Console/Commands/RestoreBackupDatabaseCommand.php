@@ -233,7 +233,7 @@ class RestoreBackupDatabaseCommand extends Command
         return $sqlFile;
     }
 
-    private function clearDatabase()
+    private function clearDatabase(): void
     {
         if (app()->environment('production')) {
             if ( ! $this->confirm('You are in PRODUCTION. Are you absolutely sure you want to clear the database?')) {
@@ -244,18 +244,18 @@ class RestoreBackupDatabaseCommand extends Command
         Artisan::call('migrate:fresh', ['--force' => true]);
     }
 
-    private function restoreDatabase($sqlFile)
+    private function restoreDatabase($sqlFile): void
     {
         $database = config('database.connections.'.config('database.default'));
 
         $command = sprintf(
-            'mysql -h %s -P %s -u %s -p%s %s < %s',
-            $database['host'],
-            $database['port'],
-            $database['username'],
-            $database['password'],
-            $database['database'],
-            $sqlFile,
+            'MYSQL_PWD=%s mariadb -h %s -P %s -u %s --ssl=0 %s < %s',
+            escapeshellarg($database['password']),
+            escapeshellarg($database['host']),
+            escapeshellarg($database['port']),
+            escapeshellarg($database['username']),
+            escapeshellarg($database['database']),
+            escapeshellarg($sqlFile),
         );
 
         $output = shell_exec($command.' 2>&1');
@@ -265,7 +265,7 @@ class RestoreBackupDatabaseCommand extends Command
         }
     }
 
-    private function cleanup($zipPath, $sqlFile)
+    private function cleanup($zipPath, $sqlFile): void
     {
         // Remove downloaded zip
         if (file_exists($zipPath)) {
@@ -279,7 +279,7 @@ class RestoreBackupDatabaseCommand extends Command
         }
     }
 
-    private function deleteDirectory($dir)
+    private function deleteDirectory($dir): bool
     {
         if ( ! is_dir($dir)) {
             return false;

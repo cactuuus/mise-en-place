@@ -221,15 +221,16 @@ class RestoreBackupDatabaseCommand extends Command
 
         $databaseName   = config('database.connections.'.config('database.default').'.database');
         $backupFilename = "mysql-{$databaseName}.sql";
-        $sqlFiles       = glob($extractPath."**/".$backupFilename, GLOB_BRACE);
+        $sqlFile        = $extractPath."db-dumps/".$backupFilename;
 
-        if (empty($sqlFiles)) {
+        if ( ! file_exists($sqlFile)) {
             throw new \Exception(
-                "No SQL file matching '{$backupFilename}' found in the backup.
-                Try inspecting the files in backup, restore it manually if needed.");
+                "No SQL file matching '{$backupFilename}' found in db-dumps folder.
+                Try inspecting the files in backup, restore it manually if needed.",
+            );
         }
 
-        return $sqlFiles[0];
+        return $sqlFile;
     }
 
     private function clearDatabase()

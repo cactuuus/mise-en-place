@@ -150,7 +150,6 @@ class RecipeController extends Controller
         $recipe->update($validated);
 
         if ($request->hasFile('image')) {
-            $recipe->clearMediaCollection('recipe-images');
             $recipe
                 ->addMediaFromRequest('image')
                 ->usingName($recipe->title)

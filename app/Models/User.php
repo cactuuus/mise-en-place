@@ -48,18 +48,23 @@ class User extends Authenticatable implements FilamentUser, HasMedia
         'avatar_urls',
     ];
 
-    public function registerMediaConversions(?Media $media = null): void
+    public function registerMediaCollections(): void
     {
-        foreach (self::$AVATAR_SIZES as $name => $size) {
-            $this
-                ->addMediaConversion($name)
-                ->fit(Fit::Max, $size, $size)
-                ->format('webp')
-                ->optimize()
-                ->quality(90)
-                ->performOnCollections('avatar')
-                ->queued();
-        }
+        $this
+            ->addMediaCollection('avatar')
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                foreach (self::$AVATAR_SIZES as $name => $size) {
+                    $this
+                        ->addMediaConversion($name)
+                        ->fit(Fit::Max, $size, $size)
+                        ->format('webp')
+                        ->optimize()
+                        ->quality(90)
+                        ->performOnCollections('avatar')
+                        ->queued();
+                }
+            });
     }
 
     public function ratings(): HasMany

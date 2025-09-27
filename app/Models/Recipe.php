@@ -63,17 +63,22 @@ class Recipe extends Model implements HasMedia
         });
     }
 
-    public function registerMediaConversions(?Media $media = null): void
+    public function registerMediaCollections(): void
     {
-        foreach (self::$IMAGE_SIZES as $name => $size) {
-            $this
-                ->addMediaConversion($name)
-                ->fit(Fit::Max, $size, $size)
-                ->format('webp')
-                ->optimize()
-                ->quality(90)
-                ->queued();
-        }
+        $this
+            ->addMediaCollection('recipe-images')
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                foreach (self::$IMAGE_SIZES as $name => $size) {
+                    $this
+                        ->addMediaConversion($name)
+                        ->fit(Fit::Max, $size, $size)
+                        ->format('webp')
+                        ->optimize()
+                        ->quality(90)
+                        ->queued();
+                }
+            });
     }
 
     public function user(): BelongsTo

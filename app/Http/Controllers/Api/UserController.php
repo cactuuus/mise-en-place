@@ -90,7 +90,6 @@ class UserController extends Controller
             'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
         ]);
 
-        $user->clearMediaCollection('avatar');
         $user
             ->addMediaFromRequest('avatar')
             ->usingName('avatar')
@@ -111,12 +110,12 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        $password = $request->validate([
+        $validated = $request->validate([
             'current_password' => 'required',
             'new_password'     => 'required|string|min:8|confirmed',
         ]);
 
-        if ( ! Hash::check($request->current_password, $user->password)) {
+        if ( ! Hash::check($validated->current_password, $user->password)) {
             return response()->json([
                 'message' => 'Current password is incorrect',
                 'errors'  => [
@@ -126,7 +125,7 @@ class UserController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password' => Hash::make($validated->new_password),
         ]);
 
         return response()->json([

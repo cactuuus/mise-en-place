@@ -14,7 +14,7 @@ RUN apk add --no-cache --virtual .build-deps \
     && docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
     && docker-php-ext-install intl zip exif gd \
     && apk del .build-deps \
-    && apk add --no-cache icu libzip jpeg libpng libwebp freetype npm
+    && apk add --no-cache icu libzip jpeg libpng libwebp freetype npm mariadb-client mariadb-connector-c
 
 WORKDIR /var/www/html
 

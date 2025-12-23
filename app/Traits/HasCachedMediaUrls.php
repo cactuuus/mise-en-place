@@ -24,16 +24,23 @@ trait HasCachedMediaUrls
             $urls = array_fill_keys(array_keys($sizes), null);
         } else {
             $media = $this->getFirstMedia($collection);
+            $baseUrl = $media->getTemporaryUrl(now()->addDays(6));
 
             $urls = Cache::remember(
                 "{$collection}_urls_{$media->id}",
-                now()->addMinutes(30),
+                now()->addDays(6),
                 fn() => collect($sizes)->mapWithKeys(fn($size, $name)
-                    => [$name => $media->getTemporaryUrl(now()->addHour(), $name)],
+                    => [$name => $this->buildCloudflareUrl($baseUrl, $size)],
                 )->toArray(),
             );
         }
 
         return $this->mediaUrlsCache[$cacheKey] = $urls;
+    }
+
+    private function buildCloudflareUrl(string $baseUrl, int $width): string
+    {
+        $domain = config('app.url');
+        return "https://{$domain}/cdn-cgi/image/width={$width}/{$baseUrl}";
     }
 }

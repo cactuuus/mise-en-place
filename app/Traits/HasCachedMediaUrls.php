@@ -41,6 +41,6 @@ trait HasCachedMediaUrls
     private function buildCloudflareUrl(string $baseUrl, int $width): string
     {
         $domain = config('app.url');
-        return "https://{$domain}/cdn-cgi/image/width={$width}/{$baseUrl}";
+        return "{$domain}/cdn-cgi/image/width={$width}/{$baseUrl}";
     }
 }

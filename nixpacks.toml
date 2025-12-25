@@ -10,7 +10,6 @@ cmds = [
 
 [phases.build]
 cmds = [
-    "php artisan optimize:clear",
     "touch database/database.sqlite",
     "chmod -R 775 storage bootstrap/cache",
     "mkdir -p /etc/supervisor/conf.d/",

@@ -25,8 +25,7 @@ class UsersTable
                     ->imageSize(50)
                     ->visibility('private')
                     ->defaultImageUrl(asset('images/avatar-placeholder.svg'))
-                    ->collection('avatar')
-                    ->conversion('small'),
+                    ->collection('avatar'),
 
                 TextColumn::make('name')
                     ->searchable()

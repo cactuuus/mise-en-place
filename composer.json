@@ -9,7 +9,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "ext-zip": "*",
         "filament/filament": "^4.0",
         "filament/infolists": "^4.0",

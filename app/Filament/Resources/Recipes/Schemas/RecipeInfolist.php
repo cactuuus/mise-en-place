@@ -27,7 +27,6 @@ class RecipeInfolist
                             ->visibility('private')
                             ->defaultImageUrl(asset('images/recipe-placeholder.svg'))
                             ->collection('recipe-images')
-                            ->conversion('large')
                             ->columnSpan(1),
 
                         Group::make()

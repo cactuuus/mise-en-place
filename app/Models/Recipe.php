@@ -65,20 +65,7 @@ class Recipe extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this
-            ->addMediaCollection('recipe-images')
-            ->singleFile()
-            ->registerMediaConversions(function (Media $media) {
-                foreach (self::$IMAGE_SIZES as $name => $size) {
-                    $this
-                        ->addMediaConversion($name)
-                        ->fit(Fit::Max, $size, $size)
-                        ->format('webp')
-                        ->optimize()
-                        ->quality(90)
-                        ->queued();
-                }
-            });
+        $this->addMediaCollection('recipe-images')->singleFile();
     }
 
     public function user(): BelongsTo

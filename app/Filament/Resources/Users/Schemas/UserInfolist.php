@@ -21,8 +21,7 @@ class UserInfolist
                                     ->circular()
                                     ->visibility('private')
                                     ->defaultImageUrl(asset('images/avatar-placeholder.svg'))
-                                    ->collection('avatar')
-                                    ->conversion('large'),
+                                    ->collection('avatar'),
                                 Schemas\Components\Grid::make(3)
                                     ->schema([
                                         Components\TextEntry::make('name')

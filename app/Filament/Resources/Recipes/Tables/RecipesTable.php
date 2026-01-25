@@ -42,8 +42,7 @@ class RecipesTable
                     ->extraAttributes(['class' => 'rounded-lg'])
                     ->defaultImageUrl(asset('images/recipe-placeholder.svg'))
                     ->tooltip('Recipe photo')
-                    ->collection('recipe-images')
-                    ->conversion('small'),
+                    ->collection('recipe-images'),
 
                 TextColumn::make('title')
                     ->label(false)

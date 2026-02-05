@@ -17,9 +17,14 @@
 /public/build
 /public/hot
 /public/storage
+/public/css
+/public/js
+/public/fonts
 /storage/*.key
 /storage/pail
 /vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
+*.sqlite
+*.sqlite-journal

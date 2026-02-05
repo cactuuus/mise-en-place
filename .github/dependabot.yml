@@ -5,14 +5,28 @@
 
 version: 2
 updates:
-  # Composer dependencies
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "php"
+    groups:
+      php-deps:
+        patterns:
+          - "*"
 
-  # NPM dependencies
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "javascript"
+    groups:
+      js-deps:
+        patterns:
+          - "*"

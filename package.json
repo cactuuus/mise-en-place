@@ -9,28 +9,28 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/typography": "^0.5.16",
-        "@types/node": "^25.2.0",
-        "autoprefixer": "^10.4.21",
-        "axios": "^1.11.0",
+        "@types/node": "^25.3.3",
+        "autoprefixer": "^10.4.27",
+        "axios": "^1.13.6",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.5.6",
         "sass": "^1.90.0",
-        "tailwindcss": "^4.1.18",
+        "tailwindcss": "^4.2.1",
         "typescript": "^5.9.2",
         "vite": "^7.0.4",
-        "vue-tsc": "^3.0.5"
+        "vue-tsc": "^3.2.5"
     },
     "dependencies": {
         "@primevue/forms": "^4.3.7",
         "@primevue/themes": "^4.3.7",
         "@vitejs/plugin-vue": "^6.0.1",
-        "@vueuse/core": "^14.2.0",
+        "@vueuse/core": "^14.2.1",
         "pinia": "^3.0.3",
         "primeicons": "^7.0.0",
         "primevue": "^4.3.7",
-        "vue": "^3.5.18",
-        "vue-router": "^5.0.2",
+        "vue": "^3.5.29",
+        "vue-router": "^5.0.3",
         "vuedraggable": "^4.1.0",
         "zod": "^4.0.17"
     }
